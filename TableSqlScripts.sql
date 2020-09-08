@@ -85,7 +85,7 @@ Resturant_ID INT NOT NULL,
 Name VARCHAR(50) NOT NULL,
 Main_Ingredients VARCHAR(100) NOT NULL,
 Price DECIMAL(4,2) NOT NULL,
-Cuisine_ID INT NOT NULL,
+Cuisine_ID INT,
 Description VARCHAR(100),
 Image_URL VARCHAR(100)
 );
@@ -96,7 +96,7 @@ Resturant_ID INT NOT NULL,
 Name VARCHAR(50) NOT NULL,
 Main_Ingredients VARCHAR(100) NOT NULL,
 Price DECIMAL(4,2) NOT NULL,
-Cuisine_ID INT NOT NULL,
+Cuisine_ID INT,
 Description VARCHAR(100),
 Image_URL VARCHAR(100)
 );
@@ -107,7 +107,7 @@ Resturant_ID INT NOT NULL,
 Name VARCHAR(50) NOT NULL,
 Main_Ingredients VARCHAR(100) NOT NULL,
 Price DECIMAL(4,2) NOT NULL,
-Cuisine_ID INT NOT NULL,
+Cuisine_ID INT,
 Description VARCHAR(100),
 Image_URL VARCHAR(100)
 );
@@ -118,7 +118,7 @@ Resturant_ID INT NOT NULL,
 Name VARCHAR(50) NOT NULL,
 Main_Ingredients VARCHAR(100) NOT NULL,
 Price DECIMAL(4,2) NOT NULL,
-Cuisine_ID INT NOT NULL,
+Cuisine_ID INT,
 Description VARCHAR(100),
 Image_URL VARCHAR(100)
 );
@@ -129,7 +129,7 @@ Resturant_ID INT NOT NULL,
 Name VARCHAR(50) NOT NULL,
 Main_Ingredients VARCHAR(100) NOT NULL,
 Price DECIMAL(4,2) NOT NULL,
-Cuisine_ID INT NOT NULL,
+Cuisine_ID INT,
 Description VARCHAR(100),
 Image_URL VARCHAR(100)
 );
