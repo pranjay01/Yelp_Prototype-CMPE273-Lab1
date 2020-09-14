@@ -50,8 +50,8 @@ CREATE TABLE SIGNUP
 (
 ID INT NOT NULL,
 Email VARCHAR(50) NOT NULL UNIQUE,
-Password VARCHAR(20) NOT NULL,
-Persona	ENUM('Customer','Restaurant') NOT NULL
+Password VARCHAR(100) NOT NULL,
+Role ENUM('Customer','Restaurant') NOT NULL
 );
 
 
