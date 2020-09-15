@@ -1,14 +1,14 @@
 "use strict";
 const mysqlConnection = require("../mysqlConnection");
-// const mysql = require("mysql");
+require("dotenv").config();
 const bcrypt = require("bcrypt");
+//2 is for enum value restauarnt
 
 let checkEmailExists = async (email) => {
-  const verifyEmailExist = "CALL getEmail(?)";
+  const verifyEmailExist = "CALL getEmail(?,?)";
 
   let connection = await mysqlConnection();
-  // console.log("Connection var :", connection);
-  let [results, fields] = await connection.query(verifyEmailExist, email);
+  let [results, fields] = await connection.query(verifyEmailExist, [email, 2]);
 
   connection.end();
   console.log(results);
@@ -19,7 +19,6 @@ let checkEmailExists = async (email) => {
   }
 };
 
-// class restaurant {
 let signup = async (restaurant, response) => {
   let {
     Email,
@@ -40,7 +39,6 @@ let signup = async (restaurant, response) => {
       const signupQuery = "CALL resturantSignup(?,?,?,?,?,?,?,?,?,?)";
 
       let connection = await mysqlConnection();
-      // console.log("Connection var :", connection);
       let { _results } = await connection.query(signupQuery, [
         Email,
         hashedPassword,
@@ -58,14 +56,12 @@ let signup = async (restaurant, response) => {
       response.writeHead(200, {
         "Content-Type": "text/plain",
       });
-      // return response.status(401, "Email Already Exists");
       response.end("User Created");
       return response;
     } catch (error) {
       response.writeHead(500, {
         "Content-Type": "text/plain",
       });
-      // return response.status(401, "Email Already Exists");
       response.end("Network error");
       return response;
     }
@@ -73,7 +69,6 @@ let signup = async (restaurant, response) => {
     response.writeHead(401, {
       "Content-Type": "text/plain",
     });
-    // return response.status(401, "Email Already Exists");
     response.end("Email Already Exists");
     return response;
   }
