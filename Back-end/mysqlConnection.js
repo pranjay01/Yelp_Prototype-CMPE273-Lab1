@@ -1,13 +1,22 @@
-if (process.env.NODE_ENV !== "production") {
-  require("dotenv").config();
+if (process.env.NODE_ENV !== 'production') {
+  // eslint-disable-next-line global-require
+  require('dotenv').config();
 }
-const mysql = require("mysql2/promise");
+const mysql = require('mysql2/promise');
 
+/** Local DB */
 const host = process.env.MYSQL_HOST;
 const user = process.env.MYSQL_USER;
 const password = process.env.MYSQL_PASSWORD;
 const db = process.env.MYSQL_DB;
 const port = process.env.MYSQL_PORT;
+
+/* RDBMS */
+// const host = process.env.MYSQL_HOST_RDS;
+// const user = process.env.MYSQL_USER_RDS;
+// const password = process.env.MYSQL_PASSWORD_RDS;
+// const db = process.env.MYSQL_DB_RDS;
+// const port = process.env.MYSQL_PORT_RDS;
 
 // var mysqlConnection = async () => {
 //   return mysql.createConnection({
@@ -20,14 +29,14 @@ const port = process.env.MYSQL_PORT;
 //   });
 // };
 
-var mysqlConnection = async () => {
+const mysqlConnection = async () => {
   return mysql.createConnection({
-    host: host,
-    user: user,
-    password: password,
+    host,
+    user,
+    password,
     database: db,
     multipleStatements: true,
-    port: port,
+    port,
   });
 };
 
