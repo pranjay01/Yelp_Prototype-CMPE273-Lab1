@@ -1,7 +1,9 @@
 /* eslint-disable no-console */
 const express = require('express');
 
-const { signup, login } = require('../restaurant/restaurantProfile');
+const signup = require('../restaurant/restaurantProfile');
+
+const login = require('../common/loginLogout');
 
 const Router = express.Router();
 

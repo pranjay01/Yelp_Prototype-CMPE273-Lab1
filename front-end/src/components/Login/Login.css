@@ -1,0 +1,39 @@
+.content-container {
+  width: 960px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+.main-content-wrap--full > .content-container {
+  padding-top: 15px;
+  padding-bottom: 36px;
+}
+
+#super-container {
+  min-height: 720px;
+}
+
+.layout-block {
+  margin: 0 -15px;
+}
+
+.main-content-wrap {
+  min-width: 1020px;
+}
+
+.main-content-wrap--full {
+  background: white;
+}
+
+.layout-h .column {
+  float: left;
+  padding: 0 15px;
+  min-height: 1px;
+  box-sizing: border-box;
+  width: 50%;
+}
+
+.signup-wrapper {
+  padding: 30px;
+  overflow: hidden;
+}
