@@ -7,6 +7,7 @@ const bodyParser = require('body-parser');
 // const mysqlConnection = require("./mysqlConnection");
 const bizProfile = require('./routes/bizProfileRoutes');
 const custProfile = require('./routes/customerProfileRoutes');
+const staticTabbles = require('./routes/staticTableRoutes');
 // const customerRoutes = require("./routes/cus");
 
 const app = express();
@@ -37,5 +38,5 @@ app.use(function (req, res, next) {
 
 app.use('/biz', bizProfile);
 app.use('/customer', custProfile);
-
+app.use('/static', staticTabbles);
 app.listen(3001);

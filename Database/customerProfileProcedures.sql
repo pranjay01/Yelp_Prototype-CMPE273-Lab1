@@ -1,4 +1,7 @@
 -- Restaurant signup
+drop procedure customerSignup
+
+
 DELIMITER  $$
 CREATE PROCEDURE `customerSignup`
 (IN _email varchar
