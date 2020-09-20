@@ -6,8 +6,8 @@ import axios from 'axios';
 import serverUrl from '../../config';
 import './Home.css';
 import { history } from '../../App';
-import MenuBlock from './menuBlock';
-import LoginBlock from './loginBlock';
+import MenuBlock from './MenuBlock';
+import LoginBlock from './LoginBlock';
 
 class Home extends Component {
   constructor(props) {

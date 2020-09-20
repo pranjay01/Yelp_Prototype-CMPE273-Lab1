@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Menu from './menu';
+import Menu from './Menu';
 class menuBlock extends Component {
   constructor(props) {
     super(props);
