@@ -41,7 +41,8 @@ const login = async (request, response, Role) => {
           path: '/',
         });
         LoggedTokens.push({
-          userId: userDetails[0].Email,
+          userID: userDetails[0].ID,
+          userName: userDetails[0].Email,
           role: userDetails[0].Role,
           Token: token,
         });
@@ -68,4 +69,29 @@ const login = async (request, response, Role) => {
   return response;
 };
 
-module.exports = login;
+const logout = async (body, response) => {
+  let isTokenDeleted;
+  // eslint-disable-next-line array-callback-return
+  LoggedTokens.filter(function roleCheck(user) {
+    if (user.Token === body.token && user.role === body.role) {
+      LoggedTokens.splice(LoggedTokens.indexOf(user), 1);
+      isTokenDeleted = true;
+    }
+  });
+
+  if (isTokenDeleted) {
+    response.writeHead(200, {
+      'Content-Type': 'text/plain',
+    });
+    response.end('User Token Deleted');
+  } else {
+    response.writeHead(401, {
+      'Content-Type': 'text/plain',
+    });
+    response.end('User Token Not found');
+    // return response;
+  }
+  return response;
+};
+
+module.exports = { login, logout };

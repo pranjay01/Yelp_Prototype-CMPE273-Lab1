@@ -6,13 +6,22 @@ import axios from 'axios';
 import serverUrl from '../../config';
 import './Home.css';
 import { history } from '../../App';
+import MenuBlock from './menuBlock';
+import LoginBlock from './loginBlock';
 
 class Home extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = { menuDisabled: true, loginOrLogout: false };
     this.handleLogout = this.handleLogout.bind(this);
   }
+
+  // show menu
+  // showMenu = () => {
+  //   this.setState({
+  //     menuDisabled: !this.state.menuDisabled,
+  //   });
+  // };
   //handle logout to destroy the cookie
   handleLogout = () => {
     var data = {
@@ -23,77 +32,14 @@ class Home extends Component {
     cookie.remove('userrole', { path: '/' });
   };
   render() {
-    let loginOrLogout = null;
-    if (cookie.load('cookie')) {
-      loginOrLogout = (
-        <div class="main-header_account">
-          <div class="user-account clearfix drop-menu-origin">
-            <a class="ybtn ybtn--primary drop-menu-link user-account_button">
-              <span class="user-account_avatar responsive-visible-large-block">
-                <img
-                  alt="Pranjay S."
-                  class="photo-box-img"
-                  height="90"
-                  loading="lazy"
-                  src="https://s3-media0.fl.yelpcdn.com/assets/public/user_medium_square.yji-bf5ff8a79310030f79328ae60713730f.png"
-                  width="90"
-                />
-              </span>
-              <span
-                style={{ width: '14px', height: '14px' }}
-                class="icon icon--14-triangle-down icon--size-14 icon--inverse icon--fallback-inverted u-triangle-direction-down user-account_button-arrow responsive-visible-large-inline-block"
-              >
-                <svg role="img" class="icon_svg"></svg>
-              </span>
-              <span
-                style={{ width: '24px', height: '24px' }}
-                class="icon icon--24-hamburger icon--size-24 icon--inverse icon--fallback-inverted drop-menu-link_open"
-              >
-                <svg role="img" class="icon_svg"></svg>
-              </span>
-              <span
-                aria-hidden="true"
-                style={{ width: '24px', height: '24px' }}
-                class="icon icon--24-close icon--size-24 icon--inverse icon--fallback-inverted drop-menu-link_close"
-              >
-                <svg role="img" class="icon_svg"></svg>
-              </span>
-            </a>
-          </div>
-        </div>
-      );
-    } else {
-      loginOrLogout = (
-        <ul className="header-nav hero-header_nav main-header_account">
-          <li
-            // onClick={() => {
-            //   history.push('/login');
-            // }}
-            className="header-nav_item u-space-r2"
-          >
-            <Link
-              className="header-nav_link header-nav_link--log-in js-analytics-click"
-              to="/customerLogin"
-            >
-              Login
-            </Link>
-          </li>
-          <li className="header-nav_item u-space-r0 js-analytics-click">
-            <Link className="ybtn ybtn--primary header-nav_button nowrap" to="/customerSignup">
-              Signup
-            </Link>
-          </li>
-        </ul>
-      );
-    }
-
     let redirectVar = null;
+    let block = null;
     if (!cookie.load('cookie')) {
       console.log('cookie not found');
-      redirectVar = <Redirect to="/customerLogin" />;
+      redirectVar = null;
     } else {
       if (cookie.load('userrole') === 'Customer') {
-        redirectVar = <Redirect to="/customerLogin" />;
+        redirectVar = null;
       } else if (cookie.load('userrole') === 'Restaurant') {
         redirectVar = <Redirect to="/restaurantHome" />;
       } else {
@@ -102,6 +48,7 @@ class Home extends Component {
     }
     return (
       <div>
+        {redirectVar}
         <div
           className="y-container homepage-hero"
           style={{
@@ -136,24 +83,20 @@ class Home extends Component {
                   <div className="hero-header_nav hero-header_nav--main nowrap">
                     <ul className="header-nav">
                       <li className="header-nav_item js-analytics-click">
-                        <Link className="header-nav_link" to="/review">
+                        <Link className="header-nav_link" to="/#">
                           Write a Review
                         </Link>
                       </li>
                       <li className="header-nav_item js-analytics-click">
-                        <Link className="header-nav_link" to="/events">
-                          Events
-                        </Link>
-                      </li>
-                      <li className="header-nav_item js-analytics-click">
                         <Link className="header-nav_link" to="/#">
-                          Talk
+                          Events
                         </Link>
                       </li>
                     </ul>
                   </div>
                 </div>
-                <div className="arrange_unit nowrap">{loginOrLogout}</div>
+
+                {cookie.load('cookie') ? <MenuBlock /> : <LoginBlock />}
               </div>
             </div>
             <div className="homepage-hero_inner">

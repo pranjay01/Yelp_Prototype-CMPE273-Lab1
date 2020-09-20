@@ -3,7 +3,7 @@ const express = require('express');
 
 const Router = express.Router();
 const signup = require('../customer/customerProfile');
-const login = require('../common/loginLogout');
+const { login, logout } = require('../common/loginLogout');
 
 // Customer signup
 Router.post('/signup', async (req, res) => {
@@ -18,6 +18,14 @@ Router.post('/login', async (req, res) => {
   console.log('Login if correct credential');
   let results = null;
   results = await login(req, res, 1);
+  return results;
+});
+
+// Customer Logout
+Router.post('/logout', async (req, res) => {
+  console.log('Logout');
+  let results = null;
+  results = await logout(req.body, res);
   return results;
 });
 module.exports = Router;

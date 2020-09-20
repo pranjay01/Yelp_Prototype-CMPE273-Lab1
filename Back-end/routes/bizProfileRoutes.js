@@ -3,7 +3,7 @@ const express = require('express');
 
 const signup = require('../restaurant/restaurantProfile');
 
-const login = require('../common/loginLogout');
+const { login, logout } = require('../common/loginLogout');
 
 const Router = express.Router();
 
@@ -20,6 +20,14 @@ Router.post('/login', async (req, res) => {
   console.log('Login if correct credential');
   let results = null;
   results = await login(req, res, 2);
+  return results;
+});
+
+// Restaurant Logout
+Router.post('/logout', async (req, res) => {
+  console.log('Logout');
+  let results = null;
+  results = await logout(req.body, res);
   return results;
 });
 module.exports = Router;
