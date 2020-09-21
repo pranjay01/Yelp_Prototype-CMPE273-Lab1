@@ -5,7 +5,7 @@ import { Redirect } from 'react-router';
 import axios from 'axios';
 import serverUrl from '../../config';
 import './Home.css';
-import { history } from '../../App';
+// import { history } from '../../App';
 import MenuBlock from './MenuBlock';
 import LoginBlock from './LoginBlock';
 
@@ -13,27 +13,11 @@ class Home extends Component {
   constructor(props) {
     super(props);
     this.state = { menuDisabled: true, loginOrLogout: false };
-    this.handleLogout = this.handleLogout.bind(this);
   }
 
-  // show menu
-  // showMenu = () => {
-  //   this.setState({
-  //     menuDisabled: !this.state.menuDisabled,
-  //   });
-  // };
-  //handle logout to destroy the cookie
-  handleLogout = () => {
-    var data = {
-      token: cookie.load('cookie'),
-    };
-    axios.post(serverUrl + 'logout', data).then((response) => {});
-    cookie.remove('cookie', { path: '/' });
-    cookie.remove('userrole', { path: '/' });
-  };
   render() {
     let redirectVar = null;
-    let block = null;
+    // let block = null;
     if (!cookie.load('cookie')) {
       console.log('cookie not found');
       redirectVar = null;

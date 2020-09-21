@@ -2,7 +2,10 @@ import React, { Component } from 'react';
 import cookie from 'react-cookies';
 import axios from 'axios';
 import serverUrl from '../../config';
-class menu extends Component {
+import { updateLogoutSuccess } from '../../constants/action-types';
+import { connect } from 'react-redux';
+
+class Menu extends Component {
   constructor(props) {
     super(props);
     this.state = {};
@@ -17,6 +20,12 @@ class menu extends Component {
     };
     axios.post(serverUrl + 'customer/logout', data).then((response) => {
       if (response.status === 200) {
+        let payload = {
+          userEmail: '',
+          role: '',
+          loginStatus: false,
+        };
+        this.props.updateLogoutSuccess(payload);
         window.location.reload(false);
       }
     });
@@ -178,4 +187,17 @@ class menu extends Component {
   }
 }
 
-export default menu;
+// export default Menu;
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    updateLogoutSuccess: (payload) => {
+      dispatch({
+        type: updateLogoutSuccess,
+        payload,
+      });
+    },
+  };
+};
+
+export default connect(null, mapDispatchToProps)(Menu);

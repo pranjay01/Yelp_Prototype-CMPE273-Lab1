@@ -5,7 +5,9 @@ import { Redirect } from 'react-router';
 import axios from 'axios';
 import serverUrl from '../../config';
 import './Login.css';
-import { history } from '../../App';
+// import { history } from '../../App';
+import { updateLoginSuccess } from '../../constants/action-types';
+import { connect } from 'react-redux';
 
 //Define a Login Component
 class RestaurantLogin extends Component {
@@ -42,7 +44,7 @@ class RestaurantLogin extends Component {
     // this.submitLogin = this.submitLogin.bind(this);
   }
   // Call the Will Mount to set the auth Flag to false
-  componentWillMount() {
+  componentDidMount() {
     if (this.props.location.pathname === '/restaurantSignup') {
       console.log('inside Signup');
       axios.get(serverUrl + 'static/signupMasterData').then((response) => {
@@ -210,9 +212,15 @@ class RestaurantLogin extends Component {
       (response) => {
         console.log('Status Code : ', response.status);
         if (response.status === 200) {
-          console.log('cookie: ', cookie.load('cookie'));
-          console.log('role: ', cookie.load('userrole'));
-          console.log('role: ', cookie);
+          // console.log('cookie: ', cookie.load('cookie'));
+          // console.log('role: ', cookie.load('userrole'));
+          // console.log('role: ', cookie);
+          let payload = {
+            userEmail: this.state.username,
+            role: cookie.load('userrole'),
+            loginStatus: true,
+          };
+          this.props.updateLoginSuccess(payload);
           this.setState({
             authFlag: true,
           });
@@ -729,4 +737,17 @@ class RestaurantLogin extends Component {
 }
 //export Login Component
 
-export default RestaurantLogin;
+// export default RestaurantLogin;
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    updateLoginSuccess: (payload) => {
+      dispatch({
+        type: updateLoginSuccess,
+        payload,
+      });
+    },
+  };
+};
+
+export default connect(null, mapDispatchToProps)(RestaurantLogin);

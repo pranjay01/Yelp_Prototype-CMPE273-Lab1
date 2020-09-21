@@ -5,7 +5,9 @@ import { Redirect } from 'react-router';
 import axios from 'axios';
 import serverUrl from '../../config';
 import './Login.css';
-import { history } from '../../App';
+// import { history } from '../../App';
+import { updateLoginSuccess } from '../../constants/action-types';
+import { connect } from 'react-redux';
 
 //Define a Login Component
 class CustomerLogin extends Component {
@@ -162,8 +164,14 @@ class CustomerLogin extends Component {
       (response) => {
         console.log('Status Code : ', response.status);
         if (response.status === 200) {
-          console.log('cookie: ', cookie.load('cookie'));
-          console.log('role: ', cookie.load('userrole'));
+          // console.log('cookie: ', cookie.load('cookie'));
+          // console.log('role: ', cookie.load('userrole'));
+          let payload = {
+            userEmail: this.state.username,
+            role: cookie.load('userrole'),
+            loginStatus: true,
+          };
+          this.props.updateLoginSuccess(payload);
           this.setState({
             authFlag: true,
           });
@@ -197,7 +205,7 @@ class CustomerLogin extends Component {
     }
 
     let signupOrLogin = null;
-    console.log(history.location);
+    // console.log(history.location);
     if (this.props.location.pathname === '/customerSignup') {
       // if (history.location.pathname === '/customerSignup') {
       signupOrLogin = (
@@ -607,4 +615,17 @@ class CustomerLogin extends Component {
 }
 //export Login Component
 
-export default CustomerLogin;
+// export default CustomerLogin;
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    updateLoginSuccess: (payload) => {
+      dispatch({
+        type: updateLoginSuccess,
+        payload,
+      });
+    },
+  };
+};
+
+export default connect(null, mapDispatchToProps)(CustomerLogin);

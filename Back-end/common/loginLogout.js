@@ -94,4 +94,16 @@ const logout = async (body, response) => {
   return response;
 };
 
-module.exports = { login, logout };
+const getUserIdFromToken = (token, userRole) => {
+  let User = null;
+  User = LoggedTokens.filter((user) => user.Token === token && user.role === userRole);
+  console.log('User JSON: ', User);
+  let userID = null;
+  if (User) {
+    console.log(User[0]);
+    userID = User[0].userID;
+  }
+  return userID;
+};
+
+module.exports = { login, logout, getUserIdFromToken };

@@ -1,7 +1,11 @@
 /* eslint-disable no-console */
 const express = require('express');
 
-const signup = require('../restaurant/restaurantProfile');
+const {
+  signup,
+  getBasicInfo,
+  getRestaurantCompleteInfo,
+} = require('../restaurant/restaurantProfile');
 
 const { login, logout } = require('../common/loginLogout');
 
@@ -30,4 +34,19 @@ Router.post('/logout', async (req, res) => {
   results = await logout(req.body, res);
   return results;
 });
+
+Router.get('/homeProfile', async (req, res) => {
+  console.log('Get basic Restaurant Profile');
+  let results = null;
+  results = await getBasicInfo(req, res);
+  return results;
+});
+
+Router.get('/restaurantCompleteProfile', async (req, res) => {
+  console.log('Get basic Restaurant Profile');
+  let results = null;
+  results = await getRestaurantCompleteInfo(req, res);
+  return results;
+});
+
 module.exports = Router;

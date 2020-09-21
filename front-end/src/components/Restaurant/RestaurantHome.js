@@ -5,11 +5,55 @@ import { Redirect } from 'react-router';
 import axios from 'axios';
 import serverUrl from '../../config';
 import './RestaurantHome.css';
+import { updateLogoutSuccess } from '../../constants/action-types';
+import { connect } from 'react-redux';
+import LeftPannel from './LeftPannel/LeftPannel';
+import DefaultHome from './DefaultHome';
+import Profile from './Profile/Profile';
+
 class RestaurantHome extends Component {
   constructor(props) {
     super(props);
-    this.state = { menuDisable: true };
+    this.state = {
+      menuDisable: true,
+      restroName: '',
+      address: '',
+      reviewCOunt: '',
+      tabName: 'Home',
+    };
   }
+  onTabChangeHandler = (tabName) => {
+    this.setState({
+      tabName,
+    });
+  };
+  componentDidMount() {
+    axios.get(serverUrl + 'biz/homeProfile', { withCredentials: true }).then(
+      (response) => {
+        if (response.status === 200) {
+          console.log('Name', response.data[0][0]);
+          this.setState({
+            restroName: response.data[0][0].Name,
+            address:
+              response.data[0][0].Street +
+              ' ' +
+              response.data[0][0].City +
+              ' ' +
+              response.data[0][0].State +
+              ' ' +
+              response.data[0][0].Zip,
+            reviewCOunt: response.data[1][0].ReviewCount,
+          });
+          console.log(this.state);
+          console.log(response.data);
+        }
+      },
+      (error) => {
+        console.log(error.response.data);
+      }
+    );
+  }
+
   showMenu = () => {
     this.setState({
       menuDisable: !this.state.menuDisable,
@@ -20,7 +64,17 @@ class RestaurantHome extends Component {
       token: cookie.load('cookie'),
       role: cookie.load('userrole'),
     };
-    axios.post(serverUrl + 'biz/logout', data).then((response) => {});
+    axios.post(serverUrl + 'biz/logout', data).then((response) => {
+      if (response.status === 200) {
+        let payload = {
+          userEmail: '',
+          role: '',
+          loginStatus: false,
+        };
+        this.props.updateLogoutSuccess(payload);
+        // window.location.reload(false);
+      }
+    });
     cookie.remove('cookie', { path: '/' });
     cookie.remove('userrole', { path: '/' });
   };
@@ -37,7 +91,7 @@ class RestaurantHome extends Component {
         redirectVar = <Redirect to="/home" />;
       } else if (cookie.load('userrole') === 'Restaurant') {
         console.log('redirect to restaurant home page');
-        redirectVar = <Redirect to="/restaurantHome" />;
+        redirectVar = null;
       } else {
         redirectVar = <Redirect to="/restaurantLogin" />;
       }
@@ -126,8 +180,11 @@ class RestaurantHome extends Component {
         </menu>
       );
     }
+
+    let tabName = this.state.tabName;
+    let basicProfile = this.state;
     return (
-      <div>
+      <div className="lemon--div__06b83__1mboc responsive responsive-biz border-color--default__06b83__3-ifU">
         {redirectVar}
         <div class="lemon--div__06b83__1mboc component__06b83__mFK-M border-color--default__06b83__3-ifU">
           <div class="lemon--div__06b83__1mboc header-container__06b83__bjkGB border-color--default__06b83__3-ifU">
@@ -183,7 +240,7 @@ class RestaurantHome extends Component {
                                   <img
                                     class="lemon--img__06b83__3GQUb photo__06b83__3O0Op"
                                     src="https://s3-media0.fl.yelpcdn.com/assets/public/default_user_avatar_40x40_v2.yji-925e5d7fcbd2b314d1a618150d57d7f6.png"
-                                    srcset="https://s3-media0.fl.yelpcdn.com/assets/public/default_user_avatar_40x40_v2@2x.yji-e91480537628f15542f0f07cc8d278c5.png"
+                                    srcSet="https://s3-media0.fl.yelpcdn.com/assets/public/default_user_avatar_40x40_v2@2x.yji-e91480537628f15542f0f07cc8d278c5.png"
                                     alt="Pranjay S."
                                     height="36"
                                     width="36"
@@ -202,9 +259,46 @@ class RestaurantHome extends Component {
             </div>
           </div>
         </div>
+        <div className="lemon--div__06b83__1mboc biz-container__06b83__3snKt border-color--default__06b83__3-ifU">
+          {<LeftPannel profileInfo={this.state} onTabChangeHandler={this.onTabChangeHandler} />}
+          <div className="lemon--div__06b83__1mboc container-default__06b83__1Sj3L content-container__06b83__2gSeg border-color--default__06b83__3-ifU">
+            <div className="lemon--div__06b83__1mboc grid__06b83__15mIv border-color--default__06b83__3-ifU">
+              <div
+                className="lemon--div__06b83__1mboc grid-column__06b83__3ZRhU border-color--default__06b83__3-ifU"
+                style={{ width: '66.66666666666666%' }}
+              >
+                {(function () {
+                  switch (tabName) {
+                    case 'Home':
+                      return <DefaultHome profileInfo={basicProfile} />;
+                    case 'Profile':
+                      return <Profile />;
+                    default:
+                      return <DefaultHome />;
+                  }
+                })()}
+                {/*<DefaultHome profileInfo={this.state} />*/}
+                {/*<Profile />*/}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
 }
 
-export default RestaurantHome;
+// export default RestaurantHome;
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    updateLogoutSuccess: (payload) => {
+      dispatch({
+        type: updateLogoutSuccess,
+        payload,
+      });
+    },
+  };
+};
+
+export default connect(null, mapDispatchToProps)(RestaurantHome);
