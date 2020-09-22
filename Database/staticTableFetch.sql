@@ -10,3 +10,17 @@ begin
 end $$
 
 delimiter ;
+
+
+
+drop procedure getCusinesForMenuQuery
+delimiter $$
+
+create procedure getCusinesForMenuQuery()
+begin
+	select ID,Category from CUISINES order by Category asc;
+    
+    
+end $$
+
+delimiter ;

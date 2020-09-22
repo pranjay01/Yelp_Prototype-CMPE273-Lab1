@@ -36,4 +36,21 @@ const getSignupMasterDataCustomer = async (response) => {
   return response;
 };
 
-module.exports = { getSignupMasterData, getSignupMasterDataCustomer };
+const getCusinesForMenu = async (response) => {
+  const getCusinesForMenuQuery = 'CALL getCusinesForMenuQuery()';
+  // 1 is for enum value customer
+  const connection = await mysqlConnection();
+  // eslint-disable-next-line no-unused-vars
+  const [results, fields] = await connection.query(getCusinesForMenuQuery);
+
+  connection.end();
+  response.writeHead(200, {
+    'Content-Type': 'application/json',
+  });
+  // eslint-disable-next-line no-console
+  console.log('SignupMaster for Customer : ', JSON.stringify(results));
+  response.end(JSON.stringify(results));
+  return response;
+};
+
+module.exports = { getSignupMasterData, getSignupMasterDataCustomer, getCusinesForMenu };

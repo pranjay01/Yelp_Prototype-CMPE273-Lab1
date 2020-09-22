@@ -10,6 +10,8 @@ import { connect } from 'react-redux';
 import LeftPannel from './LeftPannel/LeftPannel';
 import DefaultHome from './DefaultHome';
 import Profile from './Profile/Profile';
+import FoodMenu from './Menu/FoodMenu';
+// import '../Login/Login.css';
 
 class RestaurantHome extends Component {
   constructor(props) {
@@ -28,10 +30,14 @@ class RestaurantHome extends Component {
     });
   };
   componentDidMount() {
+    // this.setState({
+    //   tabName: 'Home',
+    // });
+    console.log(this.props.location.pathname);
+    console.log('tab name', this.state.tabName);
     axios.get(serverUrl + 'biz/homeProfile', { withCredentials: true }).then(
       (response) => {
         if (response.status === 200) {
-          console.log('Name', response.data[0][0]);
           this.setState({
             restroName: response.data[0][0].Name,
             address:
@@ -181,8 +187,9 @@ class RestaurantHome extends Component {
       );
     }
 
-    let tabName = this.state.tabName;
+    let tabName = this.props.tabOpened;
     let basicProfile = this.state;
+    console.log('Redux value: ', this.props.tabOpened);
     return (
       <div className="lemon--div__06b83__1mboc responsive responsive-biz border-color--default__06b83__3-ifU">
         {redirectVar}
@@ -268,11 +275,14 @@ class RestaurantHome extends Component {
                 style={{ width: '66.66666666666666%' }}
               >
                 {(function () {
+                  //switch (tabName) {
                   switch (tabName) {
                     case 'Home':
                       return <DefaultHome profileInfo={basicProfile} />;
                     case 'Profile':
                       return <Profile />;
+                    case 'FoodMenu':
+                      return <FoodMenu />;
                     default:
                       return <DefaultHome />;
                   }
@@ -289,7 +299,12 @@ class RestaurantHome extends Component {
 }
 
 // export default RestaurantHome;
-
+const mapStateToProps = (state) => {
+  const { restaurantHome } = state.restaurantHomePageReducer;
+  return {
+    tabOpened: restaurantHome.tabOpened,
+  };
+};
 const mapDispatchToProps = (dispatch) => {
   return {
     updateLogoutSuccess: (payload) => {
@@ -301,4 +316,4 @@ const mapDispatchToProps = (dispatch) => {
   };
 };
 
-export default connect(null, mapDispatchToProps)(RestaurantHome);
+export default connect(mapStateToProps, mapDispatchToProps)(RestaurantHome);

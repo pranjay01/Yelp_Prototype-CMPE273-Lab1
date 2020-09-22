@@ -6,8 +6,9 @@ const { getUserIdFromToken } = require('../common/loginLogout');
 
 const mysqlConnection = require('../mysqlConnection');
 require('dotenv').config();
-// 2 is for enum value restauarnt
 
+// Function to check if email already exists
+// 2 is for enum value restauarnt
 const checkEmailExists = async (email) => {
   const verifyEmailExist = 'CALL getEmail(?,?)';
 
@@ -24,6 +25,7 @@ const checkEmailExists = async (email) => {
   }
 };
 
+// Function to create ine restaurant
 const signup = async (restaurant, response) => {
   const {
     Email,
@@ -149,4 +151,72 @@ const getRestaurantCompleteInfo = async (request, response) => {
   return response;
 };
 
-module.exports = { signup, getBasicInfo, getRestaurantCompleteInfo };
+// Update Restaurant Profile
+const updateRestaurantProfile = async (restaurant, response) => {
+  try {
+    const {
+      Name,
+      // eslint-disable-next-line camelcase
+      Country_ID,
+      // eslint-disable-next-line camelcase
+      State_ID,
+      City,
+      Zip,
+      Street,
+      // eslint-disable-next-line camelcase
+      Phone_no,
+      // eslint-disable-next-line camelcase
+      Country_Code,
+      // eslint-disable-next-line camelcase
+      Opening_Time,
+      // eslint-disable-next-line camelcase
+      Closing_Time,
+    } = restaurant;
+    const restroID = getUserIdFromToken(restaurant.token, restaurant.userrole);
+    if (restroID) {
+      const updateRestaurantProfileQuery =
+        'CALL updateRestaurantProfileQuery(?,?,?,?,?,?,?,?,?,?,?)';
+
+      const connection = await mysqlConnection();
+      // eslint-disable-next-line no-unused-vars
+      const [results, fields] = await connection.query(updateRestaurantProfileQuery, [
+        Name,
+        // eslint-disable-next-line camelcase
+        Number(Country_ID),
+        // eslint-disable-next-line camelcase
+        Number(State_ID),
+        City,
+        Number(Zip),
+        Street,
+        // eslint-disable-next-line camelcase
+        Number(Phone_no),
+        // eslint-disable-next-line camelcase
+        Number(Country_Code),
+        // eslint-disable-next-line camelcase
+        Opening_Time,
+        // eslint-disable-next-line camelcase
+        Closing_Time,
+        restroID,
+      ]);
+      console.log(connection);
+      connection.end();
+      console.log(results);
+      console.log(results);
+      response.writeHead(200, {
+        'Content-Type': 'text/plain',
+      });
+      response.end(JSON.stringify(results));
+    } else {
+      response.writeHead(401, {
+        'Content-Type': 'text/plain',
+      });
+      response.end('Invalid User');
+    }
+  } catch (error) {
+    response.writeHead(401, {
+      'Content-Type': 'text/plain',
+    });
+    response.end('Network Error');
+  }
+};
+module.exports = { signup, getBasicInfo, getRestaurantCompleteInfo, updateRestaurantProfile };

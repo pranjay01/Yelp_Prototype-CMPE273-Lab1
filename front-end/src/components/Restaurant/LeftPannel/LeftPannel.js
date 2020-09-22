@@ -5,6 +5,8 @@ import { Redirect } from 'react-router';
 import axios from 'axios';
 import serverUrl from '../../../config';
 import '../RestaurantHome.css';
+import { updateLeftPannelTab } from '../../../constants/action-types';
+import { connect } from 'react-redux';
 
 class LeftPannel extends Component {
   constructor(props) {
@@ -14,7 +16,12 @@ class LeftPannel extends Component {
   // const changePageViewTo = (viewComponent) => {
 
   // }
-  changePageViewTo(viewComponent) {}
+  changePageViewTo(tabOpened) {
+    let payload = {
+      tabOpened,
+    };
+    this.props.updateLeftPannelTab(payload);
+  }
   // componentDidMount() {}
   render() {
     return (
@@ -72,9 +79,10 @@ class LeftPannel extends Component {
               name=""
               rel=""
               role="link"
-              onClick={() => {
-                this.props.onTabChangeHandler('Home');
-              }}
+              // onClick={() => {
+              //   this.props.onTabChangeHandler('Home');
+              // }}
+              onClick={() => this.changePageViewTo('Home')}
             >
               <div class="lemon--div__06b83__1mboc nav-item-v2__06b83__vmJJv inactive__06b83__2ZtYV active__06b83__cBu5j responsive-ui-enabled__06b83__2kOzB padding-t1__06b83__2aTOb padding-r1__06b83__1xqrz padding-b1__06b83__3erWW padding-l1__06b83__1UBqt border-color--default__06b83__3-ifU">
                 <div class="lemon--div__06b83__1mboc icon--active__06b83__lWtOD icon-v2__06b83__2Y6sR border-color--default__06b83__3-ifU text-align--center__06b83__2n2yQ">
@@ -99,9 +107,10 @@ class LeftPannel extends Component {
               name=""
               rel=""
               role="link"
-              onClick={() => {
-                this.props.onTabChangeHandler('Profile');
-              }}
+              // onClick={() => {
+              //   this.props.onTabChangeHandler('Profile');
+              // }}
+              onClick={() => this.changePageViewTo('Profile')}
             >
               <div class="lemon--div__06b83__1mboc nav-item-v2__06b83__vmJJv inactive__06b83__2ZtYV responsive-ui-enabled__06b83__2kOzB padding-t1__06b83__2aTOb padding-r1__06b83__1xqrz padding-b1__06b83__3erWW padding-l1__06b83__1UBqt border-color--default__06b83__3-ifU">
                 <div class="lemon--div__06b83__1mboc icon-v2__06b83__2Y6sR border-color--default__06b83__3-ifU text-align--center__06b83__2n2yQ">
@@ -126,9 +135,10 @@ class LeftPannel extends Component {
               name=""
               rel=""
               role="link"
-              onClick={() => {
-                this.props.onTabChangeHandler('FoodMenu');
-              }}
+              // onClick={() => {
+              //   this.props.onTabChangeHandler('FoodMenu');
+              // }}
+              onClick={() => this.changePageViewTo('FoodMenu')}
             >
               <div class="lemon--div__06b83__1mboc nav-item-v2__06b83__vmJJv inactive__06b83__2ZtYV responsive-ui-enabled__06b83__2kOzB padding-t1__06b83__2aTOb padding-r1__06b83__1xqrz padding-b1__06b83__3erWW padding-l1__06b83__1UBqt border-color--default__06b83__3-ifU">
                 <div class="lemon--div__06b83__1mboc icon-v2__06b83__2Y6sR border-color--default__06b83__3-ifU text-align--center__06b83__2n2yQ">
@@ -157,9 +167,10 @@ class LeftPannel extends Component {
               name=""
               rel=""
               role="link"
-              onClick={() => {
-                this.props.onTabChangeHandler('Orders');
-              }}
+              // onClick={() => {
+              //   this.props.onTabChangeHandler('Orders');
+              // }}
+              onClick={() => this.changePageViewTo('Orders')}
             >
               <div class="lemon--div__06b83__1mboc nav-item-v2__06b83__vmJJv inactive__06b83__2ZtYV responsive-ui-enabled__06b83__2kOzB padding-t1__06b83__2aTOb padding-r1__06b83__1xqrz padding-b1__06b83__3erWW padding-l1__06b83__1UBqt border-color--default__06b83__3-ifU">
                 <div class="lemon--div__06b83__1mboc icon-v2__06b83__2Y6sR border-color--default__06b83__3-ifU text-align--center__06b83__2n2yQ">
@@ -180,9 +191,10 @@ class LeftPannel extends Component {
             {/**Reviews */}
             <a
               class="lemon--a__06b83__IEZFH link__06b83__1G70M nav-link__06b83__2noz4 responsive-ui-enabled__06b83__2kOzB link-color--blue-dark__06b83__85-Nu link-size--default__06b83__7tls6"
-              onClick={() => {
-                this.props.onTabChangeHandler('Reviews');
-              }}
+              // onClick={() => {
+              //   this.props.onTabChangeHandler('Reviews');
+              // }}
+              onClick={() => this.changePageViewTo('Reviews')}
             >
               <div class="lemon--div__06b83__1mboc nav-item-v2__06b83__vmJJv inactive__06b83__2ZtYV responsive-ui-enabled__06b83__2kOzB padding-t1__06b83__2aTOb padding-r1__06b83__1xqrz padding-b1__06b83__3erWW padding-l1__06b83__1UBqt border-color--default__06b83__3-ifU">
                 <div class="lemon--div__06b83__1mboc icon-v2__06b83__2Y6sR border-color--default__06b83__3-ifU text-align--center__06b83__2n2yQ">
@@ -207,9 +219,10 @@ class LeftPannel extends Component {
               name=""
               rel=""
               role="link"
-              onClick={() => {
-                this.props.onTabChangeHandler('Photos');
-              }}
+              // onClick={() => {
+              //   this.props.onTabChangeHandler('Photos');
+              // }}
+              onClick={() => this.changePageViewTo('Photos')}
             >
               <div class="lemon--div__06b83__1mboc nav-item-v2__06b83__vmJJv inactive__06b83__2ZtYV responsive-ui-enabled__06b83__2kOzB padding-t1__06b83__2aTOb padding-r1__06b83__1xqrz padding-b1__06b83__3erWW padding-l1__06b83__1UBqt border-color--default__06b83__3-ifU">
                 <div class="lemon--div__06b83__1mboc icon-v2__06b83__2Y6sR border-color--default__06b83__3-ifU text-align--center__06b83__2n2yQ">
@@ -233,4 +246,17 @@ class LeftPannel extends Component {
   }
 }
 
-export default LeftPannel;
+// export default LeftPannel;
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    updateLeftPannelTab: (payload) => {
+      dispatch({
+        type: updateLeftPannelTab,
+        payload,
+      });
+    },
+  };
+};
+
+export default connect(null, mapDispatchToProps)(LeftPannel);

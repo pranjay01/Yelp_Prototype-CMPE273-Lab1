@@ -1,5 +1,5 @@
--- Restaurant signup
-drop procedure customerSignup
+-- Customer signup
+drop procedure if exists customerSignup ;
 
 DELIMITER  $$
 CREATE PROCEDURE `customerSignup`
@@ -29,39 +29,5 @@ END  $$
 
 delimiter ;
 
--- Restaurant name, address and review counts
 
-drop procedure getBasicInfo;
-delimiter $$
-
-create procedure `getBasicInfo`(in userID int)
-begin
-declare exit handler for sqlexception rollback;
-start transaction;
-	select RESTAURANT.Name as Name,City,Street,Zip,STATE.Name as State 
-    from RESTAURANT JOIN STATE ON (RESTAURANT.State_ID=STATE.ID) where RESTAURANT.Restaurant_ID=userID;
-    
-    select count(REVIEWS.ID) as ReviewCount
-    FROM REVIEWS
-    where Restaurant_ID=userID
-    GROUP BY ID,Restaurant_ID;
-    commit;
-end $$
-
-delimiter ;
-
--- Restaurant complete information
-
-drop procedure getRestaurantCompleteInfoQuery;
-delimiter $$
-
-create procedure `getRestaurantCompleteInfoQuery`(in userID int)
-begin
-declare exit handler for sqlexception rollback;
-start transaction;
-	SELECT * FROM RESTAURANT WHERE Restaurant_ID=userID;
-    commit;
-end $$
-
-delimiter ;
 

@@ -5,6 +5,7 @@ const {
   signup,
   getBasicInfo,
   getRestaurantCompleteInfo,
+  updateRestaurantProfile,
 } = require('../restaurant/restaurantProfile');
 
 const { login, logout } = require('../common/loginLogout');
@@ -35,6 +36,7 @@ Router.post('/logout', async (req, res) => {
   return results;
 });
 
+// Restaurant get Profile Info for Home page
 Router.get('/homeProfile', async (req, res) => {
   console.log('Get basic Restaurant Profile');
   let results = null;
@@ -42,10 +44,19 @@ Router.get('/homeProfile', async (req, res) => {
   return results;
 });
 
+// Restaurant get Profile Info for Profile page
 Router.get('/restaurantCompleteProfile', async (req, res) => {
   console.log('Get basic Restaurant Profile');
   let results = null;
   results = await getRestaurantCompleteInfo(req, res);
+  return results;
+});
+
+// Restaurant Update Profile
+Router.post('/updateRestaurantProfile', async (req, res) => {
+  console.log('Login if correct credential');
+  let results = null;
+  results = await updateRestaurantProfile(req.body, res);
   return results;
 });
 
