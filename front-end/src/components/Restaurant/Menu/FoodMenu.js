@@ -9,96 +9,11 @@ class FoodMenu extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      APPETIZERS: [
-        {
-          ID: 1,
-          Name: 'Paneer',
-          MainIngredients: '',
-          CuisineID: 1,
-          Description: '46464',
-          Price: 1.2,
-        },
-        {
-          ID: 2,
-          Name: 'Paneer',
-          MainIngredients: '',
-          CuisineID: 1,
-          Description: '46464',
-          Price: 1.2,
-        },
-      ],
-      BEVERAGES: [
-        {
-          ID: 2,
-          Name: 'Pepsi',
-          MainIngredients: '',
-          CuisineID: 1,
-          Description: '46464',
-          Price: 1.2,
-        },
-        {
-          ID: 2,
-          Name: 'Pepsi',
-          MainIngredients: '',
-          CuisineID: 1,
-          Description: '46464',
-          Price: 1.2,
-        },
-      ],
-      DESSERTS: [
-        {
-          ID: 1,
-          Name: 'Paneer',
-          MainIngredients: '',
-          CuisineID: 1,
-          Description: '46464',
-          Price: 1.2,
-        },
-        {
-          ID: 2,
-          Name: 'Paneer',
-          MainIngredients: '',
-          CuisineID: 1,
-          Description: '46464',
-          Price: 1.2,
-        },
-      ],
-      MAIN_COURSE: [
-        {
-          ID: 2,
-          Name: 'Pepsi',
-          MainIngredients: '',
-          CuisineID: 1,
-          Description: '46464',
-          Price: 1.2,
-        },
-        {
-          ID: 2,
-          Name: 'Pepsi',
-          MainIngredients: '',
-          CuisineID: 1,
-          Description: '46464',
-          Price: 1.2,
-        },
-      ],
-      SALADS: [
-        {
-          ID: 2,
-          Name: 'Pepsi',
-          MainIngredients: '',
-          CuisineID: 1,
-          Description: '46464',
-          Price: 1.2,
-        },
-        {
-          ID: 2,
-          Name: 'Pepsi',
-          MainIngredients: '',
-          CuisineID: 1,
-          Description: '46464',
-          Price: 1.2,
-        },
-      ],
+      APPETIZERS: [],
+      BEVERAGES: [],
+      DESSERTS: [],
+      MAIN_COURSE: [],
+      SALADS: [],
       CUISINES: [],
       showFoodCategory: '',
       addFoodItemForm: false,
@@ -123,6 +38,7 @@ class FoodMenu extends Component {
       editableCategory: '',
     };
   }
+  // Call On render
   componentDidMount() {
     console.log('inside Signup');
     axios.get(serverUrl + 'static/getCusinesForMenu').then((response) => {
@@ -136,6 +52,8 @@ class FoodMenu extends Component {
       });
     });
   }
+
+  // change editable food state
   makeEditable = (FoodId) => {
     let index = null;
     let foodItem = null;
@@ -184,6 +102,8 @@ class FoodMenu extends Component {
     console.log('tmp food store for editable: ', this.state.tmpFood);
     console.log('editable ID: ', this.state.editableId);
   };
+
+  // open or hide on select menu and fetch data if not in state
   showMenuCategory = (menuCategory) => {
     let tmp = {
       ID: null,
@@ -208,14 +128,213 @@ class FoodMenu extends Component {
         addFoodItemForm: false,
       });
     }
+    switch (menuCategory) {
+      case 'APPETIZERS':
+        if (this.state.APPETIZERS.length === 0) {
+          axios
+            .get(
+              serverUrl + 'biz/menuFetch',
+
+              { params: { category: menuCategory }, withCredentials: true }
+            )
+            .then((response) => {
+              console.log(response.data);
+              let allAppetizers = response.data[0].map((Appetizer) => {
+                return {
+                  ID: Appetizer.ID,
+                  Name: Appetizer.Name,
+                  MainIngredients: Appetizer.Main_Ingredients,
+                  CuisineID: Appetizer.Cuisine_ID,
+                  Description: Appetizer.Description,
+                  Price: Appetizer.Price,
+                };
+              });
+
+              this.setState({
+                APPETIZERS: this.state.APPETIZERS.concat(allAppetizers),
+              });
+            });
+        }
+        break;
+      case 'SALADS':
+        if (this.state.SALADS.length === 0) {
+          axios
+            .get(
+              serverUrl + 'biz/menuFetch',
+
+              { params: { category: menuCategory }, withCredentials: true }
+            )
+            .then((response) => {
+              console.log(response.data);
+              let allSalads = response.data[0].map((Salad) => {
+                return {
+                  ID: Salad.ID,
+                  Name: Salad.Name,
+                  MainIngredients: Salad.Main_Ingredients,
+                  CuisineID: Salad.Cuisine_ID,
+                  Description: Salad.Description,
+                  Price: Salad.Price,
+                };
+              });
+
+              this.setState({
+                SALADS: this.state.SALADS.concat(allSalads),
+              });
+            });
+        }
+        break;
+      case 'MAIN_COURSE':
+        if (this.state.MAIN_COURSE.length === 0) {
+          axios
+            .get(
+              serverUrl + 'biz/menuFetch',
+
+              { params: { category: menuCategory }, withCredentials: true }
+            )
+            .then((response) => {
+              console.log(response.data);
+              let allMainCourse = response.data[0].map((MainCourse) => {
+                return {
+                  ID: MainCourse.ID,
+                  Name: MainCourse.Name,
+                  MainIngredients: MainCourse.Main_Ingredients,
+                  CuisineID: MainCourse.Cuisine_ID,
+                  Description: MainCourse.Description,
+                  Price: MainCourse.Price,
+                };
+              });
+
+              this.setState({
+                MAIN_COURSE: this.state.MAIN_COURSE.concat(allMainCourse),
+              });
+            });
+        }
+        break;
+      case 'BEVERAGES':
+        if (this.state.BEVERAGES.length === 0) {
+          axios
+            .get(
+              serverUrl + 'biz/menuFetch',
+
+              { params: { category: menuCategory }, withCredentials: true }
+            )
+            .then((response) => {
+              console.log(response.data);
+              let allBeverages = response.data[0].map((Beverage) => {
+                return {
+                  ID: Beverage.ID,
+                  Name: Beverage.Name,
+                  MainIngredients: Beverage.Main_Ingredients,
+                  CuisineID: Beverage.Cuisine_ID,
+                  Description: Beverage.Description,
+                  Price: Beverage.Price,
+                };
+              });
+
+              this.setState({
+                BEVERAGES: this.state.BEVERAGES.concat(allBeverages),
+              });
+            });
+        }
+        break;
+      case 'DESSERTS':
+        if (this.state.DESSERTS.length === 0) {
+          axios
+            .get(serverUrl + 'biz/menuFetch', {
+              params: { category: menuCategory },
+              withCredentials: true,
+            })
+            .then((response) => {
+              console.log(response.data);
+              let allDesert = response.data[0].map((Dessert) => {
+                return {
+                  ID: Dessert.ID,
+                  Name: Dessert.Name,
+                  MainIngredients: Dessert.Main_Ingredients,
+                  CuisineID: Dessert.Cuisine_ID,
+                  Description: Dessert.Description,
+                  Price: Dessert.Price,
+                };
+              });
+
+              this.setState({
+                DESSERTS: this.state.DESSERTS.concat(allDesert),
+              });
+            });
+        }
+        break;
+    }
   };
 
   //on successfull delete remove from state also
   deleteFoodItem = (foodId) => {
     let category = this.state.showFoodCategory;
+    const data = {
+      category: this.state.showFoodCategory,
+      foodId: foodId,
+    };
     console.log('Delete Appetizer Food:', foodId, 'catefory: ', category);
+    axios.defaults.withCredentials = true;
+    //make a post request with the user data
+    axios.post(serverUrl + 'biz/deleteFoodItem', data).then(
+      (response) => {
+        console.log('Status Code : ', response.status);
+        if (response.status === 200) {
+          console.log(response.data);
+
+          // newFoodId = { ...newFoodId, ...this.state.newFood };
+          let index = -1;
+          switch (this.state.showFoodCategory) {
+            case 'APPETIZERS':
+              index = this.state.APPETIZERS.findIndex((x) => x.ID === foodId);
+              let tmpAPPETIZERS = [...this.state.APPETIZERS];
+              tmpAPPETIZERS.splice(index, 1);
+              this.setState({
+                APPETIZERS: tmpAPPETIZERS,
+              });
+              break;
+            case 'SALADS':
+              index = this.state.SALADS.findIndex((x) => x.ID === foodId);
+              let tmpSALADS = [...this.state.SALADS];
+              tmpSALADS.splice(index, 1);
+              this.setState({
+                SALADS: tmpSALADS,
+              });
+              break;
+            case 'MAIN_COURSE':
+              index = this.state.MAIN_COURSE.findIndex((x) => x.ID === foodId);
+              let tmpMainCourse = [...this.state.MAIN_COURSE];
+              tmpMainCourse.splice(index, 1);
+              this.setState({
+                MAIN_COURSE: tmpMainCourse,
+              });
+              break;
+            case 'BEVERAGES':
+              index = this.state.BEVERAGES.findIndex((x) => x.ID === foodId);
+              let tmpBEVERAGES = [...this.state.BEVERAGES];
+              tmpBEVERAGES.splice(index, 1);
+              this.setState({
+                BEVERAGES: tmpBEVERAGES,
+              });
+              break;
+            case 'DESSERTS':
+              index = this.state.DESSERTS.findIndex((x) => x.ID === foodId);
+              let tmpDESSERTS = [...this.state.DESSERTS];
+              tmpDESSERTS.splice(index, 1);
+              this.setState({
+                DESSERTS: tmpDESSERTS,
+              });
+              break;
+          }
+        }
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
   };
 
+  //Open or close Food Addition FOrm
   openFoodForm = () => {
     if (this.state.addFoodItemForm) {
       let tmp = {
@@ -508,6 +627,7 @@ class FoodMenu extends Component {
     }
   };
 
+  //update old food item
   updateFoodItem = (FoodId, menuCategory) => {
     let index = null;
     let foodItem = null;
@@ -602,6 +722,79 @@ class FoodMenu extends Component {
     }
   };
 
+  onSaveCreateNew = () => {
+    const data = {
+      category: this.state.showFoodCategory,
+      name: this.state.newFood.Name,
+      price: this.state.newFood.Price,
+      cuisine: this.state.newFood.CuisineID,
+      ingredients: this.state.newFood.MainIngredients,
+      description: this.state.newFood.Description,
+    };
+    //set the with credentials to true
+    axios.defaults.withCredentials = true;
+    //make a post request with the user data
+    axios.post(serverUrl + 'biz/insertFood', data).then(
+      (response) => {
+        console.log('Status Code : ', response.status);
+        if (response.status === 200) {
+          console.log(response.data);
+          let newFood = {
+            category: this.state.showFoodCategory,
+            Name: response.data[0][0].Name,
+            MainIngredients: response.data[0][0].Main_Ingredients,
+            CuisineID: response.data[0][0].Cuisine_ID,
+            Description: response.data[0][0].Description,
+            Price: response.data[0][0].Price,
+          };
+
+          // newFoodId = { ...newFoodId, ...this.state.newFood };
+          switch (this.state.showFoodCategory) {
+            case 'APPETIZERS':
+              this.setState({
+                APPETIZERS: this.state.APPETIZERS.concat(newFood),
+              });
+              break;
+            case 'SALADS':
+              this.setState({
+                SALADS: this.state.SALADS.concat(newFood),
+              });
+              break;
+            case 'MAIN_COURSE':
+              this.setState({
+                MAIN_COURSE: this.state.MAIN_COURSE.concat(newFood),
+              });
+              break;
+            case 'BEVERAGES':
+              this.setState({
+                BEVERAGES: this.state.BEVERAGES.concat(newFood),
+              });
+              break;
+            case 'DESSERTS':
+              this.setState({
+                DESSERTS: this.state.DESSERTS.concat(newFood),
+              });
+              break;
+          }
+        }
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
+    let newFood = {
+      category: '',
+      Name: '',
+      MainIngredients: '',
+      CuisineID: null,
+      Description: '',
+      Price: null,
+    };
+    this.setState({
+      newFood: { ...this.setState.newFood, ...newFood },
+      addFoodItemForm: false,
+    });
+  };
   render() {
     return (
       <div>
@@ -659,7 +852,7 @@ class FoodMenu extends Component {
                     onDescriptionChangeHandler={(evt) => this.onDescriptionChangeHandler(evt)}
                     onNameChangeHandler={(evt) => this.onNameChangeHandler(evt)}
                     food={this.state.newFood}
-                    cancelAddition={() => this.openFoodForm}
+                    cancelAddition={() => this.openFoodForm()}
                     onSaveCreateNew={() => this.onSaveCreateNew()}
                   ></NewFoodForm>
                 </div>
@@ -739,7 +932,7 @@ class FoodMenu extends Component {
                     onDescriptionChangeHandler={(evt) => this.onDescriptionChangeHandler(evt)}
                     onNameChangeHandler={(evt) => this.onNameChangeHandler(evt)}
                     food={this.state.newFood}
-                    cancelAddition={() => this.openFoodForm}
+                    cancelAddition={() => this.openFoodForm()}
                     onSaveCreateNew={() => this.onSaveCreateNew()}
                   ></NewFoodForm>
                 </div>
@@ -818,7 +1011,7 @@ class FoodMenu extends Component {
                     onDescriptionChangeHandler={(evt) => this.onDescriptionChangeHandler(evt)}
                     onNameChangeHandler={(evt) => this.onNameChangeHandler(evt)}
                     food={this.state.newFood}
-                    cancelAddition={() => this.openFoodForm}
+                    cancelAddition={() => this.openFoodForm()}
                     onSaveCreateNew={() => this.onSaveCreateNew()}
                   ></NewFoodForm>
                 </div>
@@ -897,7 +1090,7 @@ class FoodMenu extends Component {
                     onDescriptionChangeHandler={(evt) => this.onDescriptionChangeHandler(evt)}
                     onNameChangeHandler={(evt) => this.onNameChangeHandler(evt)}
                     food={this.state.newFood}
-                    cancelAddition={() => this.openFoodForm}
+                    cancelAddition={() => this.openFoodForm()}
                     onSaveCreateNew={() => this.onSaveCreateNew()}
                   ></NewFoodForm>
                 </div>
@@ -976,7 +1169,7 @@ class FoodMenu extends Component {
                     onDescriptionChangeHandler={(evt) => this.onDescriptionChangeHandler(evt)}
                     onNameChangeHandler={(evt) => this.onNameChangeHandler(evt)}
                     food={this.state.newFood}
-                    cancelAddition={() => this.openFoodForm}
+                    cancelAddition={() => this.openFoodForm()}
                     onSaveCreateNew={() => this.onSaveCreateNew()}
                   ></NewFoodForm>
                 </div>

@@ -2,6 +2,7 @@
 /* eslint-disable no-console */
 
 const bcrypt = require('bcrypt');
+const url = require('url');
 const { getUserIdFromToken } = require('../common/loginLogout');
 
 const mysqlConnection = require('../mysqlConnection');
@@ -198,9 +199,7 @@ const updateRestaurantProfile = async (restaurant, response) => {
         Closing_Time,
         restroID,
       ]);
-      console.log(connection);
       connection.end();
-      console.log(results);
       console.log(results);
       response.writeHead(200, {
         'Content-Type': 'text/plain',
@@ -219,4 +218,117 @@ const updateRestaurantProfile = async (restaurant, response) => {
     response.end('Network Error');
   }
 };
-module.exports = { signup, getBasicInfo, getRestaurantCompleteInfo, updateRestaurantProfile };
+
+const fetchMenu = async (request, response) => {
+  const { category } = url.parse(request.url, true).query;
+  const userID = getUserIdFromToken(request.cookies.cookie, request.cookies.userrole);
+  if (userID) {
+    let items = null;
+    if (category === 'APPETIZERS') {
+      items = 'CALL fetchAppetizerItems(?)';
+    } else if (category === 'BEVERAGES') {
+      items = 'CALL fetchBeveragesItems(?)';
+    } else if (category === 'DESSERTS') {
+      items = 'CALL fetchDessertsItems(?)';
+    } else if (category === 'MAIN_COURSE') {
+      items = 'CALL fetchMainCourseItems(?)';
+    } else {
+      items = 'CALL fetchSaladsItems(?)';
+    }
+    const connection = await mysqlConnection();
+    // eslint-disable-next-line no-unused-vars
+    const [results, fields] = await connection.query(items, userID);
+    connection.end();
+    response.writeHead(200, {
+      'Content-Type': 'text/plain',
+    });
+    response.end(JSON.stringify(results));
+  } else {
+    response.writeHead(401, {
+      'Content-Type': 'text/plain',
+    });
+    response.end('Invalid User');
+  }
+};
+
+const insertFood = async (request, response) => {
+  const { category, name, price, cuisine, ingredients, description } = request.body;
+  const restroId = getUserIdFromToken(request.cookies.cookie, request.cookies.userrole);
+  if (restroId) {
+    let items = null;
+    if (category === 'APPETIZERS') {
+      items = 'CALL insertAppetizerItems(?,?,?,?,?,?)';
+    } else if (category === 'BEVERAGES') {
+      items = 'CALL insertBeveragesItems(?,?,?,?,?,?)';
+    } else if (category === 'DESSERTS') {
+      items = 'CALL insertDessertsItems(?,?,?,?,?,?)';
+    } else if (category === 'MAIN_COURSE') {
+      items = 'CALL insertMainCourseItems(?,?,?,?,?,?)';
+    } else {
+      items = 'CALL insertSaladsItems(?,?,?,?,?,?)';
+    }
+    const connection = await mysqlConnection();
+    // eslint-disable-next-line no-unused-vars
+    const [results, fields] = await connection.query(items, [
+      restroId,
+      name,
+      price,
+      cuisine,
+      ingredients,
+      description,
+    ]);
+    connection.end();
+    console.log(results);
+    response.writeHead(200, {
+      'Content-Type': 'text/plain',
+    });
+    response.end(JSON.stringify(results));
+  } else {
+    response.writeHead(401, {
+      'Content-Type': 'text/plain',
+    });
+    response.end('Invalid User');
+  }
+};
+
+const deleteFoodItem = async (request, response) => {
+  const { category, foodId } = request.body;
+  const id = getUserIdFromToken(request.cookies.cookie, request.cookies.userrole);
+  if (id) {
+    let items = null;
+    if (category === 'APPETIZERS') {
+      items = 'CALL deleteAppetizerItems(?,?)';
+    } else if (category === 'BEVERAGES') {
+      items = 'CALL deleteBeveragesItems(?,?)';
+    } else if (category === 'DESSERTS') {
+      items = 'CALL deleteDessertsItems(?,?)';
+    } else if (category === 'MAIN_COURSE') {
+      items = 'CALL deleteMainCourseItems(?,?)';
+    } else {
+      items = 'CALL deleteSaladsItems(?,?)';
+    }
+    const connection = await mysqlConnection();
+    // eslint-disable-next-line no-unused-vars
+    const [results, fields] = await connection.query(items, [id, Number(foodId)]);
+    connection.end();
+    response.writeHead(200, {
+      'Content-Type': 'text/plain',
+    });
+    response.end('Food Item Deleted Successfully');
+  } else {
+    response.writeHead(401, {
+      'Content-Type': 'text/plain',
+    });
+    response.end('Invalid User');
+  }
+};
+
+module.exports = {
+  signup,
+  getBasicInfo,
+  getRestaurantCompleteInfo,
+  updateRestaurantProfile,
+  fetchMenu,
+  insertFood,
+  deleteFoodItem,
+};

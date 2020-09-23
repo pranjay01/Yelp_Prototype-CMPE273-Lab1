@@ -6,6 +6,9 @@ const {
   getBasicInfo,
   getRestaurantCompleteInfo,
   updateRestaurantProfile,
+  fetchMenu,
+  insertFood,
+  deleteFoodItem,
 } = require('../restaurant/restaurantProfile');
 
 const { login, logout } = require('../common/loginLogout');
@@ -54,9 +57,33 @@ Router.get('/restaurantCompleteProfile', async (req, res) => {
 
 // Restaurant Update Profile
 Router.post('/updateRestaurantProfile', async (req, res) => {
-  console.log('Login if correct credential');
+  console.log('Update Restaurant Profile');
   let results = null;
   results = await updateRestaurantProfile(req.body, res);
+  return results;
+});
+
+// Fetch menu of asked category
+Router.get('/menuFetch', async (req, res) => {
+  console.log('Fetch Menu');
+  let results = null;
+  results = await fetchMenu(req, res);
+  return results;
+});
+
+// nsert New Food Item
+Router.post('/insertFood', async (req, res) => {
+  console.log('Insert New Food Item');
+  let results = null;
+  results = await insertFood(req, res);
+  return results;
+});
+
+// nsert New Food Item
+Router.post('/deleteFoodItem', async (req, res) => {
+  console.log('Insert New Food Item');
+  let results = null;
+  results = await deleteFoodItem(req, res);
   return results;
 });
 

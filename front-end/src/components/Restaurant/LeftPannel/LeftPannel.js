@@ -16,12 +16,12 @@ class LeftPannel extends Component {
   // const changePageViewTo = (viewComponent) => {
 
   // }
-  changePageViewTo(tabOpened) {
-    let payload = {
-      tabOpened,
-    };
-    this.props.updateLeftPannelTab(payload);
-  }
+  // changePageViewTo(tabOpened) {
+  //   let payload = {
+  //     tabOpened,
+  //   };
+  //   this.props.updateLeftPannelTab(payload);
+  // }
   // componentDidMount() {}
   render() {
     return (
@@ -79,12 +79,16 @@ class LeftPannel extends Component {
               name=""
               rel=""
               role="link"
-              // onClick={() => {
-              //   this.props.onTabChangeHandler('Home');
-              // }}
-              onClick={() => this.changePageViewTo('Home')}
+              onClick={() => {
+                this.props.onTabChangeHandler('Home');
+              }}
+              // onClick={() => this.changePageViewTo('Home')}
             >
-              <div class="lemon--div__06b83__1mboc nav-item-v2__06b83__vmJJv inactive__06b83__2ZtYV active__06b83__cBu5j responsive-ui-enabled__06b83__2kOzB padding-t1__06b83__2aTOb padding-r1__06b83__1xqrz padding-b1__06b83__3erWW padding-l1__06b83__1UBqt border-color--default__06b83__3-ifU">
+              <div
+                class={`lemon--div__06b83__1mboc nav-item-v2__06b83__vmJJv inactive__06b83__2ZtYV responsive-ui-enabled__06b83__2kOzB padding-t1__06b83__2aTOb padding-r1__06b83__1xqrz padding-b1__06b83__3erWW padding-l1__06b83__1UBqt border-color--default__06b83__3-ifU ${
+                  this.props.profileInfo.tabName === 'Home' ? 'active__06b83__cBu5j' : ''
+                }`}
+              >
                 <div class="lemon--div__06b83__1mboc icon--active__06b83__lWtOD icon-v2__06b83__2Y6sR border-color--default__06b83__3-ifU text-align--center__06b83__2n2yQ">
                   <span aria-hidden="true" class="icon--24-home-v2 css-1mpk29p">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" class="icon_svg">
@@ -107,12 +111,16 @@ class LeftPannel extends Component {
               name=""
               rel=""
               role="link"
-              // onClick={() => {
-              //   this.props.onTabChangeHandler('Profile');
-              // }}
-              onClick={() => this.changePageViewTo('Profile')}
+              onClick={() => {
+                this.props.onTabChangeHandler('Profile');
+              }}
+              // onClick={() => this.changePageViewTo('Profile')}
             >
-              <div class="lemon--div__06b83__1mboc nav-item-v2__06b83__vmJJv inactive__06b83__2ZtYV responsive-ui-enabled__06b83__2kOzB padding-t1__06b83__2aTOb padding-r1__06b83__1xqrz padding-b1__06b83__3erWW padding-l1__06b83__1UBqt border-color--default__06b83__3-ifU">
+              <div
+                class={`lemon--div__06b83__1mboc nav-item-v2__06b83__vmJJv inactive__06b83__2ZtYV responsive-ui-enabled__06b83__2kOzB padding-t1__06b83__2aTOb padding-r1__06b83__1xqrz padding-b1__06b83__3erWW padding-l1__06b83__1UBqt border-color--default__06b83__3-ifU ${
+                  this.props.profileInfo.tabName === 'Profile' ? 'active__06b83__cBu5j' : ''
+                }`}
+              >
                 <div class="lemon--div__06b83__1mboc icon-v2__06b83__2Y6sR border-color--default__06b83__3-ifU text-align--center__06b83__2n2yQ">
                   <span aria-hidden="true" class="icon--24-bizhouse-v2 css-1mpk29p">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" class="icon_svg">
@@ -135,12 +143,16 @@ class LeftPannel extends Component {
               name=""
               rel=""
               role="link"
-              // onClick={() => {
-              //   this.props.onTabChangeHandler('FoodMenu');
-              // }}
-              onClick={() => this.changePageViewTo('FoodMenu')}
+              onClick={() => {
+                this.props.onTabChangeHandler('FoodMenu');
+              }}
+              // onClick={() => this.changePageViewTo('FoodMenu')}
             >
-              <div class="lemon--div__06b83__1mboc nav-item-v2__06b83__vmJJv inactive__06b83__2ZtYV responsive-ui-enabled__06b83__2kOzB padding-t1__06b83__2aTOb padding-r1__06b83__1xqrz padding-b1__06b83__3erWW padding-l1__06b83__1UBqt border-color--default__06b83__3-ifU">
+              <div
+                class={`lemon--div__06b83__1mboc nav-item-v2__06b83__vmJJv inactive__06b83__2ZtYV responsive-ui-enabled__06b83__2kOzB padding-t1__06b83__2aTOb padding-r1__06b83__1xqrz padding-b1__06b83__3erWW padding-l1__06b83__1UBqt border-color--default__06b83__3-ifU ${
+                  this.props.profileInfo.tabName === 'FoodMenu' ? 'active__06b83__cBu5j' : ''
+                }`}
+              >
                 <div class="lemon--div__06b83__1mboc icon-v2__06b83__2Y6sR border-color--default__06b83__3-ifU text-align--center__06b83__2n2yQ">
                   <span aria-hidden="true" class="icon--24-photos-v2 css-1mpk29p">
                     <img
@@ -167,12 +179,16 @@ class LeftPannel extends Component {
               name=""
               rel=""
               role="link"
-              // onClick={() => {
-              //   this.props.onTabChangeHandler('Orders');
-              // }}
-              onClick={() => this.changePageViewTo('Orders')}
+              onClick={() => {
+                this.props.onTabChangeHandler('Orders');
+              }}
+              // onClick={() => this.changePageViewTo('Orders')}
             >
-              <div class="lemon--div__06b83__1mboc nav-item-v2__06b83__vmJJv inactive__06b83__2ZtYV responsive-ui-enabled__06b83__2kOzB padding-t1__06b83__2aTOb padding-r1__06b83__1xqrz padding-b1__06b83__3erWW padding-l1__06b83__1UBqt border-color--default__06b83__3-ifU">
+              <div
+                class={`lemon--div__06b83__1mboc nav-item-v2__06b83__vmJJv inactive__06b83__2ZtYV responsive-ui-enabled__06b83__2kOzB padding-t1__06b83__2aTOb padding-r1__06b83__1xqrz padding-b1__06b83__3erWW padding-l1__06b83__1UBqt border-color--default__06b83__3-ifU ${
+                  this.props.profileInfo.tabName === 'Orders' ? 'active__06b83__cBu5j' : ''
+                }`}
+              >
                 <div class="lemon--div__06b83__1mboc icon-v2__06b83__2Y6sR border-color--default__06b83__3-ifU text-align--center__06b83__2n2yQ">
                   <span aria-hidden="true" class="icon--24-deal-v2 css-1mpk29p">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" class="icon_svg">
@@ -191,12 +207,17 @@ class LeftPannel extends Component {
             {/**Reviews */}
             <a
               class="lemon--a__06b83__IEZFH link__06b83__1G70M nav-link__06b83__2noz4 responsive-ui-enabled__06b83__2kOzB link-color--blue-dark__06b83__85-Nu link-size--default__06b83__7tls6"
-              // onClick={() => {
-              //   this.props.onTabChangeHandler('Reviews');
-              // }}
-              onClick={() => this.changePageViewTo('Reviews')}
+              style={{ cursor: 'pointer' }}
+              onClick={() => {
+                this.props.onTabChangeHandler('Reviews');
+              }}
+              // onClick={() => this.changePageViewTo('Reviews')}
             >
-              <div class="lemon--div__06b83__1mboc nav-item-v2__06b83__vmJJv inactive__06b83__2ZtYV responsive-ui-enabled__06b83__2kOzB padding-t1__06b83__2aTOb padding-r1__06b83__1xqrz padding-b1__06b83__3erWW padding-l1__06b83__1UBqt border-color--default__06b83__3-ifU">
+              <div
+                class={`lemon--div__06b83__1mboc nav-item-v2__06b83__vmJJv inactive__06b83__2ZtYV responsive-ui-enabled__06b83__2kOzB padding-t1__06b83__2aTOb padding-r1__06b83__1xqrz padding-b1__06b83__3erWW padding-l1__06b83__1UBqt border-color--default__06b83__3-ifU ${
+                  this.props.profileInfo.tabName === 'Reviews' ? 'active__06b83__cBu5j' : ''
+                }`}
+              >
                 <div class="lemon--div__06b83__1mboc icon-v2__06b83__2Y6sR border-color--default__06b83__3-ifU text-align--center__06b83__2n2yQ">
                   <span aria-hidden="true" class="icon--24-review-v2 css-1mpk29p">
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" class="icon_svg">
@@ -219,12 +240,16 @@ class LeftPannel extends Component {
               name=""
               rel=""
               role="link"
-              // onClick={() => {
-              //   this.props.onTabChangeHandler('Photos');
-              // }}
-              onClick={() => this.changePageViewTo('Photos')}
+              onClick={() => {
+                this.props.onTabChangeHandler('Photos');
+              }}
+              // onClick={() => this.changePageViewTo('Photos')}
             >
-              <div class="lemon--div__06b83__1mboc nav-item-v2__06b83__vmJJv inactive__06b83__2ZtYV responsive-ui-enabled__06b83__2kOzB padding-t1__06b83__2aTOb padding-r1__06b83__1xqrz padding-b1__06b83__3erWW padding-l1__06b83__1UBqt border-color--default__06b83__3-ifU">
+              <div
+                class={`lemon--div__06b83__1mboc nav-item-v2__06b83__vmJJv inactive__06b83__2ZtYV responsive-ui-enabled__06b83__2kOzB padding-t1__06b83__2aTOb padding-r1__06b83__1xqrz padding-b1__06b83__3erWW padding-l1__06b83__1UBqt border-color--default__06b83__3-ifU ${
+                  this.props.profileInfo.tabName === 'Photos' ? 'active__06b83__cBu5j' : ''
+                }`}
+              >
                 <div class="lemon--div__06b83__1mboc icon-v2__06b83__2Y6sR border-color--default__06b83__3-ifU text-align--center__06b83__2n2yQ">
                   <span aria-hidden="true" class="icon--24-photos-v2 css-1mpk29p">
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" class="icon_svg">

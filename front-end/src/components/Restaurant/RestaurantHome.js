@@ -11,6 +11,7 @@ import LeftPannel from './LeftPannel/LeftPannel';
 import DefaultHome from './DefaultHome';
 import Profile from './Profile/Profile';
 import FoodMenu from './Menu/FoodMenu';
+import ReviewList from './Reviews/ReviewList';
 // import '../Login/Login.css';
 
 class RestaurantHome extends Component {
@@ -187,7 +188,7 @@ class RestaurantHome extends Component {
       );
     }
 
-    let tabName = this.props.tabOpened;
+    let tabName = this.state.tabName;
     let basicProfile = this.state;
     console.log('Redux value: ', this.props.tabOpened);
     return (
@@ -283,6 +284,8 @@ class RestaurantHome extends Component {
                       return <Profile />;
                     case 'FoodMenu':
                       return <FoodMenu />;
+                    case 'Reviews':
+                      return <ReviewList />;
                     default:
                       return <DefaultHome />;
                   }
