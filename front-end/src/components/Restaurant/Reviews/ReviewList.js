@@ -1,74 +1,36 @@
 import Review from './Review';
 import React, { Component } from 'react';
+import axios from 'axios';
+import serverUrl from '../../../config';
 import './Reviews.css';
 
 class ReviewList extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      REVIEWS: [
-        {
-          ID: 1,
-          Rating: 5,
-          Date: null,
-          Description: 'bdjewdjehwbdeb',
-          CustomerId: 1,
-          CustomerName: 'pranjay',
-          reviewCount: 8,
-          CustomerAddr: 'jgjg',
-        },
-        {
-          ID: 2,
-          Rating: 4,
-          Date: null,
-          Description: 'bdjewdjehwbdeb',
-          CustomerId: 1,
-          CustomerName: 'pranjay',
-          reviewCount: 8,
-          CustomerAddr: 'jgjg',
-        },
-        {
-          ID: 3,
-          Rating: 3,
-          Date: null,
-          Description: 'bdjewdjehwbdeb',
-          CustomerId: 1,
-          CustomerName: 'pranjay',
-          reviewCount: 8,
-          CustomerAddr: 'jgjg',
-        },
-        {
-          ID: 4,
-          Rating: 2,
-          Date: null,
-          Description: 'bdjewdjehwbdeb',
-          CustomerId: 1,
-          CustomerName: 'pranjay',
-          reviewCount: 8,
-          CustomerAddr: 'jgjg',
-        },
-        {
-          ID: 5,
-          Rating: 1,
-          Date: null,
-          Description: 'bdjewdjehwbdeb',
-          CustomerId: 1,
-          CustomerName: 'pranjay',
-          reviewCount: 8,
-          CustomerAddr: 'jgjg',
-        },
-        {
-          ID: 6,
-          Rating: 0,
-          Date: null,
-          Description: 'bdjewdjehwbdeb',
-          CustomerId: 1,
-          CustomerName: 'pranjay',
-          reviewCount: 8,
-          CustomerAddr: 'jgjg',
-        },
-      ],
+      REVIEWS: [],
     };
+  }
+  componentDidMount() {
+    console.log('inside Reviews');
+    axios.get(serverUrl + 'biz/fetchReviews').then((response) => {
+      console.log('Review ist Fetched', response.data);
+      let allReviews = response.data[0].map((Review) => {
+        return {
+          ID: Review.ID,
+          Rating: Review.Rating,
+          Date: new Date(Review.Date),
+          Description: Review.Description,
+          CustomerId: Review.CustomerId,
+          CustomerName: Review.CustomerName,
+          CustomerAddr: Review.CustomerAddr,
+        };
+      });
+
+      this.setState({
+        REVIEWS: this.state.REVIEWS.concat(allReviews),
+      });
+    });
   }
   render() {
     return (

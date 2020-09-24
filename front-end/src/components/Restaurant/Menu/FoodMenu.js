@@ -15,7 +15,7 @@ class FoodMenu extends Component {
       MAIN_COURSE: [],
       SALADS: [],
       CUISINES: [],
-      showFoodCategory: '',
+      showFoodCategory: localStorage.getItem('showFoodCategory'),
       addFoodItemForm: false,
       newFood: {
         category: '',
@@ -40,6 +40,9 @@ class FoodMenu extends Component {
   }
   // Call On render
   componentDidMount() {
+    if (localStorage.getItem('showFoodCategory')) {
+      this.showMenuCategory(localStorage.getItem('showFoodCategory'));
+    }
     console.log('inside Signup');
     axios.get(serverUrl + 'static/getCusinesForMenu').then((response) => {
       console.log(response.data);
@@ -115,6 +118,7 @@ class FoodMenu extends Component {
       Price: null,
     };
     if (this.state.showFoodCategory === menuCategory) {
+      localStorage.setItem('showFoodCategory', '');
       this.setState({
         editableCategory: '',
         showFoodCategory: '',
@@ -122,6 +126,7 @@ class FoodMenu extends Component {
         tmpFood: { ...this.state.tmpFood, ...tmp },
       });
     } else {
+      localStorage.setItem('showFoodCategory', menuCategory);
       this.setState({
         showFoodCategory: menuCategory,
         editableCategory: menuCategory,
@@ -658,6 +663,32 @@ class FoodMenu extends Component {
         console.log('Update food item', foodItem);
         break;
     }
+
+    foodItem = { ...foodItem, category: this.state.showFoodCategory };
+    axios.defaults.withCredentials = true;
+    //make a post request with the user data
+    axios.post(serverUrl + 'biz/updateFoodItem', foodItem).then(
+      (response) => {
+        console.log('Status Code : ', response.status);
+        if (response.status === 200) {
+          console.log(response.data);
+          let tmpFood = {
+            ID: null,
+            category: '',
+            Name: '',
+            MainIngredients: '',
+            CuisineID: null,
+            Description: '',
+            Price: null,
+          };
+          this.setState({ tmpFood, editableId: null });
+          // newFoodId = { ...newFoodId, ...this.state.newFood };
+        }
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
   };
 
   //cancel Updating food, and revert back to orignal
@@ -829,7 +860,7 @@ class FoodMenu extends Component {
                     <strong>APPETIZERS</strong>
                   </p>
                 </a>
-                {this.state.showFoodCategory === 'APPETIZERS' && (
+                {this.state.showFoodCategory === 'APPETIZERS' && !this.state.addFoodItemForm && (
                   <button
                     onClick={this.openFoodForm}
                     data-ui="add-section"
@@ -837,6 +868,16 @@ class FoodMenu extends Component {
                     class="_-_-shared-ui-atoms-button-base-___button__button _-_-shared-ui-atoms-button-base-___button__small _-_-shared-ui-atoms-button-secondary-___secondary__default "
                   >
                     + Add
+                  </button>
+                )}
+                {this.state.showFoodCategory === 'APPETIZERS' && this.state.addFoodItemForm && (
+                  <button
+                    onClick={this.openFoodForm}
+                    data-ui="add-section"
+                    aria-describedby="education_label"
+                    class="_-_-shared-ui-atoms-button-base-___button__button _-_-shared-ui-atoms-button-base-___button__small _-_-shared-ui-atoms-button-secondary-___secondary__default "
+                  >
+                    - Cancel
                   </button>
                 )}
               </div>
@@ -852,7 +893,6 @@ class FoodMenu extends Component {
                     onDescriptionChangeHandler={(evt) => this.onDescriptionChangeHandler(evt)}
                     onNameChangeHandler={(evt) => this.onNameChangeHandler(evt)}
                     food={this.state.newFood}
-                    cancelAddition={() => this.openFoodForm()}
                     onSaveCreateNew={() => this.onSaveCreateNew()}
                   ></NewFoodForm>
                 </div>
@@ -909,7 +949,7 @@ class FoodMenu extends Component {
                     <strong>SALADS</strong>
                   </p>
                 </a>
-                {this.state.showFoodCategory === 'SALADS' && (
+                {this.state.showFoodCategory === 'SALADS' && !this.state.addFoodItemForm && (
                   <button
                     onClick={this.openFoodForm}
                     data-ui="add-section"
@@ -917,6 +957,16 @@ class FoodMenu extends Component {
                     class="_-_-shared-ui-atoms-button-base-___button__button _-_-shared-ui-atoms-button-base-___button__small _-_-shared-ui-atoms-button-secondary-___secondary__default "
                   >
                     + Add
+                  </button>
+                )}
+                {this.state.showFoodCategory === 'SALADS' && this.state.addFoodItemForm && (
+                  <button
+                    onClick={this.openFoodForm}
+                    data-ui="add-section"
+                    aria-describedby="education_label"
+                    class="_-_-shared-ui-atoms-button-base-___button__button _-_-shared-ui-atoms-button-base-___button__small _-_-shared-ui-atoms-button-secondary-___secondary__default "
+                  >
+                    - Cancel
                   </button>
                 )}
               </div>
@@ -932,7 +982,6 @@ class FoodMenu extends Component {
                     onDescriptionChangeHandler={(evt) => this.onDescriptionChangeHandler(evt)}
                     onNameChangeHandler={(evt) => this.onNameChangeHandler(evt)}
                     food={this.state.newFood}
-                    cancelAddition={() => this.openFoodForm()}
                     onSaveCreateNew={() => this.onSaveCreateNew()}
                   ></NewFoodForm>
                 </div>
@@ -988,7 +1037,7 @@ class FoodMenu extends Component {
                     <strong>MAIN COURSE</strong>
                   </p>
                 </a>
-                {this.state.showFoodCategory === 'MAIN_COURSE' && (
+                {this.state.showFoodCategory === 'MAIN_COURSE' && !this.state.addFoodItemForm && (
                   <button
                     onClick={this.openFoodForm}
                     data-ui="add-section"
@@ -996,6 +1045,17 @@ class FoodMenu extends Component {
                     class="_-_-shared-ui-atoms-button-base-___button__button _-_-shared-ui-atoms-button-base-___button__small _-_-shared-ui-atoms-button-secondary-___secondary__default "
                   >
                     + Add
+                  </button>
+                )}
+
+                {this.state.showFoodCategory === 'MAIN_COURSE' && this.state.addFoodItemForm && (
+                  <button
+                    onClick={this.openFoodForm}
+                    data-ui="add-section"
+                    aria-describedby="education_label"
+                    class="_-_-shared-ui-atoms-button-base-___button__button _-_-shared-ui-atoms-button-base-___button__small _-_-shared-ui-atoms-button-secondary-___secondary__default "
+                  >
+                    - Cancel
                   </button>
                 )}
               </div>
@@ -1011,7 +1071,6 @@ class FoodMenu extends Component {
                     onDescriptionChangeHandler={(evt) => this.onDescriptionChangeHandler(evt)}
                     onNameChangeHandler={(evt) => this.onNameChangeHandler(evt)}
                     food={this.state.newFood}
-                    cancelAddition={() => this.openFoodForm()}
                     onSaveCreateNew={() => this.onSaveCreateNew()}
                   ></NewFoodForm>
                 </div>
@@ -1067,7 +1126,7 @@ class FoodMenu extends Component {
                     <strong>BEVERAGES</strong>
                   </p>
                 </a>
-                {this.state.showFoodCategory === 'BEVERAGES' && (
+                {this.state.showFoodCategory === 'BEVERAGES' && !this.state.addFoodItemForm && (
                   <button
                     onClick={this.openFoodForm}
                     data-ui="add-section"
@@ -1075,6 +1134,17 @@ class FoodMenu extends Component {
                     class="_-_-shared-ui-atoms-button-base-___button__button _-_-shared-ui-atoms-button-base-___button__small _-_-shared-ui-atoms-button-secondary-___secondary__default "
                   >
                     + Add
+                  </button>
+                )}
+
+                {this.state.showFoodCategory === 'BEVERAGES' && this.state.addFoodItemForm && (
+                  <button
+                    onClick={this.openFoodForm}
+                    data-ui="add-section"
+                    aria-describedby="education_label"
+                    class="_-_-shared-ui-atoms-button-base-___button__button _-_-shared-ui-atoms-button-base-___button__small _-_-shared-ui-atoms-button-secondary-___secondary__default "
+                  >
+                    - Cancel
                   </button>
                 )}
               </div>
@@ -1090,7 +1160,6 @@ class FoodMenu extends Component {
                     onDescriptionChangeHandler={(evt) => this.onDescriptionChangeHandler(evt)}
                     onNameChangeHandler={(evt) => this.onNameChangeHandler(evt)}
                     food={this.state.newFood}
-                    cancelAddition={() => this.openFoodForm()}
                     onSaveCreateNew={() => this.onSaveCreateNew()}
                   ></NewFoodForm>
                 </div>
@@ -1146,7 +1215,7 @@ class FoodMenu extends Component {
                     <strong>DESSERTS</strong>
                   </p>
                 </a>
-                {this.state.showFoodCategory === 'DESSERTS' && (
+                {this.state.showFoodCategory === 'DESSERTS' && !this.state.addFoodItemForm && (
                   <button
                     onClick={this.openFoodForm}
                     data-ui="add-section"
@@ -1154,6 +1223,17 @@ class FoodMenu extends Component {
                     class="_-_-shared-ui-atoms-button-base-___button__button _-_-shared-ui-atoms-button-base-___button__small _-_-shared-ui-atoms-button-secondary-___secondary__default "
                   >
                     + Add
+                  </button>
+                )}
+
+                {this.state.showFoodCategory === 'DESSERTS' && this.state.addFoodItemForm && (
+                  <button
+                    onClick={this.openFoodForm}
+                    data-ui="add-section"
+                    aria-describedby="education_label"
+                    class="_-_-shared-ui-atoms-button-base-___button__button _-_-shared-ui-atoms-button-base-___button__small _-_-shared-ui-atoms-button-secondary-___secondary__default "
+                  >
+                    - Cancel
                   </button>
                 )}
               </div>
@@ -1169,7 +1249,6 @@ class FoodMenu extends Component {
                     onDescriptionChangeHandler={(evt) => this.onDescriptionChangeHandler(evt)}
                     onNameChangeHandler={(evt) => this.onNameChangeHandler(evt)}
                     food={this.state.newFood}
-                    cancelAddition={() => this.openFoodForm()}
                     onSaveCreateNew={() => this.onSaveCreateNew()}
                   ></NewFoodForm>
                 </div>

@@ -133,7 +133,7 @@ class Review extends Component {
                 </div>
                 <div class="lemon--div__373c0__1mboc arrange-unit__373c0__o3tjT arrange-unit-fill__373c0__3Sfw1 border-color--default__373c0__3-ifU">
                   <span class="lemon--span__373c0__3997G text__373c0__2Kxyz text-color--mid__373c0__jCeOG text-align--left__373c0__2XGa-">
-                    {this.props.review.Date}
+                    {this.props.review.Date.toLocaleDateString()}
                     {/* 8/22/2020*/}
                   </span>
                 </div>

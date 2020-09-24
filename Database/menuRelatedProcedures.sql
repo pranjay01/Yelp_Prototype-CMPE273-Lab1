@@ -58,8 +58,6 @@ DELIMITER ;
 
 
 
-
-
 -- Procedure to insert items in the menu
 
 drop procedure IF EXISTS insertAppetizerItems;
@@ -209,6 +207,84 @@ BEGIN
 declare exit handler for sqlexception rollback;
 start transaction;
 DELETE FROM SALADS WHERE RestaurantID = ID_check AND ID = FoodId;
+commit;
+END$$
+DELIMITER ;
+
+
+-- Procedure to update food items
+
+drop procedure IF EXISTS updateAppetizerItems;
+DELIMITER $$
+CREATE PROCEDURE `updateAppetizerItems` (IN _ID INT,IN _Resto_ID INT, IN _Name VARCHAR(50),
+IN _Main_Ingredients VARCHAR(100), IN _Price DECIMAL(4,2),IN _Cuisine_ID INT ,IN _Description VARCHAR(100))
+BEGIN
+declare exit handler for sqlexception rollback;
+start transaction;
+UPDATE APPETIZER 
+set Name=_Name, Main_Ingredients=_Main_Ingredients, Price=_Price, 
+Cuisine_ID=_Cuisine_ID, Description=_Description
+where ID=_ID and Restaurant_ID=_Resto_ID;
+commit;
+END$$
+DELIMITER ;
+
+drop procedure IF EXISTS updateBeveragesItems;
+DELIMITER $$
+CREATE PROCEDURE `updateBeveragesItems` (IN _ID INT,IN _Resto_ID INT, IN _Name VARCHAR(50),
+IN _Main_Ingredients VARCHAR(100), IN _Price DECIMAL(4,2),IN _Cuisine_ID INT ,IN _Description VARCHAR(100))
+BEGIN
+declare exit handler for sqlexception rollback;
+start transaction;
+UPDATE BEVERAGES 
+set Name=_Name, Main_Ingredients=_Main_Ingredients, Price=_Price, 
+Cuisine_ID=_Cuisine_ID, Description=_Description
+where ID=_ID and Restaurant_ID=_Resto_ID;
+commit;
+END$$
+DELIMITER ;
+
+drop procedure IF EXISTS updateDessertItems;
+DELIMITER $$
+CREATE PROCEDURE `updateDessertItems` (IN _ID INT,IN _Resto_ID INT, IN _Name VARCHAR(50),
+IN _Main_Ingredients VARCHAR(100), IN _Price DECIMAL(4,2),IN _Cuisine_ID INT ,IN _Description VARCHAR(100))
+BEGIN
+declare exit handler for sqlexception rollback;
+start transaction;
+UPDATE DESSERTS 
+set Name=_Name, Main_Ingredients=_Main_Ingredients, Price=_Price, 
+Cuisine_ID=_Cuisine_ID, Description=_Description
+where ID=_ID and Restaurant_ID=_Resto_ID;
+commit;
+END$$
+DELIMITER ;
+
+drop procedure IF EXISTS updateMainCourseItems;
+DELIMITER $$
+CREATE PROCEDURE `updateMainCourseItems` (IN _ID INT,IN _Resto_ID INT, IN _Name VARCHAR(50),
+IN _Main_Ingredients VARCHAR(100), IN _Price DECIMAL(4,2),IN _Cuisine_ID INT ,IN _Description VARCHAR(100))
+BEGIN
+declare exit handler for sqlexception rollback;
+start transaction;
+UPDATE MAIN_COURSE 
+set Name=_Name, Main_Ingredients=_Main_Ingredients, Price=_Price, 
+Cuisine_ID=_Cuisine_ID, Description=_Description
+where ID=_ID and Restaurant_ID=_Resto_ID;
+commit;
+END$$
+DELIMITER ;
+
+drop procedure IF EXISTS updateSaladsItems;
+DELIMITER $$
+CREATE PROCEDURE `updateSaladsItems` (IN _ID INT,IN _Resto_ID INT, IN _Name VARCHAR(50),
+IN _Main_Ingredients VARCHAR(100), IN _Price DECIMAL(4,2),IN _Cuisine_ID INT ,IN _Description VARCHAR(100))
+BEGIN
+declare exit handler for sqlexception rollback;
+start transaction;
+UPDATE SALADS 
+set Name=_Name, Main_Ingredients=_Main_Ingredients, Price=_Price, 
+Cuisine_ID=_Cuisine_ID, Description=_Description
+where ID=_ID and Restaurant_ID=_Resto_ID;
 commit;
 END$$
 DELIMITER ;

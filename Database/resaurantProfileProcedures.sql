@@ -124,3 +124,20 @@ start transaction;
 end $$
 
 delimiter ;
+
+
+-- Procedure to fetch review for the Restaurant
+drop procedure  if exists fetchReviews;
+DELIMITER $$
+CREATE PROCEDURE `fetchReviews` (IN RestroID INT)
+BEGIN
+declare exit handler for sqlexception rollback;
+start transaction;
+SELECT REVIEWS.ID as ID, REVIEWS.Customer_ID as CustomerId, 
+concat(First_Name,' ', Last_Name) as CustomerName,Description,Date,
+Rating , concat(City, Zip )
+FROM REVIEWS JOIN CUSTOMER on REVIEWS.Customer_ID = CUSTOMER.Customer_ID
+WHERE Restaurant_ID = RestroID;
+commit;
+END$$
+DELIMITER ;

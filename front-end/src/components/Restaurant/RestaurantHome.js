@@ -22,13 +22,15 @@ class RestaurantHome extends Component {
       restroName: '',
       address: '',
       reviewCOunt: '',
-      tabName: 'Home',
+      tabName: localStorage.getItem('tabName'),
     };
   }
   onTabChangeHandler = (tabName) => {
     this.setState({
       tabName,
     });
+    localStorage.setItem('tabName', tabName);
+    localStorage.setItem('showFoodCategory', '');
   };
   componentDidMount() {
     // this.setState({
@@ -73,6 +75,7 @@ class RestaurantHome extends Component {
     };
     axios.post(serverUrl + 'biz/logout', data).then((response) => {
       if (response.status === 200) {
+        localStorage.clear();
         let payload = {
           userEmail: '',
           role: '',
@@ -286,8 +289,8 @@ class RestaurantHome extends Component {
                       return <FoodMenu />;
                     case 'Reviews':
                       return <ReviewList />;
-                    default:
-                      return <DefaultHome />;
+                    // default:
+                    //   return <DefaultHome />;
                   }
                 })()}
                 {/*<DefaultHome profileInfo={this.state} />*/}

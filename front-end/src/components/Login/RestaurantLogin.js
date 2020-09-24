@@ -45,26 +45,25 @@ class RestaurantLogin extends Component {
   }
   // Call the Will Mount to set the auth Flag to false
   componentDidMount() {
-    if (this.props.location.pathname === '/restaurantSignup') {
-      console.log('inside Signup');
-      axios.get(serverUrl + 'static/signupMasterData').then((response) => {
-        console.log(response.data);
-        let allCountries = response.data[0].map((country) => {
-          return { key: country.ID, value: country.Name };
-        });
-        let allStates = response.data[1].map((state) => {
-          return { key: state.ID, value: state.Name };
-        });
-        let allCountrieCodes = response.data[0].map((countryCode) => {
-          return { key: countryCode.ID, value: countryCode.Country_Code };
-        });
-        this.setState({
-          countries: this.state.countries.concat(allCountries),
-          states: this.state.states.concat(allStates),
-          countryCodes: this.state.countryCodes.concat(allCountrieCodes),
-        });
+    console.log('inside Signup');
+    axios.get(serverUrl + 'static/signupMasterData').then((response) => {
+      console.log(response.data);
+      let allCountries = response.data[0].map((country) => {
+        return { key: country.ID, value: country.Name };
       });
-    }
+      let allStates = response.data[1].map((state) => {
+        return { key: state.ID, value: state.Name };
+      });
+      let allCountrieCodes = response.data[0].map((countryCode) => {
+        return { key: countryCode.ID, value: countryCode.Country_Code };
+      });
+      this.setState({
+        countries: this.state.countries.concat(allCountries),
+        states: this.state.states.concat(allStates),
+        countryCodes: this.state.countryCodes.concat(allCountrieCodes),
+      });
+    });
+
     this.setState({
       authFlag: false,
     });
@@ -96,8 +95,13 @@ class RestaurantLogin extends Component {
   };
 
   onChangeHandlerPhoneNo = (e) => {
+    let ErrorStr = null;
+    if (e.target.value && !/^\d+$/.test(e.target.value)) {
+      ErrorStr = 'Validate Contact Number';
+    }
     this.setState({
       contactNo: e.target.value,
+      errorBlock: ErrorStr,
     });
   };
 
@@ -114,22 +118,80 @@ class RestaurantLogin extends Component {
   };
 
   onChangeHandlerZipCode = (e) => {
+    let ErrorStr = null;
+    if (e.target.value && !/^\d+$/.test(e.target.value)) {
+      ErrorStr = 'Validate Zip Code';
+    }
     this.setState({
       zip: e.target.value,
+      errorBlock: ErrorStr,
     });
   };
 
   onChangeHandlerCity = (e) => {
     this.setState({
       city: e.target.value,
+      errorBlock: null,
     });
   };
   onChangeHandlerStreet = (e) => {
     this.setState({
       street: e.target.value,
+      errorBlock: null,
     });
   };
 
+  ValiditySignup = () => {
+    let ErrorStr = '';
+    if (this.state.Name.length == 0) {
+      ErrorStr = ErrorStr + 'Name cannot be Empty';
+    }
+    if (this.state.countryCode === '') {
+      if (ErrorStr) {
+        ErrorStr += ', ';
+      }
+      ErrorStr = ErrorStr + 'Select correct Phone Extention';
+    }
+
+    if (this.state.state === '') {
+      if (ErrorStr) {
+        ErrorStr += ', ';
+      }
+      ErrorStr = ErrorStr + 'Select correct State';
+    }
+    if (this.state.city.length === 0) {
+      if (ErrorStr) {
+        ErrorStr += ', ';
+      }
+      ErrorStr = ErrorStr + 'City cannot be empty';
+    }
+
+    if (this.state.country === '') {
+      if (ErrorStr) {
+        ErrorStr += ', ';
+      }
+      ErrorStr = ErrorStr + 'Select Country';
+    }
+
+    if (!/^\d+$/.test(this.state.zip)) {
+      if (ErrorStr) {
+        ErrorStr += ', ';
+      }
+      ErrorStr = ErrorStr + 'Validate Zip Code';
+    }
+
+    if (!/^\d+$/.test(this.state.contactNo)) {
+      if (ErrorStr) {
+        ErrorStr += ', ';
+      }
+      ErrorStr = ErrorStr + 'Validate Phone Number';
+    }
+
+    if (ErrorStr.length == 0) {
+      ErrorStr = 'Correct';
+    }
+    return ErrorStr;
+  };
   onSubmitSignUp = (e) => {
     //prevent page from refresh
     e.preventDefault();
@@ -156,6 +218,19 @@ class RestaurantLogin extends Component {
           this.setState({
             authFlag: true,
             sigupSuccessful: true,
+            authFlag: false,
+            errorBlock: null,
+            inputBlockHighlight: null,
+            errorFlag: 1,
+            email: '',
+            signupPassword: '',
+            country: null,
+            state: null,
+            countryCode: null,
+            city: null,
+            zip: null,
+            street: null,
+            contactNo: null,
           });
         } else {
           this.setState({
@@ -164,7 +239,7 @@ class RestaurantLogin extends Component {
         }
       },
       (error) => {
-        console.log(error.response.data);
+        console.log(error.response);
         this.setState({
           errorBlock: error.response.data,
           sigupSuccessful: false,
@@ -212,6 +287,7 @@ class RestaurantLogin extends Component {
       (response) => {
         console.log('Status Code : ', response.status);
         if (response.status === 200) {
+          localStorage.setItem('tabName', 'Home');
           // console.log('cookie: ', cookie.load('cookie'));
           // console.log('role: ', cookie.load('userrole'));
           // console.log('role: ', cookie);
@@ -349,6 +425,8 @@ class RestaurantLogin extends Component {
 
                   <label class="placeholder-sub">Password</label>
                   <input
+                    minlength="6"
+                    maxlength="18"
                     id="password"
                     name="password"
                     placeholder="Password"
@@ -407,6 +485,8 @@ class RestaurantLogin extends Component {
                   <li style={{ width: '80%' }}>
                     <label class="placeholder-sub">Phone-No</label>
                     <input
+                      minlength="10"
+                      maxlength="10"
                       id="phoneNo"
                       name="phoneNo"
                       placeholder="Phone-No"
@@ -458,11 +538,13 @@ class RestaurantLogin extends Component {
                   <li style={{ width: '35%' }}>
                     <label class="placeholder-sub">Zip Code</label>
                     <input
+                      minlength="5"
+                      maxlength="5"
                       id="zipCode"
                       name="zipCode"
                       placeholder="zipCode"
                       required="required"
-                      type="number"
+                      type="text"
                       onChange={this.onChangeHandlerZipCode}
                     />
                   </li>
@@ -492,6 +574,7 @@ class RestaurantLogin extends Component {
               </div>
 
               <button
+                disabled={!(this.state.errorBlock === null)}
                 id="signup-button"
                 type="submit"
                 class="ybtn ybtn--primary ybtn--big disable-on-submit submit signup-button"

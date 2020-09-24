@@ -9,6 +9,8 @@ const {
   fetchMenu,
   insertFood,
   deleteFoodItem,
+  updateFoodItem,
+  fetchReviews,
 } = require('../restaurant/restaurantProfile');
 
 const { login, logout } = require('../common/loginLogout');
@@ -79,12 +81,27 @@ Router.post('/insertFood', async (req, res) => {
   return results;
 });
 
-// nsert New Food Item
+// Delete Food Item
 Router.post('/deleteFoodItem', async (req, res) => {
-  console.log('Insert New Food Item');
+  console.log('Delete Food Item');
   let results = null;
   results = await deleteFoodItem(req, res);
   return results;
 });
 
+// Update Food Item
+Router.post('/updateFoodItem', async (req, res) => {
+  console.log('Update Food Item');
+  let results = null;
+  results = await updateFoodItem(req, res);
+  return results;
+});
+
+// Fetch reviews
+Router.get('/fetchReviews', async (req, res) => {
+  console.log('Fetch Menu');
+  let results = null;
+  results = await fetchReviews(req, res);
+  return results;
+});
 module.exports = Router;

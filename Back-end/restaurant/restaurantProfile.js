@@ -1,11 +1,12 @@
-/* eslint-disable no-else-return */
 /* eslint-disable no-console */
 
 const bcrypt = require('bcrypt');
 const url = require('url');
+// const { request } = require('http');
 const { getUserIdFromToken } = require('../common/loginLogout');
 
 const mysqlConnection = require('../mysqlConnection');
+
 require('dotenv').config();
 
 // Function to check if email already exists
@@ -21,6 +22,7 @@ const checkEmailExists = async (email) => {
   console.log(results);
   if (results[0].length === 0) {
     return true;
+    // eslint-disable-next-line no-else-return
   } else {
     return false;
   }
@@ -217,6 +219,7 @@ const updateRestaurantProfile = async (restaurant, response) => {
     });
     response.end('Network Error');
   }
+  return response;
 };
 
 const fetchMenu = async (request, response) => {
@@ -249,6 +252,7 @@ const fetchMenu = async (request, response) => {
     });
     response.end('Invalid User');
   }
+  return response;
 };
 
 const insertFood = async (request, response) => {
@@ -289,6 +293,7 @@ const insertFood = async (request, response) => {
     });
     response.end('Invalid User');
   }
+  return response;
 };
 
 const deleteFoodItem = async (request, response) => {
@@ -321,6 +326,81 @@ const deleteFoodItem = async (request, response) => {
     });
     response.end('Invalid User');
   }
+  return response;
+};
+
+// Update Restaurant Profile
+const updateFoodItem = async (request, response) => {
+  try {
+    const foodItem = request.body;
+    const { ID, category, Name, MainIngredients, CuisineID, Description, Price } = foodItem;
+    const restroID = getUserIdFromToken(request.cookies.cookie, request.cookies.userrole);
+    let updateFoodItemQuery = '';
+    if (restroID) {
+      if (category === 'APPETIZERS') {
+        updateFoodItemQuery = 'CALL updateAppetizerItems(?,?,?,?,?,?,?)';
+      } else if (category === 'BEVERAGES') {
+        updateFoodItemQuery = 'CALL updateBeveragesItems(?,?,?,?,?,?,?)';
+      } else if (category === 'DESSERTS') {
+        updateFoodItemQuery = 'CALL updateDessertItems(?,?,?,?,?,?,?)';
+      } else if (category === 'MAIN_COURSE') {
+        updateFoodItemQuery = 'CALL updateMainCourseItems(?,?,?,?,?,?,?)';
+      } else {
+        updateFoodItemQuery = 'CALL updateSaladsItems(?,?,?,?,?,?,?)';
+      }
+      const connection = await mysqlConnection();
+      // eslint-disable-next-line no-unused-vars
+      const [results, fields] = await connection.query(updateFoodItemQuery, [
+        ID,
+        restroID,
+        Name,
+        MainIngredients,
+        Price,
+        CuisineID,
+        Description,
+      ]);
+      connection.end();
+      console.log(results);
+      response.writeHead(200, {
+        'Content-Type': 'text/plain',
+      });
+      response.end('Food Item Updated successfully');
+    } else {
+      response.writeHead(401, {
+        'Content-Type': 'text/plain',
+      });
+      response.end('Invalid User');
+    }
+  } catch (error) {
+    response.writeHead(401, {
+      'Content-Type': 'text/plain',
+    });
+    response.end('Network Error');
+  }
+  return response;
+};
+
+// fetch Reviews
+const fetchReviews = async (request, response) => {
+  const restroId = getUserIdFromToken(request.cookies.cookie, request.cookies.userrole);
+  if (restroId) {
+    const fetchReviewsQuery = 'CALL fetchReviews(?)';
+
+    const connection = await mysqlConnection();
+    // eslint-disable-next-line no-unused-vars
+    const [results, fields] = await connection.query(fetchReviewsQuery, restroId);
+    connection.end();
+    response.writeHead(200, {
+      'Content-Type': 'text/plain',
+    });
+    response.end(JSON.stringify(results));
+  } else {
+    response.writeHead(401, {
+      'Content-Type': 'text/plain',
+    });
+    response.end('Invalid User');
+  }
+  return response;
 };
 
 module.exports = {
@@ -331,4 +411,6 @@ module.exports = {
   fetchMenu,
   insertFood,
   deleteFoodItem,
+  updateFoodItem,
+  fetchReviews,
 };

@@ -268,9 +268,6 @@ class Profile extends Component {
     return (
       <div style={{ marginTop: '3%' }}>
         <div class={errorClass}>
-          <a onClick={this.removeError} class="js-alert-dismiss dismiss-link" href="#">
-            ×
-          </a>
           <p class="alert-message">
             <ul>{this.state.submitErrorBlock}</ul>
           </p>
