@@ -1,10 +1,9 @@
-import { updatProfileInformation, updateLeftPannelTab } from '../constants/action-types';
+import { updatProfileInformation, updateHomeProfile } from '../constants/action-types';
 
 const defaultState = {
   restaurantHome: {
     restaurantName: '',
     restaurantAddress: '',
-    tabOpened: 'Home',
   },
 };
 
@@ -17,13 +16,14 @@ const restaurantHomePageReducer = (state = defaultState, action) => {
         //   return Object.assign(state, action.payload);
       };
     }
-    case updateLeftPannelTab: {
+    case updateHomeProfile: {
       return {
         ...state,
         restaurantHome: { ...state.restaurantHome, ...action.payload },
         //   return Object.assign(state, action.payload);
       };
     }
+
     default: {
       return { ...state };
     }

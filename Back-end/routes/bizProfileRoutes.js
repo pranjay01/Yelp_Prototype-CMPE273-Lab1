@@ -11,6 +11,9 @@ const {
   deleteFoodItem,
   updateFoodItem,
   fetchReviews,
+  getOrderDetailsNew,
+  orderFetch,
+  updateDeliveryStatus,
 } = require('../restaurant/restaurantProfile');
 
 const { login, logout } = require('../common/loginLogout');
@@ -102,6 +105,30 @@ Router.get('/fetchReviews', async (req, res) => {
   console.log('Fetch Menu');
   let results = null;
   results = await fetchReviews(req, res);
+  return results;
+});
+
+// Fetch Orders
+Router.get('/getOrderDetailsNew', async (req, res) => {
+  console.log('Fetch Orders');
+  let results = null;
+  results = await getOrderDetailsNew(req, res);
+  return results;
+});
+
+// Fetch particukar order detail
+Router.get('/orderFetch', async (req, res) => {
+  console.log('Fetch OrderDetail');
+  let results = null;
+  results = await orderFetch(req, res);
+  return results;
+});
+
+// Update Delivery Status
+Router.post('/updateDeliveryStatus', async (req, res) => {
+  console.log('Update Delivery Status');
+  let results = null;
+  results = await updateDeliveryStatus(req, res);
   return results;
 });
 module.exports = Router;

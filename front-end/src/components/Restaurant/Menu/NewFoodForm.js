@@ -43,7 +43,8 @@ class NewFoodForm extends Component {
                     name="Price"
                     placeholder="Price"
                     required="required"
-                    type="text"
+                    type="number"
+                    step="0.01"
                     onChange={(event) => this.props.onPriceChangeHandler(event.target.value)}
                     value={this.props.food.Price}
                   />

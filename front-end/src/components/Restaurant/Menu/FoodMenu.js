@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import serverUrl from '../../../config';
-import cookie from 'react-cookies';
 import './FoodMenu.css';
 import Food from './Food';
 import NewFoodForm from './NewFoodForm';
@@ -85,6 +84,9 @@ class FoodMenu extends Component {
         index = this.state.DESSERTS.findIndex((x) => x.ID === FoodId);
         foodItem = { ...this.state.DESSERTS[index], category: this.state.showFoodCategory };
 
+        break;
+      default:
+        console.log('wrong Input');
         break;
     }
 
@@ -268,6 +270,9 @@ class FoodMenu extends Component {
             });
         }
         break;
+      default:
+        console.log('wrong Input');
+        break;
     }
   };
 
@@ -329,6 +334,9 @@ class FoodMenu extends Component {
               this.setState({
                 DESSERTS: tmpDESSERTS,
               });
+              break;
+            default:
+              console.log('wrong Input');
               break;
           }
         }
@@ -442,10 +450,12 @@ class FoodMenu extends Component {
         DESSERTS[index] = food;
         this.setState({ DESSERTS });
         break;
+      default:
+        console.log('wrong Input');
+        break;
     }
   };
   onPriceChangeHandlerUpdate = (value, id, menuCategory) => {
-    let tmp = { Price: value };
     let index = null;
     let food = null;
     switch (this.state.showFoodCategory) {
@@ -488,6 +498,9 @@ class FoodMenu extends Component {
         food.Price = value;
         DESSERTS[index] = food;
         this.setState({ DESSERTS });
+        break;
+      default:
+        console.log('wrong Input');
         break;
     }
   };
@@ -536,10 +549,12 @@ class FoodMenu extends Component {
         DESSERTS[index] = food;
         this.setState({ DESSERTS });
         break;
+      default:
+        console.log('wrong Input');
+        break;
     }
   };
   onIngredentsChangeHandlerUpdate = (value, id, menuCategory) => {
-    let tmp = { MainIngredients: value };
     let index = null;
     let food = null;
     switch (this.state.showFoodCategory) {
@@ -582,6 +597,9 @@ class FoodMenu extends Component {
         food.MainIngredients = value;
         DESSERTS[index] = food;
         this.setState({ DESSERTS });
+        break;
+      default:
+        console.log('wrong Input');
         break;
     }
   };
@@ -629,6 +647,9 @@ class FoodMenu extends Component {
         DESSERTS[index] = food;
         this.setState({ DESSERTS });
         break;
+      default:
+        console.log('wrong Input');
+        break;
     }
   };
 
@@ -661,6 +682,9 @@ class FoodMenu extends Component {
         index = this.state.DESSERTS.findIndex((x) => x.ID === FoodId);
         foodItem = { ...this.state.DESSERTS[index] };
         console.log('Update food item', foodItem);
+        break;
+      default:
+        console.log('wrong Input');
         break;
     }
 
@@ -750,6 +774,9 @@ class FoodMenu extends Component {
         this.setState({ DESSERTS, tmpFood, editableId: null });
         console.log('Cance Update, orignal food item', foodItem);
         break;
+      default:
+        console.log('wrong Input');
+        break;
     }
   };
 
@@ -805,6 +832,9 @@ class FoodMenu extends Component {
               this.setState({
                 DESSERTS: this.state.DESSERTS.concat(newFood),
               });
+              break;
+            default:
+              console.log('wrong Input');
               break;
           }
         }

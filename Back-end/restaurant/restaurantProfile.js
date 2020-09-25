@@ -9,6 +9,61 @@ const mysqlConnection = require('../mysqlConnection');
 
 require('dotenv').config();
 
+const getOrderList = async (_order, _appetizers, _desserts, _beverages, _salads, _mainCourse) => {
+  const results = [];
+  // eslint-disable-next-line no-restricted-syntax
+  for (const item of _order) {
+    const itemInformation = item.split(':');
+    if (itemInformation[1] === '1') {
+      const index = _appetizers.findIndex((x) => x.ID === Number(itemInformation[0]));
+      const tmpObj = {
+        Name: _appetizers[index].Name,
+        Count: Number(itemInformation[2]),
+        PPrice: _appetizers[index].Price,
+        TPrice: _appetizers[index].Price * Number(itemInformation[2]),
+      };
+      results.push(tmpObj);
+    } else if (itemInformation[1] === '2') {
+      const index = _salads.findIndex((x) => x.ID === Number(itemInformation[0]));
+      const tmpObj = {
+        Name: _salads[index].Name,
+        Count: Number(itemInformation[2]),
+        PPrice: _salads[index].Price,
+        TPrice: _salads[index].Price * Number(itemInformation[2]),
+      };
+      results.push(tmpObj);
+    } else if (itemInformation[1] === '3') {
+      const index = _desserts.findIndex((x) => x.ID === Number(itemInformation[0]));
+      const tmpObj = {
+        Name: _desserts[index].Name,
+        Count: Number(itemInformation[2]),
+        PPrice: _desserts[index].Price,
+        TPrice: _desserts[index].Price * Number(itemInformation[2]),
+      };
+      results.push(tmpObj);
+    } else if (itemInformation[1] === '4') {
+      const index = _beverages.findIndex((x) => x.ID === Number(itemInformation[0]));
+      const tmpObj = {
+        Name: _beverages[index].Name,
+        Count: Number(itemInformation[2]),
+        PPrice: _beverages[index].Price,
+        TPrice: _beverages[index].Price * Number(itemInformation[2]),
+      };
+      results.push(tmpObj);
+    } else if (itemInformation[1] === '5') {
+      const index = _mainCourse.findIndex((x) => x.ID === Number(itemInformation[0]));
+      const tmpObj = {
+        Name: _mainCourse[index].Name,
+        Count: Number(itemInformation[2]),
+        PPrice: _mainCourse[index].Price,
+        TPrice: _mainCourse[index].Price * Number(itemInformation[2]),
+      };
+      results.push(tmpObj);
+    }
+  }
+  return results;
+};
+
 // Function to check if email already exists
 // 2 is for enum value restauarnt
 const checkEmailExists = async (email) => {
@@ -174,11 +229,14 @@ const updateRestaurantProfile = async (restaurant, response) => {
       Opening_Time,
       // eslint-disable-next-line camelcase
       Closing_Time,
+      CurbsidePickup,
+      DineIn,
+      YelpDelivery,
     } = restaurant;
     const restroID = getUserIdFromToken(restaurant.token, restaurant.userrole);
     if (restroID) {
       const updateRestaurantProfileQuery =
-        'CALL updateRestaurantProfileQuery(?,?,?,?,?,?,?,?,?,?,?)';
+        'CALL updateRestaurantProfileQuery(?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
 
       const connection = await mysqlConnection();
       // eslint-disable-next-line no-unused-vars
@@ -200,6 +258,9 @@ const updateRestaurantProfile = async (restaurant, response) => {
         // eslint-disable-next-line camelcase
         Closing_Time,
         restroID,
+        CurbsidePickup,
+        DineIn,
+        YelpDelivery,
       ]);
       connection.end();
       console.log(results);
@@ -403,6 +464,100 @@ const fetchReviews = async (request, response) => {
   return response;
 };
 
+const getOrderDetailsNew = async (request, response) => {
+  const { sortValue } = url.parse(request.url, true).query;
+  const userID = getUserIdFromToken(request.cookies.cookie, request.cookies.userrole);
+  if (userID) {
+    const getOrderDetailsQuery = 'CALL getOrderDetails(?,?)';
+
+    const connection = await mysqlConnection();
+    // eslint-disable-next-line no-unused-vars
+    const [results, fields] = await connection.query(getOrderDetailsQuery, [userID, sortValue]);
+    connection.end();
+    response.writeHead(200, {
+      'Content-Type': 'text/plain',
+    });
+    response.end(JSON.stringify(results));
+  } else {
+    response.writeHead(401, {
+      'Content-Type': 'text/plain',
+    });
+    response.end('Invalid User');
+  }
+  return response;
+};
+
+// Fetch details of particular order
+const orderFetch = async (request, response) => {
+  const { orderID } = url.parse(request.url, true).query;
+  const userID = getUserIdFromToken(request.cookies.cookie, request.cookies.userrole);
+  if (userID) {
+    const orderFetchQuery = 'CALL orderFetch(?,?)';
+
+    const connection = await mysqlConnection();
+    // eslint-disable-next-line no-unused-vars
+    const [results, fields] = await connection.query(orderFetchQuery, [userID, orderID]);
+    let order = results[0][0].Ordered_Dishes;
+    order = order.split(';');
+    const appetizers = results[1];
+    const beverages = results[2];
+    const salads = results[3];
+    const desserts = results[4];
+    const mainCourse = results[5];
+    const orders = await getOrderList(order, appetizers, desserts, beverages, salads, mainCourse);
+
+    console.log(orders);
+
+    connection.end();
+    response.writeHead(200, {
+      'Content-Type': 'text/plain',
+    });
+    response.end(JSON.stringify(orders));
+  } else {
+    response.writeHead(401, {
+      'Content-Type': 'text/plain',
+    });
+    response.end('Invalid User');
+  }
+  return response;
+};
+
+const updateDeliveryStatus = async (request, response) => {
+  try {
+    const order = request.body;
+    const { orderID, deliveryStatus, token, userrole } = order;
+    const restroID = getUserIdFromToken(token, userrole);
+
+    if (restroID) {
+      const updateOrderStatusQuery = 'CALL updateOrderStatus(?,?,?)';
+
+      const connection = await mysqlConnection();
+      // eslint-disable-next-line no-unused-vars
+      const [results, fields] = await connection.query(updateOrderStatusQuery, [
+        orderID,
+        restroID,
+        deliveryStatus,
+      ]);
+      connection.end();
+      console.log(results);
+      response.writeHead(200, {
+        'Content-Type': 'text/plain',
+      });
+      response.end('Order Status Updated successfully');
+    } else {
+      response.writeHead(401, {
+        'Content-Type': 'text/plain',
+      });
+      response.end('Invalid User');
+    }
+  } catch (error) {
+    response.writeHead(401, {
+      'Content-Type': 'text/plain',
+    });
+    response.end('Network Error');
+  }
+  return response;
+};
 module.exports = {
   signup,
   getBasicInfo,
@@ -413,4 +568,7 @@ module.exports = {
   deleteFoodItem,
   updateFoodItem,
   fetchReviews,
+  getOrderDetailsNew,
+  orderFetch,
+  updateDeliveryStatus,
 };

@@ -5,6 +5,7 @@ const {
   getSignupMasterData,
   getSignupMasterDataCustomer,
   getCusinesForMenu,
+  getDeliverStatus,
 } = require('../staticTables/staticTableFetch');
 
 const Router = express.Router();
@@ -30,6 +31,14 @@ Router.get('/getCusinesForMenu', async (req, res) => {
   console.log('Get Cusines for menu');
   let results = null;
   results = await getCusinesForMenu(res);
+  return results;
+});
+
+// Delivery Statuses
+Router.get('/getDeliverStatus', async (req, res) => {
+  console.log('Get Cusines for menu');
+  let results = null;
+  results = await getDeliverStatus(res);
   return results;
 });
 

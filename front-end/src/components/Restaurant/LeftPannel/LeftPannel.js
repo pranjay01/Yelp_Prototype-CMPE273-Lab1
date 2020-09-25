@@ -5,7 +5,6 @@ import { Redirect } from 'react-router';
 import axios from 'axios';
 import serverUrl from '../../../config';
 import '../RestaurantHome.css';
-import { updateLeftPannelTab } from '../../../constants/action-types';
 import { connect } from 'react-redux';
 
 class LeftPannel extends Component {
@@ -35,11 +34,11 @@ class LeftPannel extends Component {
                     <div class="lemon--div__06b83__1mboc arrange-unit__06b83__o3tjT arrange-unit-fill__06b83__3Sfw1 border-color--default__06b83__3-ifU">
                       <div class="lemon--div__06b83__1mboc fs-block border-color--default__06b83__3-ifU">
                         <h4 class="lemon--h4__06b83__1yd__ heading--h4__06b83__27bDo">
-                          {this.props.profileInfo.restroName}
+                          {this.props.restaurantProfile.restaurantName}
                         </h4>
                         <div class="lemon--div__06b83__1mboc padding-t1__06b83__2aTOb border-color--default__06b83__3-ifU">
                           <p class="lemon--p__06b83__3Qnnj text__06b83__2Kxyz text-color--subtle__06b83__3DZpi text-align--left__06b83__2XGa- text-size--small__06b83__3NVWO">
-                            {this.props.profileInfo.address}
+                            {this.props.restaurantProfile.restaurantAddress}
                           </p>
                         </div>
                       </div>
@@ -272,16 +271,21 @@ class LeftPannel extends Component {
 }
 
 // export default LeftPannel;
-
-const mapDispatchToProps = (dispatch) => {
+const mapStateToProps = (state) => {
+  const { restaurantHome } = state.restaurantHomePageReducer;
   return {
-    updateLeftPannelTab: (payload) => {
-      dispatch({
-        type: updateLeftPannelTab,
-        payload,
-      });
-    },
+    restaurantProfile: restaurantHome,
   };
 };
+// const mapDispatchToProps = (dispatch) => {
+//   return {
+//     updateLeftPannelTab: (payload) => {
+//       dispatch({
+//         type: updateLeftPannelTab,
+//         payload,
+//       });
+//     },
+//   };
+// };
 
-export default connect(null, mapDispatchToProps)(LeftPannel);
+export default connect(mapStateToProps, null)(LeftPannel);

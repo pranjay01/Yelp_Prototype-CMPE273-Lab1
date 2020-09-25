@@ -39,18 +39,7 @@ class ReviewList extends Component {
           {this.state.REVIEWS.map((review) => (
             <Review
               review={review}
-              //   CUISINES={this.state.CUISINES}
-              //   editableId={this.state.editableId}
-              //   makeEditable={(ID) => this.makeEditable(ID)}
-              //   onDelete={this.deleteFoodItem}
-              //   onCancelUpdate={() => this.cancelFoodUpdate(food.ID)}
-              //   onSave={() => this.updateFoodItem(food.ID)}
-              //   onNameChangeHandler={(evt, id) => this.onNameChangeHandlerUpdate(evt, id)}
-              //   onPriceChangeHandler={(evt, id) => this.onPriceChangeHandlerUpdate(evt, id)}
-              //   onCusineChangeHandler={(evt, id) => this.onCusineChangeHandlerUpdate(evt, id)}
-              //   onIngredentsChangeHandler={(evt, id) => this.onIngredentsChangeHandlerUpdate(evt, id)}
-              //   onDescriptionChangeHandler={(evt, id) =>
-              //     this.onDescriptionChangeHandlerUpdate(evt, id)
+
               //   }
             />
           ))}

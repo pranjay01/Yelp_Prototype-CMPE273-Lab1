@@ -42,11 +42,12 @@ class Food extends Component {
                   <li style={{ width: '22%' }}>
                     <label class="placeholder-sub">Price</label>
                     <input
-                      id="first_name"
-                      name="first_name"
+                      id="Price"
+                      name="Price"
                       placeholder="Price"
                       required="required"
-                      type="text"
+                      type="number"
+                      step="0.01"
                       onChange={(event, id) =>
                         this.props.onPriceChangeHandler(event.target.value, this.props.food.ID)
                       }

@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
 import axios from 'axios';
 import serverUrl from '../../../config';
 import cookie from 'react-cookies';
+import { updateHomeProfile } from '../../../constants/action-types';
+import { connect } from 'react-redux';
 
 class Profile extends Component {
   constructor(props) {
@@ -25,6 +26,25 @@ class Profile extends Component {
       isFormDisable: true,
       submitError: false,
       submitErrorBlock: '',
+      CurbsidePickup: false,
+      DineIn: false,
+      YelpDelivery: false,
+      tmpEditProfile: {
+        Name: '',
+        Email: '',
+        Country_ID: '',
+        State_ID: '',
+        City: '',
+        Zip: '',
+        Street: '',
+        Phone_no: '',
+        Country_Code: '',
+        Opening_Time: '',
+        Closing_Time: '',
+        CurbsidePickup: false,
+        DineIn: false,
+        YelpDelivery: false,
+      },
     };
   }
 
@@ -32,8 +52,21 @@ class Profile extends Component {
     axios.get(serverUrl + 'biz/restaurantCompleteProfile', { withCredentials: true }).then(
       (response) => {
         if (response.status === 200) {
-          // console.log('Street', response.data[0][0].Street);
-          // console.log('Street', response.data[0][0].Street);
+          let CurbsidePickup = false;
+          let DineIn = false;
+          let YelpDelivery = false;
+          let DeliveryOptions = response.data[1];
+          DeliveryOptions.forEach(function (option) {
+            if (option.ID === 1) {
+              CurbsidePickup = true;
+            }
+            if (option.ID === 2) {
+              DineIn = true;
+            }
+            if (option.ID === 3) {
+              YelpDelivery = true;
+            }
+          });
           this.setState({
             Name: response.data[0][0].Name,
             Email: response.data[0][0].Email,
@@ -46,12 +79,16 @@ class Profile extends Component {
             Country_Code: response.data[0][0].Country_Code,
             Opening_Time: response.data[0][0].Opening_Time,
             Closing_Time: response.data[0][0].Closing_Time,
+            CurbsidePickup,
+            DineIn,
+            YelpDelivery,
             isFormDisable: true,
           });
           console.log(this.state);
           console.log(response.data);
         }
       },
+
       (error) => {
         console.log(error.response.data);
       }
@@ -77,13 +114,87 @@ class Profile extends Component {
   }
 
   editProfile = () => {
-    this.setState({
-      isFormDisable: !this.state.isFormDisable,
-      submitError: false,
-    });
+    if (this.state.isFormDisable) {
+      let tmpEditProfile = {
+        Name: this.state.Name,
+        Email: this.state.Email,
+        Country_ID: this.state.Country_ID,
+        State_ID: Number(this.state.State_ID),
+        City: this.state.City,
+        Zip: this.state.Zip,
+        Street: this.state.Street,
+        Phone_no: this.state.Phone_no,
+        Country_Code: this.state.Country_Code,
+        Opening_Time: this.state.Opening_Time,
+        Closing_Time: this.state.Closing_Time,
+        CurbsidePickup: this.state.CurbsidePickup,
+        DineIn: this.state.DineIn,
+        YelpDelivery: this.state.YelpDelivery,
+      };
+      this.setState({
+        isFormDisable: !this.state.isFormDisable,
+        tmpEditProfile,
+        submitError: false,
+      });
+    } else {
+      let orignalData = this.state.tmpEditProfile;
+      let tmpEditProfile = {
+        Name: '',
+        Email: '',
+        Country_ID: '',
+        State_ID: '',
+        City: '',
+        Zip: '',
+        Street: '',
+        Phone_no: '',
+        Country_Code: '',
+        Opening_Time: '',
+        Closing_Time: '',
+        CurbsidePickup: false,
+        DineIn: false,
+        YelpDelivery: false,
+      };
+      this.setState({
+        Name: orignalData.Name,
+        Email: orignalData.Email,
+        Country_ID: orignalData.Country_ID,
+        State_ID: orignalData.State_ID,
+        City: orignalData.City,
+        Zip: orignalData.Zip,
+        Street: orignalData.Street,
+        Phone_no: orignalData.Phone_no,
+        Country_Code: orignalData.Country_Code,
+        Opening_Time: orignalData.Opening_Time,
+        Closing_Time: orignalData.Closing_Time,
+        CurbsidePickup: orignalData.CurbsidePickup,
+        DineIn: orignalData.DineIn,
+        YelpDelivery: orignalData.YelpDelivery,
+        tmpEditProfile,
+        isFormDisable: !this.state.isFormDisable,
+
+        submitError: false,
+      });
+      let index = this.state.States.findIndex((x) => x.key === orignalData.State_ID);
+      let payload = {
+        restaurantAddress:
+          orignalData.Street +
+          ' ' +
+          orignalData.City +
+          ' ' +
+          this.state.States[index].value +
+          ' ' +
+          orignalData.Zip,
+        restaurantName: orignalData.Name,
+      };
+      this.props.updateHomeProfile(payload);
+    }
   };
 
   onChangeHandlerName = (e) => {
+    let payload = {
+      restaurantName: e.target.value,
+    };
+    this.props.updateHomeProfile(payload);
     this.setState({
       Name: e.target.value,
       submitError: false,
@@ -119,6 +230,18 @@ class Profile extends Component {
   };
 
   onChangeHandlerState = (e) => {
+    let index = this.state.States.findIndex((x) => x.key === Number(e.target.value));
+    let payload = {
+      restaurantAddress:
+        this.state.Street +
+        ' ' +
+        this.state.City +
+        ' ' +
+        this.state.States[index].value +
+        ' ' +
+        this.state.Zip,
+    };
+    this.props.updateHomeProfile(payload);
     this.setState({
       State_ID: e.target.value,
       submitError: false,
@@ -126,6 +249,18 @@ class Profile extends Component {
   };
 
   onChangeHandlerZipCode = (e) => {
+    let index = this.state.States.findIndex((x) => x.key === Number(this.state.State_ID));
+    let payload = {
+      restaurantAddress:
+        this.state.Street +
+        ' ' +
+        this.state.City +
+        ' ' +
+        this.state.States[index].value +
+        ' ' +
+        e.target.value,
+    };
+    this.props.updateHomeProfile(payload);
     this.setState({
       Zip: e.target.value,
       submitError: false,
@@ -133,6 +268,18 @@ class Profile extends Component {
   };
 
   onChangeHandlerCity = (e) => {
+    let index = this.state.States.findIndex((x) => x.key === Number(this.state.State_ID));
+    let payload = {
+      restaurantAddress:
+        this.state.Street +
+        ' ' +
+        e.target.value +
+        ' ' +
+        this.state.States[index].value +
+        ' ' +
+        this.state.Zip,
+    };
+    this.props.updateHomeProfile(payload);
     this.setState({
       City: e.target.value,
       submitError: false,
@@ -140,6 +287,18 @@ class Profile extends Component {
   };
 
   onChangeHandlerStreet = (e) => {
+    let index = this.state.States.findIndex((x) => x.key === Number(this.state.State_ID));
+    let payload = {
+      restaurantAddress:
+        e.target.value +
+        ' ' +
+        this.state.City +
+        ' ' +
+        this.state.States[index].value +
+        ' ' +
+        this.state.Zip,
+    };
+    this.props.updateHomeProfile(payload);
     this.setState({
       Street: e.target.value,
       submitError: false,
@@ -157,6 +316,23 @@ class Profile extends Component {
     this.setState({
       Closing_Time: e.target.value,
       submitError: false,
+    });
+  };
+
+  onChangeHandlerYelpDelivery = () => {
+    this.setState({
+      YelpDelivery: !this.state.YelpDelivery,
+      submitError: false,
+    });
+  };
+  onChangeHandlerCurbsidePickup = () => {
+    this.setState({
+      CurbsidePickup: !this.state.CurbsidePickup,
+    });
+  };
+  onChangeHandlerDineIn = () => {
+    this.setState({
+      DineIn: !this.state.DineIn,
     });
   };
 
@@ -228,6 +404,9 @@ class Profile extends Component {
         Phone_no: this.state.Phone_no,
         Opening_Time: this.state.Opening_Time,
         Closing_Time: this.state.Closing_Time,
+        CurbsidePickup: this.state.CurbsidePickup,
+        DineIn: this.state.DineIn,
+        YelpDelivery: this.state.YelpDelivery,
         token: cookie.load('cookie'),
         userrole: cookie.load('userrole'),
       };
@@ -433,8 +612,40 @@ class Profile extends Component {
                 </li>
               </ul>
               <fieldset class="login-separator hr-line">
-                <legend align="left">Business Hours</legend>
+                <legend align="left">Business Information</legend>
               </fieldset>
+              <ul class="inline-layout clearfix">
+                <li style={{ width: '30%' }}>
+                  <label class="">Curbside Pickup</label>
+                  <input
+                    style={{ width: '20px', height: '20px' }}
+                    name="isGoing"
+                    type="checkbox"
+                    checked={this.state.CurbsidePickup}
+                    onChange={this.onChangeHandlerCurbsidePickup}
+                  />
+                </li>
+                <li style={{ width: '30%' }}>
+                  <label class="">Dine In</label>
+                  <input
+                    style={{ width: '20px', height: '20px' }}
+                    name="isGoing"
+                    type="checkbox"
+                    checked={this.state.DineIn}
+                    onChange={this.onChangeHandlerDineIn}
+                  />
+                </li>
+                <li style={{ width: '30%' }}>
+                  <label class="">Yelp Delivery</label>
+                  <input
+                    style={{ width: '20px', height: '20px' }}
+                    name="isGoing"
+                    type="checkbox"
+                    checked={this.state.YelpDelivery}
+                    onChange={this.onChangeHandlerYelpDelivery}
+                  />
+                </li>
+              </ul>
               <ul class="inline-layout clearfix">
                 <li style={{ width: '40%' }}>
                   <label class="">Opening Time</label>
@@ -559,4 +770,17 @@ class Profile extends Component {
   }
 }
 
-export default Profile;
+const mapDispatchToProps = (dispatch) => {
+  return {
+    updateHomeProfile: (payload) => {
+      dispatch({
+        type: updateHomeProfile,
+        payload,
+      });
+    },
+  };
+};
+
+export default connect(null, mapDispatchToProps)(Profile);
+
+// export default Profile;

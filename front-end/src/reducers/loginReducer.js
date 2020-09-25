@@ -17,7 +17,7 @@ const LoginReducer = (state = defaultState, action) => {
         //   return Object.assign(state, action.payload);
       };
     }
-    case updateLoginSuccess: {
+    case updateLogoutSuccess: {
       return {
         ...state,
         loginLogout: { ...state.loginLogout, ...action.payload },

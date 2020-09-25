@@ -5,13 +5,14 @@ import { Redirect } from 'react-router';
 import axios from 'axios';
 import serverUrl from '../../config';
 import './RestaurantHome.css';
-import { updateLogoutSuccess } from '../../constants/action-types';
+import { updateLogoutSuccess, updateHomeProfile } from '../../constants/action-types';
 import { connect } from 'react-redux';
 import LeftPannel from './LeftPannel/LeftPannel';
 import DefaultHome from './DefaultHome';
 import Profile from './Profile/Profile';
 import FoodMenu from './Menu/FoodMenu';
 import ReviewList from './Reviews/ReviewList';
+import OrdersList from './Orders/OrdersList';
 // import '../Login/Login.css';
 
 class RestaurantHome extends Component {
@@ -26,18 +27,6 @@ class RestaurantHome extends Component {
     };
   }
   onTabChangeHandler = (tabName) => {
-    this.setState({
-      tabName,
-    });
-    localStorage.setItem('tabName', tabName);
-    localStorage.setItem('showFoodCategory', '');
-  };
-  componentDidMount() {
-    // this.setState({
-    //   tabName: 'Home',
-    // });
-    console.log(this.props.location.pathname);
-    console.log('tab name', this.state.tabName);
     axios.get(serverUrl + 'biz/homeProfile', { withCredentials: true }).then(
       (response) => {
         if (response.status === 200) {
@@ -53,6 +42,60 @@ class RestaurantHome extends Component {
               response.data[0][0].Zip,
             reviewCOunt: response.data[1][0].ReviewCount,
           });
+          let payload = {
+            restaurantName: response.data[0][0].Name,
+            restaurantAddress:
+              response.data[0][0].Street +
+              ' ' +
+              response.data[0][0].City +
+              ' ' +
+              response.data[0][0].State +
+              ' ' +
+              response.data[0][0].Zip,
+          };
+          this.props.updateHomeProfile(payload);
+          console.log(this.state);
+          console.log(response.data);
+        }
+      },
+      (error) => {
+        console.log(error.response.data);
+      }
+    );
+    this.setState({
+      tabName,
+    });
+    localStorage.setItem('tabName', tabName);
+    localStorage.setItem('showFoodCategory', '');
+  };
+  componentDidMount() {
+    axios.get(serverUrl + 'biz/homeProfile', { withCredentials: true }).then(
+      (response) => {
+        if (response.status === 200) {
+          this.setState({
+            restroName: response.data[0][0].Name,
+            address:
+              response.data[0][0].Street +
+              ' ' +
+              response.data[0][0].City +
+              ' ' +
+              response.data[0][0].State +
+              ' ' +
+              response.data[0][0].Zip,
+            reviewCOunt: response.data[1][0].ReviewCount,
+          });
+          let payload = {
+            restaurantName: response.data[0][0].Name,
+            restaurantAddress:
+              response.data[0][0].Street +
+              ' ' +
+              response.data[0][0].City +
+              ' ' +
+              response.data[0][0].State +
+              ' ' +
+              response.data[0][0].Zip,
+          };
+          this.props.updateHomeProfile(payload);
           console.log(this.state);
           console.log(response.data);
         }
@@ -193,7 +236,7 @@ class RestaurantHome extends Component {
 
     let tabName = this.state.tabName;
     let basicProfile = this.state;
-    console.log('Redux value: ', this.props.tabOpened);
+
     return (
       <div className="lemon--div__06b83__1mboc responsive responsive-biz border-color--default__06b83__3-ifU">
         {redirectVar}
@@ -289,6 +332,8 @@ class RestaurantHome extends Component {
                       return <FoodMenu />;
                     case 'Reviews':
                       return <ReviewList />;
+                    case 'Orders':
+                      return <OrdersList />;
                     // default:
                     //   return <DefaultHome />;
                   }
@@ -305,12 +350,12 @@ class RestaurantHome extends Component {
 }
 
 // export default RestaurantHome;
-const mapStateToProps = (state) => {
-  const { restaurantHome } = state.restaurantHomePageReducer;
-  return {
-    tabOpened: restaurantHome.tabOpened,
-  };
-};
+// const mapStateToProps = (state) => {
+//   const { restaurantHome } = state.restaurantHomePageReducer;
+//   return {
+//     tabOpened: restaurantHome.tabOpened,
+//   };
+// };
 const mapDispatchToProps = (dispatch) => {
   return {
     updateLogoutSuccess: (payload) => {
@@ -319,7 +364,13 @@ const mapDispatchToProps = (dispatch) => {
         payload,
       });
     },
+    updateHomeProfile: (payload) => {
+      dispatch({
+        type: updateHomeProfile,
+        payload,
+      });
+    },
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(RestaurantHome);
+export default connect(null, mapDispatchToProps)(RestaurantHome);

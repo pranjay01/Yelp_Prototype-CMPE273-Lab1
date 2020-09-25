@@ -31,7 +31,7 @@ END  $$
 
 
 -- Fetch details based on email common for both restaurant and customer
-use Yelp_Prototype;
+
 drop procedure  if exists getEmail;
 DELIMITER  $$
 CREATE PROCEDURE `getEmail`
@@ -85,6 +85,8 @@ start transaction;
     JOIN SIGNUP ON (Restaurant_ID=SIGNUP.ID) 
     WHERE Restaurant_ID=userID;
     commit;
+    
+    select Delivery_ID as ID from DELIVERY_TYPE_RESTAURANT_MAPPINGS where Restaurant_ID=userID;
 end $$
 
 delimiter ;
@@ -99,15 +101,13 @@ create procedure `updateRestaurantProfileQuery`
 (in _Name varchar(50),in _Country_ID INT,in _State_ID INT,
 in _City varchar(25),in _Zip INT,in _Street VARCHAR(50),
 _Phone_no BIGINT,in _Country_Code INT,in _Opening_Time VARCHAR(10),
-in _Closing_Time VARCHAR(10),in _Restaurant_ID INT)
+in _Closing_Time VARCHAR(10),in _Restaurant_ID INT, in CurbsidePickup BOOLEAN,
+in DineIn BOOLEAN,in YelpDelivery BOOLEAN)
 begin
--- declare _startTime TIME;
--- declare _closingTime TIME;
+
 declare exit handler for sqlexception rollback;
 start transaction;
--- set _startTime=(SELECT CONVERT(_Opening_Time,TIME));
--- 	set _closingTime=(SELECT CONVERT(_Closing_Time,TIME));
-
+	
 	UPDATE RESTAURANT SET
     Name=_Name,
     Country_ID=_Country_ID,
@@ -120,6 +120,24 @@ start transaction;
     Opening_Time=_Opening_Time,
     Closing_Time=_Closing_Time
     where Restaurant_ID=_Restaurant_ID;
+    
+    DELETE FROM DELIVERY_TYPE_RESTAURANT_MAPPINGS where Restaurant_ID=_Restaurant_ID;
+    
+    IF CurbsidePickup THEN
+		INSERT INTO DELIVERY_TYPE_RESTAURANT_MAPPINGS (Delivery_ID,Restaurant_ID) 
+        VALUES(1,_Restaurant_ID);
+	END IF;
+    
+    IF DineIn THEN
+		INSERT INTO DELIVERY_TYPE_RESTAURANT_MAPPINGS (Delivery_ID,Restaurant_ID) 
+        VALUES(2,_Restaurant_ID);
+	END IF;
+    
+    IF YelpDelivery THEN
+		INSERT INTO DELIVERY_TYPE_RESTAURANT_MAPPINGS (Delivery_ID,Restaurant_ID) 
+        VALUES(3,_Restaurant_ID);
+	END IF;
+    
     commit;
 end $$
 

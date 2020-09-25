@@ -6,7 +6,7 @@ import axios from 'axios';
 import serverUrl from '../../config';
 import './Login.css';
 // import { history } from '../../App';
-import { updateLoginSuccess } from '../../constants/action-types';
+import { updateLoginSuccess, updateSignupStatus } from '../../constants/action-types';
 import { connect } from 'react-redux';
 
 //Define a Login Component
@@ -214,6 +214,13 @@ class RestaurantLogin extends Component {
       (response) => {
         console.log('Status Code : ', response.status);
         if (response.status === 200) {
+          let payload = {
+            userEmail: this.state.username,
+
+            signupStatus: 'SignedUp Successful',
+          };
+          this.props.updateSignupStatus(payload);
+
           console.log(response.data);
           this.setState({
             authFlag: true,
@@ -287,10 +294,10 @@ class RestaurantLogin extends Component {
       (response) => {
         console.log('Status Code : ', response.status);
         if (response.status === 200) {
+          localStorage.setItem('orderSortBy', 'All');
           localStorage.setItem('tabName', 'Home');
-          // console.log('cookie: ', cookie.load('cookie'));
-          // console.log('role: ', cookie.load('userrole'));
-          // console.log('role: ', cookie);
+          localStorage.setItem('token', cookie.load('cookie'));
+          localStorage.setItem('userrole', cookie.load('userrole'));
           let payload = {
             userEmail: this.state.username,
             role: cookie.load('userrole'),
@@ -827,6 +834,12 @@ const mapDispatchToProps = (dispatch) => {
     updateLoginSuccess: (payload) => {
       dispatch({
         type: updateLoginSuccess,
+        payload,
+      });
+    },
+    updateSignupStatus: (payload) => {
+      dispatch({
+        type: updateSignupStatus,
         payload,
       });
     },

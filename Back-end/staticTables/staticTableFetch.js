@@ -53,4 +53,26 @@ const getCusinesForMenu = async (response) => {
   return response;
 };
 
-module.exports = { getSignupMasterData, getSignupMasterDataCustomer, getCusinesForMenu };
+const getDeliverStatus = async (response) => {
+  const getDeliverStatusQuery = 'CALL getDeliverStatus()';
+  // 1 is for enum value customer
+  const connection = await mysqlConnection();
+  // eslint-disable-next-line no-unused-vars
+  const [results, fields] = await connection.query(getDeliverStatusQuery);
+
+  connection.end();
+  response.writeHead(200, {
+    'Content-Type': 'application/json',
+  });
+  // eslint-disable-next-line no-console
+  console.log('Delivery statuses of orders : ', JSON.stringify(results));
+  response.end(JSON.stringify(results));
+  return response;
+};
+
+module.exports = {
+  getSignupMasterData,
+  getSignupMasterDataCustomer,
+  getCusinesForMenu,
+  getDeliverStatus,
+};
