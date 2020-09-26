@@ -13,12 +13,14 @@ import Profile from './Profile/Profile';
 import FoodMenu from './Menu/FoodMenu';
 import ReviewList from './Reviews/ReviewList';
 import OrdersList from './Orders/OrdersList';
+import EventList from './Events/EventsList';
 // import '../Login/Login.css';
 
 class RestaurantHome extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      loggedIn: true,
       menuDisable: true,
       restroName: '',
       address: '',
@@ -111,11 +113,12 @@ class RestaurantHome extends Component {
       menuDisable: !this.state.menuDisable,
     });
   };
-  logout = () => {
+  logout = (e) => {
     var data = {
       token: cookie.load('cookie'),
       role: cookie.load('userrole'),
     };
+    e.preventDefault();
     axios.post(serverUrl + 'biz/logout', data).then((response) => {
       if (response.status === 200) {
         localStorage.clear();
@@ -125,6 +128,14 @@ class RestaurantHome extends Component {
           loginStatus: false,
         };
         this.props.updateLogoutSuccess(payload);
+        payload = {
+          restaurantName: '',
+          restaurantAddress: '',
+        };
+        this.props.updateHomeProfile(payload);
+        this.setState({
+          loggedIn: false,
+        });
         // window.location.reload(false);
       }
     });
@@ -334,6 +345,8 @@ class RestaurantHome extends Component {
                       return <ReviewList />;
                     case 'Orders':
                       return <OrdersList />;
+                    case 'Events':
+                      return <EventList />;
                     // default:
                     //   return <DefaultHome />;
                   }

@@ -142,7 +142,7 @@ class ordersList extends Component {
         <nav class="navbar navbar-inverse">
           <div class="container-fluid">
             <div class="navbar-header">
-              <a class="navbar-brand">Sort By</a>
+              <a class="navbar-brand">Filter By</a>
             </div>
             <ul class="nav navbar-nav">
               <li className={localStorage.getItem('orderSortBy') === 'All' && 'active'}>

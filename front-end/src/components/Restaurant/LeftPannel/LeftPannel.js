@@ -231,6 +231,35 @@ class LeftPannel extends Component {
                 </div>
               </div>
             </a>
+            {/**Events */}
+            <a
+              class="lemon--a__06b83__IEZFH link__06b83__1G70M nav-link__06b83__2noz4 responsive-ui-enabled__06b83__2kOzB link-color--blue-dark__06b83__85-Nu link-size--default__06b83__7tls6"
+              style={{ cursor: 'pointer' }}
+              onClick={() => {
+                this.props.onTabChangeHandler('Events');
+              }}
+              // onClick={() => this.changePageViewTo('Reviews')}
+            >
+              <div
+                class={`lemon--div__06b83__1mboc nav-item-v2__06b83__vmJJv inactive__06b83__2ZtYV responsive-ui-enabled__06b83__2kOzB padding-t1__06b83__2aTOb padding-r1__06b83__1xqrz padding-b1__06b83__3erWW padding-l1__06b83__1UBqt border-color--default__06b83__3-ifU ${
+                  this.props.profileInfo.tabName === 'Events' ? 'active__06b83__cBu5j' : ''
+                }`}
+              >
+                <div class="lemon--div__06b83__1mboc icon-v2__06b83__2Y6sR border-color--default__06b83__3-ifU text-align--center__06b83__2n2yQ">
+                  <span aria-hidden="true" class="icon--24-review-v2 css-1mpk29p">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" class="icon_svg">
+                      <path d="M17 22H5a5 5 0 01-5-5V5a5 5 0 015-5h12a5 5 0 015 5v12a5 5 0 01-5 5zM5 2a3 3 0 00-3 3v12a3 3 0 003 3h12a3 3 0 003-3V5a3 3 0 00-3-3H5zm11.23 7.56a.51.51 0 01-.13.56l-2.19 2.13.52 3a.51.51 0 01-.2.49.49.49 0 01-.53 0L11 14.32l-2.7 1.41a.5.5 0 01-.73-.53l.52-3-2.17-2.13a.51.51 0 01-.13-.51.51.51 0 01.41-.34l3-.44L10.55 6a.52.52 0 01.9 0l1.37 2.78 3 .44a.51.51 0 01.41.34z"></path>
+                    </svg>
+                  </span>
+                </div>
+                <div class="lemon--div__06b83__1mboc text-container__06b83__2z-fK collapsed-view__06b83__3VinO margin-l1-5__06b83__2lUKU border-color--default__06b83__3-ifU">
+                  <p class="lemon--p__06b83__3Qnnj text__06b83__2Kxyz text-color--normal__06b83__3xep9 text-align--left__06b83__2XGa- text-weight--semibold__06b83__2l0fe">
+                    Events
+                  </p>
+                </div>
+              </div>
+            </a>
+
             {/**Photos */}
             <a
               class="lemon--a__06b83__IEZFH link__06b83__1G70M nav-link__06b83__2noz4 responsive-ui-enabled__06b83__2kOzB link-color--blue-dark__06b83__85-Nu link-size--default__06b83__7tls6"

@@ -213,9 +213,9 @@ class RestaurantLogin extends Component {
     axios.post(serverUrl + 'biz/signup', data).then(
       (response) => {
         console.log('Status Code : ', response.status);
-        if (response.status === 200) {
+        if (response.status === 201) {
           let payload = {
-            userEmail: this.state.username,
+            userEmail: this.state.email,
 
             signupStatus: 'SignedUp Successful',
           };
@@ -409,11 +409,11 @@ class RestaurantLogin extends Component {
               id="signup-form"
             >
               <div class="js-password-meter-container">
-                <label class="placeholder-sub">Name</label>
+                <label class="placeholder-sub"> Restaurant Name</label>
                 <input
                   id="first_name"
                   name="first_name"
-                  placeholder="Name"
+                  placeholder="Restaurant Name"
                   required="required"
                   type="text"
                   onChange={this.onChangeHandlerName}

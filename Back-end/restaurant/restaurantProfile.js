@@ -122,7 +122,7 @@ const signup = async (restaurant, response) => {
       ]);
       connection.end();
       console.log(_results);
-      response.writeHead(200, {
+      response.writeHead(201, {
         'Content-Type': 'text/plain',
       });
       response.end('User Created');
@@ -464,6 +464,7 @@ const fetchReviews = async (request, response) => {
   return response;
 };
 
+// fetch order depending on filter value
 const getOrderDetailsNew = async (request, response) => {
   const { sortValue } = url.parse(request.url, true).query;
   const userID = getUserIdFromToken(request.cookies.cookie, request.cookies.userrole);
@@ -522,6 +523,7 @@ const orderFetch = async (request, response) => {
   return response;
 };
 
+// Update Deliver Status
 const updateDeliveryStatus = async (request, response) => {
   try {
     const order = request.body;
@@ -558,6 +560,128 @@ const updateDeliveryStatus = async (request, response) => {
   }
   return response;
 };
+
+// Create New Event
+const createNewEvent = async (request, response) => {
+  const {
+    Name,
+    Description,
+    EventDate,
+    EventStartTime,
+    EventEndTime,
+    CountryId,
+    StateId,
+    City,
+    hashtags,
+    Zip,
+    Street,
+    token,
+    userrole,
+  } = request.body;
+  try {
+    const restroID = getUserIdFromToken(token, userrole);
+    if (restroID) {
+      const createNewEventQuery = 'CALL createNewEvent(?,?,?,?,?,?,?,?,?,?,?,?)';
+
+      const connection = await mysqlConnection();
+      // eslint-disable-next-line no-unused-vars
+      const [results, fields] = await connection.query(createNewEventQuery, [
+        Name,
+        restroID,
+        Description,
+        EventDate,
+        EventStartTime,
+        EventEndTime,
+        CountryId,
+        StateId,
+        City,
+        Zip,
+        Street,
+        hashtags,
+      ]);
+      connection.end();
+      console.log(results);
+      response.writeHead(201, {
+        'Content-Type': 'text/plain',
+      });
+      response.end('Event created successfully');
+    } else {
+      response.writeHead(401, {
+        'Content-Type': 'text/plain',
+      });
+      response.end('Invalid User');
+    }
+  } catch (error) {
+    response.writeHead(500, {
+      'Content-Type': 'text/plain',
+    });
+    response.end('Network error');
+  }
+  return response;
+};
+
+// fetch events fased on filter
+const getEventList = async (request, response) => {
+  try {
+    const { sortValue } = url.parse(request.url, true).query;
+    const userID = getUserIdFromToken(request.cookies.cookie, request.cookies.userrole);
+    if (userID) {
+      const getEventListQuery = 'CALL getEventList(?,?)';
+
+      const connection = await mysqlConnection();
+      // eslint-disable-next-line no-unused-vars
+      const [results, fields] = await connection.query(getEventListQuery, [userID, sortValue]);
+      connection.end();
+      response.writeHead(200, {
+        'Content-Type': 'text/plain',
+      });
+      response.end(JSON.stringify(results));
+    } else {
+      response.writeHead(401, {
+        'Content-Type': 'text/plain',
+      });
+      response.end('Invalid User');
+    }
+  } catch (error) {
+    response.writeHead(500, {
+      'Content-Type': 'text/plain',
+    });
+    response.end('Network error');
+  }
+  return response;
+};
+
+// fetch events fased on filter
+const getCustomerList = async (request, response) => {
+  try {
+    const { eventID } = url.parse(request.url, true).query;
+    const userID = getUserIdFromToken(request.cookies.cookie, request.cookies.userrole);
+    if (userID) {
+      const getRegisteredCustomersQuery = 'CALL getRegisteredCustomers(?)';
+
+      const connection = await mysqlConnection();
+      // eslint-disable-next-line no-unused-vars
+      const [results, fields] = await connection.query(getRegisteredCustomersQuery, eventID);
+      connection.end();
+      response.writeHead(200, {
+        'Content-Type': 'text/plain',
+      });
+      response.end(JSON.stringify(results));
+    } else {
+      response.writeHead(401, {
+        'Content-Type': 'text/plain',
+      });
+      response.end('Invalid User');
+    }
+  } catch (error) {
+    response.writeHead(500, {
+      'Content-Type': 'text/plain',
+    });
+    response.end('Network error');
+  }
+  return response;
+};
+
 module.exports = {
   signup,
   getBasicInfo,
@@ -571,4 +695,7 @@ module.exports = {
   getOrderDetailsNew,
   orderFetch,
   updateDeliveryStatus,
+  createNewEvent,
+  getEventList,
+  getCustomerList,
 };

@@ -14,6 +14,9 @@ const {
   getOrderDetailsNew,
   orderFetch,
   updateDeliveryStatus,
+  createNewEvent,
+  getEventList,
+  getCustomerList,
 } = require('../restaurant/restaurantProfile');
 
 const { login, logout } = require('../common/loginLogout');
@@ -131,4 +134,29 @@ Router.post('/updateDeliveryStatus', async (req, res) => {
   results = await updateDeliveryStatus(req, res);
   return results;
 });
+
+// Update Delivery Status
+Router.post('/createNewEvent', async (req, res) => {
+  console.log('Create new Event');
+  let results = null;
+  results = await createNewEvent(req, res);
+  return results;
+});
+
+// Fetch Events
+Router.get('/getEventList', async (req, res) => {
+  console.log('Fetch Events');
+  let results = null;
+  results = await getEventList(req, res);
+  return results;
+});
+
+// Get Customer Register to event
+Router.get('/getCustomerList', async (req, res) => {
+  console.log('Fetch Events');
+  let results = null;
+  results = await getCustomerList(req, res);
+  return results;
+});
+
 module.exports = Router;
