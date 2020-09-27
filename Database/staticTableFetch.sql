@@ -28,7 +28,7 @@ end $$
 delimiter ;
 
 
-drop procedure if exists getDeliverStatusDELIVERY_STATUS;
+drop procedure if exists getDeliverStatus;
 delimiter $$
 
 create procedure getDeliverStatus()
@@ -40,4 +40,18 @@ end $$
 
 delimiter ;
 
+drop procedure if exists getSignupMasterDataCustomer;
 
+DELIMITER  $$
+CREATE PROCEDURE `getSignupMasterDataCustomer`
+()
+BEGIN
+    
+declare exit handler for sqlexception
+rollback;
+start transaction;
+
+select ID,Gender from GENDER_LIST order by ID asc;
+
+commit;
+END  $$

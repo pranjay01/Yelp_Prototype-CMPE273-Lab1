@@ -248,7 +248,7 @@ class LeftPannel extends Component {
                 <div class="lemon--div__06b83__1mboc icon-v2__06b83__2Y6sR border-color--default__06b83__3-ifU text-align--center__06b83__2n2yQ">
                   <span aria-hidden="true" class="icon--24-review-v2 css-1mpk29p">
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" class="icon_svg">
-                      <path d="M17 22H5a5 5 0 01-5-5V5a5 5 0 015-5h12a5 5 0 015 5v12a5 5 0 01-5 5zM5 2a3 3 0 00-3 3v12a3 3 0 003 3h12a3 3 0 003-3V5a3 3 0 00-3-3H5zm11.23 7.56a.51.51 0 01-.13.56l-2.19 2.13.52 3a.51.51 0 01-.2.49.49.49 0 01-.53 0L11 14.32l-2.7 1.41a.5.5 0 01-.73-.53l.52-3-2.17-2.13a.51.51 0 01-.13-.51.51.51 0 01.41-.34l3-.44L10.55 6a.52.52 0 01.9 0l1.37 2.78 3 .44a.51.51 0 01.41.34z"></path>
+                      <path d="M18 21H6a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3 1 1 0 0 1 2 0h8a1 1 0 0 1 2 0 3 3 0 0 1 3 3v12a3 3 0 0 1-3 3zm1-13H5v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1V8zm-5.634 7.723L12 18l-1.366-2.277a3.5 3.5 0 1 1 2.732 0zM12 11.25a1.25 1.25 0 1 0 0 2.5 1.25 1.25 0 0 0 0-2.5z"></path>
                     </svg>
                   </span>
                 </div>

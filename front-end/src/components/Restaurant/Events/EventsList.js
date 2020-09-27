@@ -3,13 +3,14 @@ import { Link } from 'react-router-dom';
 import Event from './Event';
 // import OrderDetails from './OrderDetails';
 import '../Orders/Orders.css';
-import Pagination from 'react-js-pagination';
 import axios from 'axios';
 import serverUrl from '../../../config';
 import NewEventForm from './NewEventForm';
-import { Alert } from 'reactstrap';
 // import 'bootstrap/dist/css/bootstrap.css';
 import RegisteredCustomers from './RegisteredCustomers';
+import { updateSnackbarData } from '../../../constants/action-types';
+import { connect } from 'react-redux';
+import SnackBar from '../../CommonComponents/SnackBar';
 
 class EventList extends Component {
   constructor(props) {
@@ -160,7 +161,11 @@ class EventList extends Component {
         console.log('Status Code : ', response.status);
         if (response.status === 201) {
           console.log(response.data);
-          this.onShowAlert();
+          let payload = {
+            success: true,
+            message: 'Event Created Successfully!',
+          };
+          this.props.updateSnackbarData(payload);
         }
       },
       (error) => {
@@ -177,9 +182,8 @@ class EventList extends Component {
     return (
       <div>
         {/*redirectVar*/}
-        <Alert color="info" isOpen={this.state.visible}>
-          Event Created Successfully!
-        </Alert>
+
+        {this.props.snackbarData != null && <SnackBar />}
         <nav class="navbar navbar-inverse">
           <div class="container-fluid">
             <div class="navbar-header">
@@ -256,4 +260,23 @@ class EventList extends Component {
   }
 }
 
-export default EventList;
+// export default EventList;
+const mapStateToProps = (state) => {
+  const snackbarData = state.snackBarReducer;
+  return {
+    snackbarData: snackbarData,
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    updateSnackbarData: (payload) => {
+      dispatch({
+        type: updateSnackbarData,
+        payload,
+      });
+    },
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(EventList);

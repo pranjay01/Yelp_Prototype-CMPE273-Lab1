@@ -31,3 +31,40 @@ delimiter ;
 
 
 
+-- Customer signup
+drop procedure if exists getBasicInfoCustomer ;
+
+DELIMITER  $$
+CREATE PROCEDURE getBasicInfoCustomer
+(IN userID INT)
+BEGIN
+
+select concat(First_Name,' ',substr(Last_Name,1,1),'.') as Name, City as Address 
+From CUSTOMER where Customer_ID=userID;
+
+select count(ID) as ReviewCount from REVIEWS where Customer_ID = userID;
+
+END  $$
+
+delimiter ;
+
+
+-- Procedure For Customer Update Profile, Fetch all static data+ Profile data
+
+drop procedure if exists getDataForCustomerUpdateProfile;
+delimiter $$
+
+create procedure getDataForCustomerUpdateProfile(IN cusID INT)
+begin
+declare exit handler for sqlexception rollback;
+start transaction;
+	SELECT * FROM CUSTOMER WHERE Customer_ID=cusID;
+    
+	select ID,Name from COUNTRY order by ID asc;
+    
+    select ID,Name from STATE order by Name asc;
+
+    select ID,Gender from GENDER_LIST order by Gender asc;    
+    
+commit;
+end $$

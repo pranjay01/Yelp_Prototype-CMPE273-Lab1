@@ -69,7 +69,7 @@ rollback;
 start transaction;
 
 select concat(CUSTOMER.First_Name, ' ', CUSTOMER.Last_Name)
- as cusName, CUSTOMER.Customer_ID, Email FROM REGISTRATION JOIn CUSTOMER ON 
+ as cusName, CUSTOMER.Customer_ID as ID, Email FROM REGISTRATION JOIn CUSTOMER ON 
  CUSTOMER.Customer_ID=REGISTRATION.Customer_ID JOIN SIGNUP ON SIGNUP.ID=CUSTOMER.Customer_ID
  WHERE REGISTRATION.Event_ID=_EventID;
 

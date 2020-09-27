@@ -2,15 +2,17 @@ import React, { Component } from 'react';
 import cookie from 'react-cookies';
 import axios from 'axios';
 import serverUrl from '../../config';
-import { updateLogoutSuccess } from '../../constants/action-types';
+import { updateLogoutSuccess, getCustomerBasicInfo } from '../../constants/action-types';
 import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 
 class Menu extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = { Name: '', Address: '', ReviewCount: 0 };
   }
 
+  componentDidMount() {}
   logout = (e) => {
     e.preventDefault();
     console.log('logouting customer');
@@ -18,8 +20,12 @@ class Menu extends Component {
       token: cookie.load('cookie'),
       role: cookie.load('userrole'),
     };
+    cookie.remove('cookie', { path: '/' });
+    cookie.remove('userrole', { path: '/' });
+    localStorage.clear();
     axios.post(serverUrl + 'customer/logout', data).then((response) => {
       if (response.status === 200) {
+        localStorage.clear();
         let payload = {
           userEmail: '',
           role: '',
@@ -29,8 +35,6 @@ class Menu extends Component {
         window.location.reload(false);
       }
     });
-    cookie.remove('cookie', { path: '/' });
-    cookie.remove('userrole', { path: '/' });
   };
   render() {
     return (
@@ -66,41 +70,36 @@ class Menu extends Component {
             <div class="media-story">
               <ul class="user-passport-info">
                 <li class="user-name">
-                  <a
+                  <Link
+                    to="/AboutMe"
                     class="user-display-name js-analytics-click"
                     href="/user_details?userid=Sbr_JFt86Dss0N-hb9StQg"
                     data-hovercard-id="GkI5Ur8X1IZVOq75Iizx9Q"
                     data-analytics-label="about_me"
                     id="dropdown_user-name"
                   >
-                    Pranjay S.
-                  </a>
+                    {this.props.customerInfo.Name}
+                  </Link>
                 </li>
                 <li class="user-location responsive-hidden-small">
-                  <b>San Francisco, CA</b>
+                  <b>{this.props.customerInfo.Address}</b>
                 </li>
               </ul>
 
               <ul class="user-passport-stats">
-                <li class="friend-count">
-                  <span
-                    aria-hidden="true"
-                    style={{ fill: '#f15c00', width: '18px', height: '18px' }}
-                    class="icon icon--18-friends icon--size-18"
-                  >
-                    <svg role="img" class="icon_svg"></svg>
-                  </span>
-                  <b>0</b>
-                </li>
                 <li class="review-count">
                   <span
                     aria-hidden="true"
                     style={{ fill: '#f15c00', width: '18px', height: '18px' }}
                     class="icon icon--18-review icon--size-18"
                   >
-                    <svg role="img" class="icon_svg"></svg>
+                    <svg role="img" class="icon_svg">
+                      <svg id="18x18_review" height="18" viewBox="0 0 18 18" width="18">
+                        <path d="M13 3H5c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1.505 9.643l-2.526-1.55L6.526 12.7 7 9.934 5 7.977l2.766-.404L8.97 4.7l1.264 2.873L13 7.977l-2 1.957.495 2.71z"></path>
+                      </svg>
+                    </svg>
                   </span>
-                  <b>0</b>
+                  <b>{this.props.customerInfo.ReviewCount}</b>
                 </li>
               </ul>
             </div>
@@ -109,9 +108,10 @@ class Menu extends Component {
 
         <ul class="drop-menu-group--nav drop-menu-group">
           <li class="drop-down-menu-link" role="none">
-            <a
+            <Link
+              to="/AboutMe"
               class="js-analytics-click arrange arrange--middle arrange--6"
-              href="/user_details?userid=Sbr_JFt86Dss0N-hb9StQg"
+              href="#"
               data-analytics-label="dropdown_about-me"
               role="menuitem"
               tabindex="0"
@@ -122,7 +122,11 @@ class Menu extends Component {
                   style={{ width: '24px', height: '24px' }}
                   class="icon icon--24-profile icon--size-24 u-space-r1"
                 >
-                  <svg role="img" class="icon_svg"></svg>
+                  <svg role="img" class="icon_svg">
+                    <svg id="24x24_profile" height="24" viewBox="0 0 24 24" width="24">
+                      <path d="M4.37 22c.278-4.762 3.587-8 7.63-8 4.043 0 7.352 3.238 7.63 8H4.37zM12 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"></path>
+                    </svg>
+                  </svg>
                 </span>
                 About Me
               </strong>
@@ -135,37 +139,7 @@ class Menu extends Component {
                   <svg role="img" class="icon_svg"></svg>
                 </span>
               </span>
-            </a>
-          </li>
-
-          <li class="drop-down-menu-link" role="none">
-            <a
-              class="js-analytics-click arrange arrange--middle arrange--6"
-              href="/profile"
-              data-analytics-label="Zprofile"
-              role="menuitem"
-              tabindex="0"
-            >
-              <strong class="arrange_unit">
-                <span
-                  aria-hidden="true"
-                  style={{ width: '24px', height: '24px' }}
-                  class="icon icon--24-settings icon--size-24 u-space-r1"
-                >
-                  <svg role="img" class="icon_svg"></svg>
-                </span>
-                Account Settings
-              </strong>
-              <span class="arrange_unit arrange_unit--fill u-text-right">
-                <span
-                  aria-hidden="true"
-                  style={{ width: '24px', height: '24px' }}
-                  class="icon icon--24-chevron-right icon--size-24 hidden-non-responsive-inline-block responsive-visible-medium-inline-block"
-                >
-                  <svg role="img" class="icon_svg"></svg>
-                </span>
-              </span>
-            </a>
+            </Link>
           </li>
         </ul>
 
@@ -188,6 +162,12 @@ class Menu extends Component {
 }
 
 // export default Menu;
+const mapStateToProps = (state) => {
+  const { customerInfo } = state.customerBasicInfoReducer;
+  return {
+    customerInfo: customerInfo,
+  };
+};
 
 const mapDispatchToProps = (dispatch) => {
   return {
@@ -197,7 +177,13 @@ const mapDispatchToProps = (dispatch) => {
         payload,
       });
     },
+    getCustomerBasicInfo: (payload) => {
+      dispatch({
+        type: getCustomerBasicInfo,
+        payload,
+      });
+    },
   };
 };
 
-export default connect(null, mapDispatchToProps)(Menu);
+export default connect(mapStateToProps, mapDispatchToProps)(Menu);

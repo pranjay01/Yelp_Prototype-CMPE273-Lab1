@@ -8,6 +8,8 @@ import './Login.css';
 // import { history } from '../../App';
 import { updateLoginSuccess } from '../../constants/action-types';
 import { connect } from 'react-redux';
+import { updateSnackbarData } from '..//../constants/action-types';
+import SnackBar from '../CommonComponents/SnackBar';
 
 //Define a Login Component
 class CustomerLogin extends Component {
@@ -37,9 +39,9 @@ class CustomerLogin extends Component {
     // this.submitLogin = this.submitLogin.bind(this);
   }
   componentWillMount() {
-    if (this.props.location.pathname === '/restaurantSignup') {
+    if (this.props.location.pathname === '/customerSignup') {
       console.log('inside Signup');
-      axios.get(serverUrl + 'static/signupMasterData').then((response) => {
+      axios.get(serverUrl + 'static/signupMasterDataCustomer').then((response) => {
         console.log(response.data);
         let allGenders = response.data[0].map((gender) => {
           return { key: gender.ID, value: gender.Gender };
@@ -103,9 +105,14 @@ class CustomerLogin extends Component {
         console.log('Status Code : ', response.status);
         if (response.status === 200) {
           console.log(response.data);
+          let payload = {
+            success: true,
+            message: 'Account Created Successfully!',
+          };
+          this.props.updateSnackbarData(payload);
           this.setState({
             authFlag: true,
-            sigupSuccessful: true,
+            //sigupSuccessful: true,
           });
         } else {
           this.setState({
@@ -164,6 +171,8 @@ class CustomerLogin extends Component {
       (response) => {
         console.log('Status Code : ', response.status);
         if (response.status === 200) {
+          localStorage.setItem('token', cookie.load('cookie'));
+          localStorage.setItem('userrole', cookie.load('userrole'));
           // console.log('cookie: ', cookie.load('cookie'));
           // console.log('role: ', cookie.load('userrole'));
           let payload = {
@@ -185,13 +194,20 @@ class CustomerLogin extends Component {
         // console.log('Status Code : ', error.status);
         // console.log('Status Code : ', error.response);
         this.setState({
-          errorBlock: error.response.data,
+          errorBlock: error,
           inputBlockHighlight: 'errorBlock',
         });
       }
     );
   };
 
+  checkSnackbar = () => {
+    let payload = {
+      success: true,
+      message: 'Account Created Successfully!',
+    };
+    this.props.updateSnackbarData(payload);
+  };
   render() {
     let redirectVar = null;
     if (cookie.load('cookie')) {
@@ -542,6 +558,8 @@ class CustomerLogin extends Component {
     return (
       <div>
         {redirectVar}
+        {this.props.snackbarData != null && <SnackBar />}
+        <button onClick={this.checkSnackbar}></button>
         <div>
           <div class="lemon--div__373c0__1mboc header__373c0__AlFmH border-color--default__373c0__2oFDT">
             <div class="lemon--div__373c0__1mboc container__373c0__13FCe transparent__373c0__3oxYH">
@@ -616,12 +634,24 @@ class CustomerLogin extends Component {
 //export Login Component
 
 // export default CustomerLogin;
+const mapStateToProps = (state) => {
+  const snackbarData = state.snackBarReducer;
+  return {
+    snackbarData: snackbarData,
+  };
+};
 
 const mapDispatchToProps = (dispatch) => {
   return {
     updateLoginSuccess: (payload) => {
       dispatch({
         type: updateLoginSuccess,
+        payload,
+      });
+    },
+    updateSnackbarData: (payload) => {
+      dispatch({
+        type: updateSnackbarData,
         payload,
       });
     },

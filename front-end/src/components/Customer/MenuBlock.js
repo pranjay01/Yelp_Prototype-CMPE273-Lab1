@@ -1,9 +1,30 @@
 import React, { Component } from 'react';
 import Menu from './Menu';
+import axios from 'axios';
+import serverUrl from '../../config';
+import { getCustomerBasicInfo } from '../../constants/action-types';
+import { connect } from 'react-redux';
 class menuBlock extends Component {
   constructor(props) {
     super(props);
     this.state = { menuDisabled: true };
+  }
+  componentDidMount() {
+    axios
+      .get(
+        serverUrl + 'customer/getBasicInfo',
+
+        { withCredentials: true }
+      )
+      .then((response) => {
+        console.log(response.data);
+        let payload = {
+          Name: response.data[0][0].Name,
+          Address: response.data[0][0].Address,
+          ReviewCount: response.data[1][0].ReviewCount,
+        };
+        this.props.getCustomerBasicInfo(payload);
+      });
   }
   showMenu = () => {
     this.setState({
@@ -54,4 +75,17 @@ class menuBlock extends Component {
   }
 }
 
-export default menuBlock;
+//export default menuBlock;
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    getCustomerBasicInfo: (payload) => {
+      dispatch({
+        type: getCustomerBasicInfo,
+        payload,
+      });
+    },
+  };
+};
+
+export default connect(null, mapDispatchToProps)(menuBlock);

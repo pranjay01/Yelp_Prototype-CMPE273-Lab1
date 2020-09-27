@@ -2,7 +2,11 @@
 const express = require('express');
 
 const Router = express.Router();
-const signup = require('../customer/customerProfile');
+const {
+  signup,
+  getBasicInfo,
+  getDataForCustomerUpdateProfile,
+} = require('../customer/customerProfile');
 const { login, logout } = require('../common/loginLogout');
 
 // Customer signup
@@ -28,4 +32,19 @@ Router.post('/logout', async (req, res) => {
   results = await logout(req.body, res);
   return results;
 });
+
+Router.get('/getBasicInfo', async (req, res) => {
+  console.log('getBasicInfo');
+  let results = null;
+  results = await getBasicInfo(req, res);
+  return results;
+});
+
+Router.get('/getDataForCustomerUpdateProfile', async (req, res) => {
+  console.log('getDataForCustomerUpdateProfile');
+  let results = null;
+  results = await getDataForCustomerUpdateProfile(req, res);
+  return results;
+});
+
 module.exports = Router;

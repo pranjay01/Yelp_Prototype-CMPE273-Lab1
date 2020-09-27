@@ -2,11 +2,10 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import cookie from 'react-cookies';
 import { Redirect } from 'react-router';
-import axios from 'axios';
-import serverUrl from '../../config';
+
 import './Home.css';
 // import { history } from '../../App';
-import MenuBlock from './MenuBlock';
+import MenuBlock from '../Customer/MenuBlock';
 import LoginBlock from './LoginBlock';
 
 class Home extends Component {

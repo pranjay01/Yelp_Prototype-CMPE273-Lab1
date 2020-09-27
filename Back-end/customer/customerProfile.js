@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 const bcrypt = require('bcrypt');
-
+const { getUserIdFromToken } = require('../common/loginLogout');
 const mysqlConnection = require('../mysqlConnection');
 
 require('dotenv').config();
@@ -61,6 +61,78 @@ const signup = async (customer, response) => {
     return response;
   }
 };
+
+// getCustomer Basic Info
+const getBasicInfo = async (request, response) => {
+  console.log(request.headers.cookie);
+  console.log(request.cookies);
+  try {
+    const userID = getUserIdFromToken(request.cookies.cookie, request.cookies.userrole);
+    if (userID) {
+      const getBasicInfoQuery = 'CALL getBasicInfoCustomer(?)';
+
+      const connection = await mysqlConnection();
+      // eslint-disable-next-line no-unused-vars
+      const [results, fields] = await connection.query(getBasicInfoQuery, userID);
+      connection.end();
+      console.log(results);
+      if (results[1].length === 0) {
+        results[1].push({ ReviewCount: 0 });
+      }
+      response.writeHead(200, {
+        'Content-Type': 'text/plain',
+      });
+      response.end(JSON.stringify(results));
+    } else {
+      response.writeHead(401, {
+        'Content-Type': 'text/plain',
+      });
+      response.end('Invalid User');
+    }
+  } catch (error) {
+    response.writeHead(401, {
+      'Content-Type': 'text/plain',
+    });
+    response.end('Network Error');
+  }
+  return response;
+};
+
+// get data static + user for update profile
+const getDataForCustomerUpdateProfile = async (request, response) => {
+  try {
+    const userID = getUserIdFromToken(request.cookies.cookie, request.cookies.userrole);
+    if (userID) {
+      const getDataForCustomerUpdateProfileQuery = 'CALL getDataForCustomerUpdateProfile(?)';
+
+      const connection = await mysqlConnection();
+      // eslint-disable-next-line no-unused-vars
+      const [results, fields] = await connection.query(
+        getDataForCustomerUpdateProfileQuery,
+        userID
+      );
+      connection.end();
+      console.log(results);
+
+      response.writeHead(200, {
+        'Content-Type': 'text/plain',
+      });
+      response.end(JSON.stringify(results));
+    } else {
+      response.writeHead(401, {
+        'Content-Type': 'text/plain',
+      });
+      response.end('Invalid User');
+    }
+  } catch (error) {
+    response.writeHead(401, {
+      'Content-Type': 'text/plain',
+    });
+    response.end('Network Error');
+  }
+  return response;
+};
+
 // }
 
-module.exports = signup;
+module.exports = { signup, getBasicInfo, getDataForCustomerUpdateProfile };
