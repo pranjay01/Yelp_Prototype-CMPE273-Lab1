@@ -194,7 +194,7 @@ class CustomerLogin extends Component {
         // console.log('Status Code : ', error.status);
         // console.log('Status Code : ', error.response);
         this.setState({
-          errorBlock: error,
+          errorBlock: error.response.data,
           inputBlockHighlight: 'errorBlock',
         });
       }

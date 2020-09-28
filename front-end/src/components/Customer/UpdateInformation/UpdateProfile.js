@@ -9,11 +9,13 @@ import serverUrl from '../../../config';
 import { updateSnackbarData } from '../../../constants/action-types';
 import { connect } from 'react-redux';
 import SnackBar from '../../CommonComponents/SnackBar';
+import Moment from 'moment';
 
 class UpdateProfile extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      errors: { zipError: '', dateError: '' },
       genders: [],
       Countries: [],
       States: [],
@@ -48,7 +50,8 @@ class UpdateProfile extends Component {
           Last_Name: response.data[0][0].Last_Name,
           Nick_Name: response.data[0][0].Nick_Name,
           Gender: response.data[0][0].Gender,
-          Date_Of_Birth: response.data[0][0].Date_Of_Birth,
+          // Date_Of_Birth: new Date(response.data[0][0].Date_Of_Birth),
+          Date_Of_Birth: Moment(response.data[0][0].Date_Of_Birth).format('YYYY-MM-DD'),
           Country_ID: response.data[0][0].Country_ID,
           State_ID: response.data[0][0].State_ID,
           City: response.data[0][0].City,
@@ -80,103 +83,119 @@ class UpdateProfile extends Component {
 
   onFNameChangeHandler = (e) => {
     this.setState({
-      First_Name: this.state.Profile.First_Name,
+      Profile: { ...this.state.Profile, ...{ First_Name: e.target.value } },
     });
   };
   onLNameChangeHandler = (e) => {
     this.setState({
-      Last_Name: this.state.Profile.Last_Name,
+      Profile: { ...this.state.Profile, ...{ Last_Name: e.target.value } },
     });
   };
   onNickNameChangeHandler = (e) => {
     this.setState({
-      Nick_Name: this.state.Profile.Nick_Name,
+      Profile: { ...this.state.Profile, ...{ Nick_Name: e.target.value } },
     });
   };
   onChangeHandlerGender = (e) => {
     this.setState({
-      Gender: this.state.Profile.Gender,
+      Profile: { ...this.state.Profile, ...{ Gender: e.target.value } },
     });
   };
   onHeadlineChangeHandler = (e) => {
     this.setState({
-      Headline: this.state.Profile.Headline,
+      Profile: { ...this.state.Profile, ...{ Headline: e.target.value } },
     });
   };
   onLoveChangeHandler = (e) => {
     this.setState({
-      I_Love: this.state.Profile.I_Love,
+      Profile: { ...this.state.Profile, ...{ I_Love: e.target.value } },
     });
   };
   onFMIChangeHandler = (e) => {
     this.setState({
-      Find_Me_In: this.state.Profile.Find_Me_In,
+      Profile: { ...this.state.Profile, ...{ Find_Me_In: e.target.value } },
     });
   };
   onWebsiteChangeHandler = (e) => {
     this.setState({
-      Website: this.state.Profile.Website,
+      Profile: { ...this.state.Profile, ...{ Website: e.target.value } },
     });
   };
   onChangeHandlerCountry = (e) => {
     this.setState({
-      Country_ID: this.state.Profile.Country_ID,
+      Profile: { ...this.state.Profile, ...{ Country_ID: e.target.value } },
     });
   };
   onChangeHandlerState = (e) => {
     this.setState({
-      State_ID: this.state.Profile.State_ID,
+      Profile: { ...this.state.Profile, ...{ State_ID: e.target.value } },
     });
   };
   onChangeHandlerZipCode = (e) => {
-    let errors = {};
-    if (!/^\d+$/.test(e.target.value)) {
-      errors['zipError'] = 'Invalid value!';
+    if (!/^\d+$/.test(e.target.value) && e.target.value.length > 0) {
       this.setState({
-        errors,
+        errors: { ...this.state.errors, ...{ zipError: '  Invalid Value!' } },
       });
-      let payload = {
-        success: false,
-        message: 'Invalid Zip Value!',
-      };
-      this.props.updateSnackbarData(payload);
     } else {
       this.setState({
-        Zip: this.state.Profile.Zip,
-        errors,
+        Profile: { ...this.state.Profile, ...{ Zip: e.target.value } },
+
+        errors: { ...this.state.errors, ...{ zipError: '' } },
       });
     }
   };
   onChangeHandlerCity = (e) => {
     this.setState({
-      City: this.state.Profile.City,
+      Profile: { ...this.state.Profile, ...{ City: e.target.value } },
     });
   };
   onChangeHandlerStreet = (e) => {
     this.setState({
-      Street: this.state.Profile.Street,
+      Profile: { ...this.state.Profile, ...{ Street: e.target.value } },
     });
   };
   onChangeDate = (e) => {
-    let errors = {};
+    // let errors = {};
     const today = new Date();
     const inputDate = new Date(e.target.value);
     if (today <= inputDate) {
-      errors['dateError'] = 'Select future Date!';
+      //errors['dateError'] = '  Cannot select future Date!';
       this.setState({
-        errors,
+        errors: { ...this.state.errors, ...{ dateError: '  Cannot select future Date!' } },
       });
-      let payload = {
-        success: false,
-        message: 'Date Of Birth Van not be of Future!',
-      };
-      this.props.updateSnackbarData(payload);
     } else {
       this.setState({
-        Date_Of_Birth: this.state.Profile.Date_Of_Birth,
-        errors,
+        Profile: { ...this.state.Profile, ...{ Date_Of_Birth: e.target.value } },
+
+        errors: { ...this.state.errors, ...{ dateError: '' } },
       });
     }
+  };
+
+  updateProfile = (e) => {
+    e.preventDefault();
+    const data = {
+      ...this.state.Profile,
+      ...{ token: localStorage.getItem('token'), userrole: localStorage.getItem('userrole') },
+    };
+    axios.defaults.withCredentials = true;
+    //make a post request with the user data
+    axios.put(serverUrl + 'customer/updateProfile', data).then(
+      (response) => {
+        console.log('Status Code : ', response.status);
+        if (response.status === 204) {
+          console.log(response.data);
+          let payload = {
+            success: true,
+            message: 'Profile Updated Successfully!',
+          };
+          this.props.updateSnackbarData(payload);
+        }
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
   };
 
   render() {
@@ -209,7 +228,10 @@ class UpdateProfile extends Component {
                   <div class="section-header clearfix">
                     <h2>Profile</h2>
                   </div>
-                  <form className="profile-bio yform yform-vertical-spacing">
+                  <form
+                    onSubmit={this.updateProfile}
+                    className="profile-bio yform yform-vertical-spacing"
+                  >
                     <label for="first_name">First Name</label>
                     <span class="help-block">This field is required.</span>
                     <input
@@ -256,6 +278,7 @@ class UpdateProfile extends Component {
                       className="form-control"
                       onChange={this.onChangeHandlerGender}
                       value={this.state.Profile.Gender}
+                      required
                     >
                       <option className="Dropdown-menu" key="" value="">
                         -Select-
@@ -339,7 +362,6 @@ class UpdateProfile extends Component {
                       className="form-control"
                       onChange={this.onChangeHandlerState}
                       value={this.state.Profile.State_ID}
-                      required
                     >
                       <option className="Dropdown-menu" key="" value="">
                         -Select-
@@ -350,14 +372,15 @@ class UpdateProfile extends Component {
                         </option>
                       ))}
                     </select>
-                    <label for="Zip Code">Zip Code</label>
+                    <label for="Zip Code">
+                      Zip Code<span style={{ color: 'red' }}>{this.state.errors['zipError']}</span>
+                    </label>
                     <input
                       minlength="5"
                       maxlength="5"
                       id="zipCode"
                       name="zipCode"
                       placeholder="zipCode"
-                      required="required"
                       type="text"
                       onChange={this.onChangeHandlerZipCode}
                       value={this.state.Profile.Zip}
@@ -367,7 +390,6 @@ class UpdateProfile extends Component {
                       id="city"
                       name="city"
                       placeholder="City"
-                      required="required"
                       type="text"
                       onChange={this.onChangeHandlerCity}
                       value={this.state.Profile.City}
@@ -377,12 +399,14 @@ class UpdateProfile extends Component {
                       id="street"
                       name="street"
                       placeholder="Street"
-                      required="required"
                       type="text"
                       onChange={this.onChangeHandlerStreet}
                       value={this.state.Profile.Street}
                     />
-                    <label for="DOB">Date Of Birth</label>
+                    <label for="DOB">
+                      Date Of Birth
+                      <span style={{ color: 'red' }}>{this.state.errors['dateError']}</span>
+                    </label>
                     <input
                       id="DOB"
                       name="DOB"
@@ -394,6 +418,10 @@ class UpdateProfile extends Component {
                       value={this.state.Profile.Date_Of_Birth}
                     />
                     <button
+                      disabled={
+                        this.state.errors.zipError.length !== 0 ||
+                        this.state.errors.dateError.length !== 0
+                      }
                       type="submit"
                       value="submit"
                       class="ybtn ybtn--primary ybtn-full-responsive-small"

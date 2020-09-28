@@ -6,6 +6,10 @@ const {
   signup,
   getBasicInfo,
   getDataForCustomerUpdateProfile,
+  updateProfile,
+  getContactInfo,
+  updateContactInfo,
+  getCustomerCompleteProfile,
 } = require('../customer/customerProfile');
 const { login, logout } = require('../common/loginLogout');
 
@@ -47,4 +51,31 @@ Router.get('/getDataForCustomerUpdateProfile', async (req, res) => {
   return results;
 });
 
+Router.put('/updateProfile', async (req, res) => {
+  console.log('updateProfile');
+  let results = null;
+  results = await updateProfile(req, res);
+  return results;
+});
+
+Router.get('/getContactInfo', async (req, res) => {
+  console.log('getContactInfo');
+  let results = null;
+  results = await getContactInfo(req, res);
+  return results;
+});
+
+Router.put('/updateContactInfo', async (req, res) => {
+  console.log('updateContactInfo');
+  let results = null;
+  results = await updateContactInfo(req, res);
+  return results;
+});
+
+Router.get('/getCustomerCompleteProfile', async (req, res) => {
+  console.log('getContactInfo');
+  let results = null;
+  results = await getCustomerCompleteProfile(req, res);
+  return results;
+});
 module.exports = Router;

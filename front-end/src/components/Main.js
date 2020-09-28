@@ -7,7 +7,7 @@ import Home from './Home/Home';
 import CustomerNavBar from './Customer/CustomerNavBar';
 import AboutMe from './Customer/AboutMe';
 import UpdateProfile from './Customer/UpdateInformation/UpdateProfile';
-
+import UpdateContactInformation from './Customer/UpdateInformation/UpdateContactInformation';
 // Create a Main Component
 class Main extends Component {
   render() {
@@ -24,6 +24,7 @@ class Main extends Component {
         <Route path="/cus" component={CustomerNavBar} />
         <Route path="/AboutMe" component={AboutMe} />
         <Route path="/UpdateProfile" component={UpdateProfile} />
+        <Route path="/UpdateContactInformation" component={UpdateContactInformation} />
 
         <Route exact path="/" component={Home} />
         {/*</Switch>*/}

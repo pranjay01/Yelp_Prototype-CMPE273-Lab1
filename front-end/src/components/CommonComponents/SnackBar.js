@@ -8,7 +8,7 @@ class SnackBar extends Component {
     this.state = {};
   }
   componentDidMount() {
-    setTimeout(this.props.removeSnackbar, 3);
+    setTimeout(this.props.removeSnackbar(), 3000);
   }
   render() {
     const { data } = this.props;

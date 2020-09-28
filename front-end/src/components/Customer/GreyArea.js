@@ -104,6 +104,32 @@ class GreyArea extends Component {
                       </div>
                     </Link>
                   </li>
+                  <li>
+                    <Link
+                      to="/UpdateContactInformation"
+                      class="arrange arrange--middle"
+                      href="#"
+                      rel=""
+                    >
+                      <div class="action-link_icon arrange_unit">
+                        <span
+                          aria-hidden="true"
+                          style={{ width: '18px', height: '18px' }}
+                          class="icon icon--18-feed icon--size-18 icon--currentColor"
+                        >
+                          <svg role="img" class="icon_svg">
+                            <svg id="18x18_feed" height="18" viewBox="0 0 18 18" width="18">
+                              <path d="M14 3H4a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zM4 6.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-3zM14 12H4v-1h10v1zm0-5h-4V6h4v1zm0 2h-4V8h4v1z"></path>
+                            </svg>
+                            {/*<use xlink:href="#18x18_feed"></use>*/}
+                          </svg>
+                        </span>
+                      </div>
+                      <div class="action-link_label arrange_unit arrange_unit--fill">
+                        Update Contact Information
+                      </div>
+                    </Link>
+                  </li>
                 </ul>
               </div>
             </div>

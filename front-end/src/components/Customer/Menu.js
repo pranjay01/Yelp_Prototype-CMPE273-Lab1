@@ -14,7 +14,7 @@ class Menu extends Component {
 
   componentDidMount() {}
   logout = (e) => {
-    e.preventDefault();
+    // e.preventDefault();
     console.log('logouting customer');
     var data = {
       token: cookie.load('cookie'),
@@ -25,7 +25,6 @@ class Menu extends Component {
     localStorage.clear();
     axios.post(serverUrl + 'customer/logout', data).then((response) => {
       if (response.status === 200) {
-        localStorage.clear();
         let payload = {
           userEmail: '',
           role: '',
