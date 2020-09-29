@@ -11,7 +11,7 @@ declare exit handler for sqlexception
 rollback;
 start transaction;
 if OrderType='All' Then
-	select ORDERS.ID as ID, CUSTOMER.Customer_ID as CustomerID, 
+	select ORDERS.ID as ID, CUSTOMER.Customer_ID as CustomerID, CUSTOMER.ImageURL as ImageUrl,
 	concat(CUSTOMER.First_Name, ' ', CUSTOMER.Last_Name) as CustomerName, Date, Order_Type, 
 	Delivery_Status as DeliverStatusID,DELIVERY_STATUS.Status as DeliverStatusValue , Bill
 	FROM ORDERS LEFT JOIN CUSTOMER ON CUSTOMER.Customer_ID=ORDERS.Customer_ID 
@@ -19,7 +19,7 @@ if OrderType='All' Then
 	WHERE Restaurant_ID=RestroId;
 end if;
 if OrderType='New' Then
-	select ORDERS.ID as ID, CUSTOMER.Customer_ID as CustomerID, 
+	select ORDERS.ID as ID, CUSTOMER.Customer_ID as CustomerID, CUSTOMER.ImageURL as ImageUrl,
 	concat(CUSTOMER.First_Name, ' ', CUSTOMER.Last_Name) as CustomerName, Date, Order_Type, 
 	Delivery_Status as DeliverStatusID,DELIVERY_STATUS.Status as DeliverStatusValue , Bill
 	FROM ORDERS LEFT JOIN CUSTOMER ON CUSTOMER.Customer_ID=ORDERS.Customer_ID 
@@ -27,7 +27,7 @@ if OrderType='New' Then
 	WHERE Restaurant_ID=RestroId and Delivery_Status<5;
 end if;
 if OrderType='Delivered' Then
-	select ORDERS.ID as ID, CUSTOMER.Customer_ID as CustomerID, 
+	select ORDERS.ID as ID, CUSTOMER.Customer_ID as CustomerID, CUSTOMER.ImageURL as ImageUrl,
 	concat(CUSTOMER.First_Name, ' ', CUSTOMER.Last_Name) as CustomerName, Date, Order_Type, 
 	Delivery_Status as DeliverStatusID,DELIVERY_STATUS.Status as DeliverStatusValue , Bill
 	FROM ORDERS LEFT JOIN CUSTOMER ON CUSTOMER.Customer_ID=ORDERS.Customer_ID 

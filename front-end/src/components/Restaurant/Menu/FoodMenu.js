@@ -23,6 +23,7 @@ class FoodMenu extends Component {
         CuisineID: null,
         Description: '',
         Price: null,
+        ImageUrl: '',
       },
       tmpFood: {
         ID: null,
@@ -97,6 +98,7 @@ class FoodMenu extends Component {
       CuisineID: null,
       Description: '',
       Price: null,
+      ImageUrl: '',
     };
     this.setState({
       editableId: FoodId,
@@ -154,6 +156,7 @@ class FoodMenu extends Component {
                   CuisineID: Appetizer.Cuisine_ID,
                   Description: Appetizer.Description,
                   Price: Appetizer.Price,
+                  ImageUrl: Appetizer.ImageURL,
                 };
               });
 
@@ -181,6 +184,7 @@ class FoodMenu extends Component {
                   CuisineID: Salad.Cuisine_ID,
                   Description: Salad.Description,
                   Price: Salad.Price,
+                  ImageUrl: Salad.ImageURL,
                 };
               });
 
@@ -208,6 +212,7 @@ class FoodMenu extends Component {
                   CuisineID: MainCourse.Cuisine_ID,
                   Description: MainCourse.Description,
                   Price: MainCourse.Price,
+                  ImageUrl: MainCourse.ImageURL,
                 };
               });
 
@@ -235,6 +240,7 @@ class FoodMenu extends Component {
                   CuisineID: Beverage.Cuisine_ID,
                   Description: Beverage.Description,
                   Price: Beverage.Price,
+                  ImageUrl: Beverage.ImageURL,
                 };
               });
 
@@ -261,6 +267,7 @@ class FoodMenu extends Component {
                   CuisineID: Dessert.Cuisine_ID,
                   Description: Dessert.Description,
                   Price: Dessert.Price,
+                  ImageUrl: Dessert.ImageURL,
                 };
               });
 
@@ -356,6 +363,7 @@ class FoodMenu extends Component {
         CuisineID: null,
         Description: '',
         Price: null,
+        ImageUrl: '',
       };
       this.setState({
         newFood: { ...this.state.newFood, ...tmp },
@@ -654,7 +662,7 @@ class FoodMenu extends Component {
   };
 
   //update old food item
-  updateFoodItem = (FoodId, menuCategory) => {
+  updateFoodItem = (FoodId, event) => {
     let index = null;
     let foodItem = null;
     switch (this.state.showFoodCategory) {
@@ -689,6 +697,7 @@ class FoodMenu extends Component {
     }
 
     foodItem = { ...foodItem, category: this.state.showFoodCategory };
+    event.preventDefault();
     axios.defaults.withCredentials = true;
     //make a post request with the user data
     axios.post(serverUrl + 'biz/updateFoodItem', foodItem).then(
@@ -780,6 +789,129 @@ class FoodMenu extends Component {
     }
   };
 
+  onChangeFileHandlerOld = (event, id) => {
+    if (event.target.files.length === 1) {
+      event.preventDefault();
+      let formData = new FormData();
+      formData.append('file', event.target.files[0], event.target.files[0].name);
+      axios({
+        method: 'post',
+        url: serverUrl + 'biz/uploadFoodImage',
+        data: formData,
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+        .then((response) => {
+          console.log('Status Code : ', response.status);
+          if (parseInt(response.status) === 200) {
+            console.log('Product Saved');
+            let tmp = { ImageUrl: response.data };
+            this.updateImageUrl(response.data, id);
+            // this.setState({
+            //   newFood: { ...this.state.newFood, ...tmp },
+            // });
+            //Router.push('/vendor/' + localStorage.getItem('user_id'));
+          } else if (parseInt(response.status) === 400) {
+            console.log(response.data);
+          }
+        })
+        .catch((error) => {
+          this.setState({
+            errorMsg: error.message,
+            authFlag: false,
+          });
+        });
+      // this.setState({
+      //   uploadedPic: event.target.files,
+      // });
+    }
+  };
+
+  updateImageUrl = (value, id) => {
+    let index = null;
+    let food = null;
+    switch (this.state.showFoodCategory) {
+      case 'APPETIZERS':
+        index = this.state.APPETIZERS.findIndex((x) => x.ID === id);
+        let APPETIZERS = [...this.state.APPETIZERS];
+        food = { ...APPETIZERS[index] };
+        food.ImageUrl = value;
+        APPETIZERS[index] = food;
+        this.setState({ APPETIZERS });
+        break;
+      case 'SALADS':
+        index = this.state.SALADS.findIndex((x) => x.ID === id);
+        let SALADS = [...this.state.SALADS];
+        food = { ...SALADS[index] };
+        food.ImageUrl = value;
+        SALADS[index] = food;
+        this.setState({ SALADS });
+        break;
+      case 'MAIN_COURSE':
+        index = this.state.MAIN_COURSE.findIndex((x) => x.ID === id);
+        let MAIN_COURSE = [...this.state.MAIN_COURSE];
+        food = { ...MAIN_COURSE[index] };
+        food.ImageUrl = value;
+        MAIN_COURSE[index] = food;
+        this.setState({ MAIN_COURSE });
+        break;
+      case 'BEVERAGES':
+        index = this.state.BEVERAGES.findIndex((x) => x.ID === id);
+        let BEVERAGES = [...this.state.BEVERAGES];
+        food = { ...BEVERAGES[index] };
+        food.ImageUrl = value;
+        BEVERAGES[index] = food;
+        this.setState({ BEVERAGES });
+        break;
+      case 'DESSERTS':
+        index = this.state.DESSERTS.findIndex((x) => x.ID === id);
+        let DESSERTS = [...this.state.DESSERTS];
+        food = { ...DESSERTS[index] };
+        food.ImageUrl = value;
+        DESSERTS[index] = food;
+        this.setState({ DESSERTS });
+        break;
+      default:
+        console.log('wrong Input');
+        break;
+    }
+  };
+
+  onChangeFileHandler = (event) => {
+    if (event.target.files.length === 1) {
+      event.preventDefault();
+      let formData = new FormData();
+      formData.append('file', event.target.files[0], event.target.files[0].name);
+      axios({
+        method: 'post',
+        url: serverUrl + 'biz/uploadFoodImage',
+        data: formData,
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+        .then((response) => {
+          console.log('Status Code : ', response.status);
+          if (parseInt(response.status) === 200) {
+            console.log('Product Saved');
+            let tmp = { ImageUrl: response.data };
+            this.setState({
+              newFood: { ...this.state.newFood, ...tmp },
+            });
+            //Router.push('/vendor/' + localStorage.getItem('user_id'));
+          } else if (parseInt(response.status) === 400) {
+            console.log(response.data);
+          }
+        })
+        .catch((error) => {
+          this.setState({
+            errorMsg: error.message,
+            authFlag: false,
+          });
+        });
+      // this.setState({
+      //   uploadedPic: event.target.files,
+      // });
+    }
+  };
+
   onSaveCreateNew = () => {
     const data = {
       category: this.state.showFoodCategory,
@@ -788,6 +920,7 @@ class FoodMenu extends Component {
       cuisine: this.state.newFood.CuisineID,
       ingredients: this.state.newFood.MainIngredients,
       description: this.state.newFood.Description,
+      ImageUrl: this.state.newFood.ImageUrl,
     };
     //set the with credentials to true
     axios.defaults.withCredentials = true;
@@ -804,6 +937,7 @@ class FoodMenu extends Component {
             CuisineID: response.data[0][0].Cuisine_ID,
             Description: response.data[0][0].Description,
             Price: response.data[0][0].Price,
+            ImageUrl: response.data[0][0].ImageUrl,
           };
 
           // newFoodId = { ...newFoodId, ...this.state.newFood };
@@ -939,7 +1073,7 @@ class FoodMenu extends Component {
                         makeEditable={(ID) => this.makeEditable(ID)}
                         onDelete={this.deleteFoodItem}
                         onCancelUpdate={() => this.cancelFoodUpdate(food.ID)}
-                        onSave={() => this.updateFoodItem(food.ID)}
+                        onSave={(event) => this.updateFoodItem(food.ID, event)}
                         onNameChangeHandler={(evt, id) => this.onNameChangeHandlerUpdate(evt, id)}
                         onPriceChangeHandler={(evt, id) => this.onPriceChangeHandlerUpdate(evt, id)}
                         onCusineChangeHandler={(evt, id) =>
@@ -950,6 +1084,9 @@ class FoodMenu extends Component {
                         }
                         onDescriptionChangeHandler={(evt, id) =>
                           this.onDescriptionChangeHandlerUpdate(evt, id)
+                        }
+                        onChangeFileHandlerOld={(event) =>
+                          this.onChangeFileHandlerOld(event, food.ID)
                         }
                       />
                     ))}
@@ -1012,6 +1149,7 @@ class FoodMenu extends Component {
                     onIngredentsChangeHandler={(evt) => this.onIngredentsChangeHandler(evt)}
                     onDescriptionChangeHandler={(evt) => this.onDescriptionChangeHandler(evt)}
                     onNameChangeHandler={(evt) => this.onNameChangeHandler(evt)}
+                    onChangeFileHandler={(event) => this.onChangeFileHandler(event)}
                     food={this.state.newFood}
                     onSaveCreateNew={() => this.onSaveCreateNew()}
                   ></NewFoodForm>
@@ -1027,7 +1165,7 @@ class FoodMenu extends Component {
                         editableId={this.state.editableId}
                         makeEditable={(ID) => this.makeEditable(ID)}
                         onDelete={this.deleteFoodItem}
-                        onSave={() => this.updateFoodItem(food.ID)}
+                        onSave={(event) => this.updateFoodItem(food.ID, event)}
                         onCancelUpdate={() => this.cancelFoodUpdate(food.ID)}
                         onNameChangeHandler={(evt, id) => this.onNameChangeHandlerUpdate(evt, id)}
                         onPriceChangeHandler={(evt, id) => this.onPriceChangeHandlerUpdate(evt, id)}
@@ -1039,6 +1177,9 @@ class FoodMenu extends Component {
                         }
                         onDescriptionChangeHandler={(evt, id) =>
                           this.onDescriptionChangeHandlerUpdate(evt, id)
+                        }
+                        onChangeFileHandlerOld={(event) =>
+                          this.onChangeFileHandlerOld(event, food.ID)
                         }
                       />
                     ))}
@@ -1101,6 +1242,7 @@ class FoodMenu extends Component {
                     onIngredentsChangeHandler={(evt) => this.onIngredentsChangeHandler(evt)}
                     onDescriptionChangeHandler={(evt) => this.onDescriptionChangeHandler(evt)}
                     onNameChangeHandler={(evt) => this.onNameChangeHandler(evt)}
+                    onChangeFileHandler={(event) => this.onChangeFileHandler(event)}
                     food={this.state.newFood}
                     onSaveCreateNew={() => this.onSaveCreateNew()}
                   ></NewFoodForm>
@@ -1116,7 +1258,7 @@ class FoodMenu extends Component {
                         editableId={this.state.editableId}
                         makeEditable={(ID) => this.makeEditable(ID)}
                         onDelete={this.deleteFoodItem}
-                        onSave={() => this.updateFoodItem(food.ID)}
+                        onSave={(event) => this.updateFoodItem(food.ID, event)}
                         onCancelUpdate={() => this.cancelFoodUpdate(food.ID)}
                         onNameChangeHandler={(evt, id) => this.onNameChangeHandlerUpdate(evt, id)}
                         onPriceChangeHandler={(evt, id) => this.onPriceChangeHandlerUpdate(evt, id)}
@@ -1128,6 +1270,9 @@ class FoodMenu extends Component {
                         }
                         onDescriptionChangeHandler={(evt, id) =>
                           this.onDescriptionChangeHandlerUpdate(evt, id)
+                        }
+                        onChangeFileHandlerOld={(event) =>
+                          this.onChangeFileHandlerOld(event, food.ID)
                         }
                       />
                     ))}
@@ -1190,6 +1335,7 @@ class FoodMenu extends Component {
                     onIngredentsChangeHandler={(evt) => this.onIngredentsChangeHandler(evt)}
                     onDescriptionChangeHandler={(evt) => this.onDescriptionChangeHandler(evt)}
                     onNameChangeHandler={(evt) => this.onNameChangeHandler(evt)}
+                    onChangeFileHandler={(event) => this.onChangeFileHandler(event)}
                     food={this.state.newFood}
                     onSaveCreateNew={() => this.onSaveCreateNew()}
                   ></NewFoodForm>
@@ -1205,7 +1351,7 @@ class FoodMenu extends Component {
                         editableId={this.state.editableId}
                         makeEditable={(ID) => this.makeEditable(ID)}
                         onDelete={this.deleteFoodItem}
-                        onSave={() => this.updateFoodItem(food.ID)}
+                        onSave={(event) => this.updateFoodItem(food.ID, event)}
                         onCancelUpdate={() => this.cancelFoodUpdate(food.ID)}
                         onNameChangeHandler={(evt, id) => this.onNameChangeHandlerUpdate(evt, id)}
                         onPriceChangeHandler={(evt, id) => this.onPriceChangeHandlerUpdate(evt, id)}
@@ -1217,6 +1363,9 @@ class FoodMenu extends Component {
                         }
                         onDescriptionChangeHandler={(evt, id) =>
                           this.onDescriptionChangeHandlerUpdate(evt, id)
+                        }
+                        onChangeFileHandlerOld={(event) =>
+                          this.onChangeFileHandlerOld(event, food.ID)
                         }
                       />
                     ))}
@@ -1279,6 +1428,7 @@ class FoodMenu extends Component {
                     onIngredentsChangeHandler={(evt) => this.onIngredentsChangeHandler(evt)}
                     onDescriptionChangeHandler={(evt) => this.onDescriptionChangeHandler(evt)}
                     onNameChangeHandler={(evt) => this.onNameChangeHandler(evt)}
+                    onChangeFileHandler={(event) => this.onChangeFileHandler(event)}
                     food={this.state.newFood}
                     onSaveCreateNew={() => this.onSaveCreateNew()}
                   ></NewFoodForm>
@@ -1294,7 +1444,7 @@ class FoodMenu extends Component {
                         onDelete={this.deleteFoodItem}
                         editableId={this.state.editableId}
                         makeEditable={(ID) => this.makeEditable(ID)}
-                        onSave={() => this.updateFoodItem(food.ID)}
+                        onSave={(event) => this.updateFoodItem(food.ID, event)}
                         onCancelUpdate={() => this.cancelFoodUpdate(food.ID)}
                         onNameChangeHandler={(evt, id) => this.onNameChangeHandlerUpdate(evt, id)}
                         onPriceChangeHandler={(evt, id) => this.onPriceChangeHandlerUpdate(evt, id)}
@@ -1306,6 +1456,9 @@ class FoodMenu extends Component {
                         }
                         onDescriptionChangeHandler={(evt, id) =>
                           this.onDescriptionChangeHandlerUpdate(evt, id)
+                        }
+                        onChangeFileHandlerOld={(event) =>
+                          this.onChangeFileHandlerOld(event, food.ID)
                         }
                       />
                     ))}

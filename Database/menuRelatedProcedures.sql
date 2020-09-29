@@ -64,14 +64,14 @@ drop procedure IF EXISTS insertAppetizerItems;
 DELIMITER $$
 CREATE PROCEDURE `insertAppetizerItems` (IN RestaurantID INT,IN Dishname_check varchar(50),
  IN Price_check decimal(4,2) , IN _cuisineId INT, IN ingredients_check varchar(100), 
- IN description_check varchar(100))
+ IN description_check varchar(100),IN _ImageUrl VARCHAR(500))
 BEGIN
 DECLARE newID INT;
 declare exit handler for sqlexception rollback;
 start transaction;
 INSERT INTO APPETIZER (Restaurant_ID, Name, Price, Cuisine_ID, Main_Ingredients, 
-Description) 
-VALUES (RestaurantID,Dishname_check, Price_check, _cuisineId, ingredients_check, description_check);
+Description,ImageURL) 
+VALUES (RestaurantID,Dishname_check, Price_check, _cuisineId, ingredients_check, description_check,_ImageUrl);
 set newID =(SELECT LAST_INSERT_ID());
 SELECT * FROM APPETIZER WHERE ID=newID;
 commit;
@@ -83,14 +83,14 @@ drop procedure IF EXISTS insertBeveragesItems;
 DELIMITER $$
 CREATE PROCEDURE `insertBeveragesItems` (IN RestaurantID INT,IN Dishname_check varchar(50),
  IN Price_check decimal(4,2) , IN _cuisineId INT, IN ingredients_check varchar(100), 
- IN description_check varchar(100))
+ IN description_check varchar(100),IN _ImageUrl VARCHAR(500))
 BEGIN
 DECLARE newID INT;
 declare exit handler for sqlexception rollback;
 start transaction;
 INSERT INTO BEVERAGES (Restaurant_ID, Name, Price, Cuisine_ID, Main_Ingredients, 
-Description) 
-VALUES (RestaurantID,Dishname_check, Price_check, _cuisineId, ingredients_check, description_check);
+Description,ImageURL) 
+VALUES (RestaurantID,Dishname_check, Price_check, _cuisineId, ingredients_check, description_check,_ImageUrl);
 set newID =(SELECT LAST_INSERT_ID());
 SELECT * FROM BEVERAGES WHERE ID=newID;
 commit;
@@ -102,14 +102,14 @@ drop procedure IF EXISTS insertDessertsItems;
 DELIMITER $$
 CREATE PROCEDURE `insertDessertsItems` (IN RestaurantID INT,IN Dishname_check varchar(50),
  IN Price_check decimal(4,2) , IN _cuisineId INT, IN ingredients_check varchar(100), 
- IN description_check varchar(100))
+ IN description_check varchar(100),IN _ImageUrl VARCHAR(500))
 BEGIN
 declare newID INT;
 declare exit handler for sqlexception rollback;
 start transaction;
 INSERT INTO DESSERTS (Restaurant_ID, Name, Price, Cuisine_ID, Main_Ingredients, 
-Description) 
-VALUES (RestaurantID,Dishname_check, Price_check, _cuisineId, ingredients_check, description_check);
+Description,ImageURL) 
+VALUES (RestaurantID,Dishname_check, Price_check, _cuisineId, ingredients_check, description_check,_ImageUrl);
 set newID =(SELECT LAST_INSERT_ID());
 SELECT * FROM DESSERTS WHERE ID=newID;
 commit;
@@ -120,14 +120,14 @@ drop procedure IF EXISTS insertMainCourseItems;
 DELIMITER $$
 CREATE PROCEDURE `insertMainCourseItems` (IN RestaurantID INT,IN Dishname_check varchar(50),
  IN Price_check decimal(4,2) , IN _cuisineId INT, IN ingredients_check varchar(100), 
- IN description_check varchar(100))
+ IN description_check varchar(100),IN _ImageUrl VARCHAR(500))
 BEGIN
 declare newID INT;
 declare exit handler for sqlexception rollback;
 start transaction;
 INSERT INTO MAIN_COURSE (Restaurant_ID, Name, Price, Cuisine_ID, Main_Ingredients, 
-Description) 
-VALUES (RestaurantID,Dishname_check, Price_check, _cuisineId, ingredients_check, description_check);
+Description,ImageURL) 
+VALUES (RestaurantID,Dishname_check, Price_check, _cuisineId, ingredients_check, description_check,_ImageUrl);
 set newID =(SELECT LAST_INSERT_ID());
 SELECT * FROM MAIN_COURSE WHERE ID=newID;
 commit;
@@ -138,14 +138,14 @@ drop procedure IF EXISTS insertSaladsItems;
 DELIMITER $$
 CREATE PROCEDURE `insertSaladsItems` (IN RestaurantID INT,IN Dishname_check varchar(50),
  IN Price_check decimal(4,2) , IN _cuisineId INT, IN ingredients_check varchar(100), 
- IN description_check varchar(100))
+ IN description_check varchar(100),IN _ImageUrl VARCHAR(500))
 BEGIN
 declare newId INT;
 declare exit handler for sqlexception rollback;
 start transaction;
 INSERT INTO SALADS (Restaurant_ID, Name, Price, Cuisine_ID, Main_Ingredients, 
-Description) 
-VALUES (RestaurantID,Dishname_check, Price_check, _cuisineId, ingredients_check, description_check);
+Description,ImageURL) 
+VALUES (RestaurantID,Dishname_check, Price_check, _cuisineId, ingredients_check, description_check,_ImageUrl);
 set newID =(SELECT LAST_INSERT_ID());
 SELECT * FROM SALADS WHERE ID=newID;
 commit;
@@ -217,28 +217,31 @@ DELIMITER ;
 drop procedure IF EXISTS updateAppetizerItems;
 DELIMITER $$
 CREATE PROCEDURE `updateAppetizerItems` (IN _ID INT,IN _Resto_ID INT, IN _Name VARCHAR(50),
-IN _Main_Ingredients VARCHAR(100), IN _Price DECIMAL(4,2),IN _Cuisine_ID INT ,IN _Description VARCHAR(100))
+IN _Main_Ingredients VARCHAR(100), IN _Price DECIMAL(4,2),IN _Cuisine_ID INT ,
+IN _Description VARCHAR(100), IN _ImageUrl VARCHAR(500))
 BEGIN
 declare exit handler for sqlexception rollback;
 start transaction;
 UPDATE APPETIZER 
 set Name=_Name, Main_Ingredients=_Main_Ingredients, Price=_Price, 
-Cuisine_ID=_Cuisine_ID, Description=_Description
+Cuisine_ID=_Cuisine_ID, Description=_Description ,ImageURL=_ImageUrl
 where ID=_ID and Restaurant_ID=_Resto_ID;
 commit;
 END$$
+
 DELIMITER ;
 
 drop procedure IF EXISTS updateBeveragesItems;
 DELIMITER $$
 CREATE PROCEDURE `updateBeveragesItems` (IN _ID INT,IN _Resto_ID INT, IN _Name VARCHAR(50),
-IN _Main_Ingredients VARCHAR(100), IN _Price DECIMAL(4,2),IN _Cuisine_ID INT ,IN _Description VARCHAR(100))
+IN _Main_Ingredients VARCHAR(100), IN _Price DECIMAL(4,2),IN _Cuisine_ID INT ,
+IN _Description VARCHAR(100), IN _ImageUrl VARCHAR(500))
 BEGIN
 declare exit handler for sqlexception rollback;
 start transaction;
 UPDATE BEVERAGES 
 set Name=_Name, Main_Ingredients=_Main_Ingredients, Price=_Price, 
-Cuisine_ID=_Cuisine_ID, Description=_Description
+Cuisine_ID=_Cuisine_ID, Description=_Description ,ImageURL=_ImageUrl
 where ID=_ID and Restaurant_ID=_Resto_ID;
 commit;
 END$$
@@ -247,13 +250,14 @@ DELIMITER ;
 drop procedure IF EXISTS updateDessertItems;
 DELIMITER $$
 CREATE PROCEDURE `updateDessertItems` (IN _ID INT,IN _Resto_ID INT, IN _Name VARCHAR(50),
-IN _Main_Ingredients VARCHAR(100), IN _Price DECIMAL(4,2),IN _Cuisine_ID INT ,IN _Description VARCHAR(100))
+IN _Main_Ingredients VARCHAR(100), IN _Price DECIMAL(4,2),IN _Cuisine_ID INT ,
+IN _Description VARCHAR(100), IN _ImageUrl VARCHAR(500))
 BEGIN
 declare exit handler for sqlexception rollback;
 start transaction;
 UPDATE DESSERTS 
 set Name=_Name, Main_Ingredients=_Main_Ingredients, Price=_Price, 
-Cuisine_ID=_Cuisine_ID, Description=_Description
+Cuisine_ID=_Cuisine_ID, Description=_Description ,ImageURL=_ImageUrl
 where ID=_ID and Restaurant_ID=_Resto_ID;
 commit;
 END$$
@@ -262,13 +266,14 @@ DELIMITER ;
 drop procedure IF EXISTS updateMainCourseItems;
 DELIMITER $$
 CREATE PROCEDURE `updateMainCourseItems` (IN _ID INT,IN _Resto_ID INT, IN _Name VARCHAR(50),
-IN _Main_Ingredients VARCHAR(100), IN _Price DECIMAL(4,2),IN _Cuisine_ID INT ,IN _Description VARCHAR(100))
+IN _Main_Ingredients VARCHAR(100), IN _Price DECIMAL(4,2),IN _Cuisine_ID INT ,
+IN _Description VARCHAR(100), IN _ImageUrl VARCHAR(500))
 BEGIN
 declare exit handler for sqlexception rollback;
 start transaction;
 UPDATE MAIN_COURSE 
 set Name=_Name, Main_Ingredients=_Main_Ingredients, Price=_Price, 
-Cuisine_ID=_Cuisine_ID, Description=_Description
+Cuisine_ID=_Cuisine_ID, Description=_Description ,ImageURL=_ImageUrl
 where ID=_ID and Restaurant_ID=_Resto_ID;
 commit;
 END$$
@@ -277,13 +282,14 @@ DELIMITER ;
 drop procedure IF EXISTS updateSaladsItems;
 DELIMITER $$
 CREATE PROCEDURE `updateSaladsItems` (IN _ID INT,IN _Resto_ID INT, IN _Name VARCHAR(50),
-IN _Main_Ingredients VARCHAR(100), IN _Price DECIMAL(4,2),IN _Cuisine_ID INT ,IN _Description VARCHAR(100))
+IN _Main_Ingredients VARCHAR(100), IN _Price DECIMAL(4,2),IN _Cuisine_ID INT ,
+IN _Description VARCHAR(100), IN _ImageUrl VARCHAR(500))
 BEGIN
 declare exit handler for sqlexception rollback;
 start transaction;
 UPDATE SALADS 
 set Name=_Name, Main_Ingredients=_Main_Ingredients, Price=_Price, 
-Cuisine_ID=_Cuisine_ID, Description=_Description
+Cuisine_ID=_Cuisine_ID, Description=_Description ,ImageURL=_ImageUrl
 where ID=_ID and Restaurant_ID=_Resto_ID;
 commit;
 END$$

@@ -151,7 +151,7 @@ CREATE PROCEDURE `fetchReviews` (IN RestroID INT)
 BEGIN
 declare exit handler for sqlexception rollback;
 start transaction;
-SELECT REVIEWS.ID as ID, REVIEWS.Customer_ID as CustomerId, 
+SELECT REVIEWS.ID as ID, REVIEWS.Customer_ID as CustomerId,  CUSTOMER.ImageURL as ImageUrl,
 concat(First_Name,' ', Last_Name) as CustomerName,Description,Date,
 Rating , concat(City, Zip )
 FROM REVIEWS JOIN CUSTOMER on REVIEWS.Customer_ID = CUSTOMER.Customer_ID
@@ -164,9 +164,9 @@ DELIMITER ;
 
 
 -- Procedure to fetch review for the Restaurant
-drop procedure  if exists uploadRestaurantProfilePic;
+drop procedure  if exists uploadPicToDB;
 DELIMITER $$
-CREATE PROCEDURE `uploadRestaurantProfilePic` (IN RestroID INT, 
+CREATE PROCEDURE `uploadPicToDB` (IN RestroID INT, 
 IN _ImagrUrl VARCHAR(500))
 BEGIN
 declare exit handler for sqlexception rollback;

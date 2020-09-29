@@ -14,7 +14,7 @@ class NewFoodForm extends Component {
           backgroundRepeat: 'no-repeat',
           backgroundSize: 'contain',
           width: '100%',
-          backgroundImage: `url(${this.props.food.ImageURL})`,
+          backgroundImage: `url(${this.props.food.ImageUrl})`,
         }}
       >
         <div data-ui="group">
@@ -122,14 +122,15 @@ class NewFoodForm extends Component {
                   />
                 </li>
                 <li>
+                  <label for="image">Update Image</label>
                   <input
                     style={{ cursor: 'pointer' }}
                     type="file"
                     accept="image/*"
                     onChange={(event) => this.props.onChangeFileHandler(event)}
                     //onChange={this.onChangeFileHandler}
-                    name="fileName"
-                    id="filename"
+                    name="image"
+                    id="image"
                     multiple
                     placeholder="update Profile Pic"
                   />

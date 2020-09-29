@@ -19,6 +19,7 @@ const {
   getCustomerList,
   uploadRestaurantProfilePic,
   uploadPicToDB,
+  uploadFoodImage,
 } = require('../restaurant/restaurantProfile');
 
 const { login, logout } = require('../common/loginLogout');
@@ -172,6 +173,13 @@ Router.post('/uploadPicToDB', async (req, res) => {
   console.log('uploadPicToDB');
   let results = null;
   results = await uploadPicToDB(req, res);
+  return results;
+});
+
+Router.post('/uploadFoodImage', async (req, res) => {
+  console.log('uploadFoodImage');
+  let results = null;
+  results = await uploadFoodImage(req, res);
   return results;
 });
 module.exports = Router;

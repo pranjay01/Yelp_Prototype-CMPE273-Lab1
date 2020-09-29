@@ -28,7 +28,7 @@ const multipleUpload = multer({
     // eslint-disable-next-line object-shorthand
     key: function (req, file, cb) {
       console.log(req.body);
-      const folderName = 'yelpPrototype-customer-';
+      const folderName = 'yelpPrototype-restaurant-';
       console.log('Multer Called', folderName);
       cb(null, `${folderName}/${Date.now().toString()}${file.originalname}`);
     },
@@ -343,20 +343,20 @@ const fetchMenu = async (request, response) => {
 };
 
 const insertFood = async (request, response) => {
-  const { category, name, price, cuisine, ingredients, description } = request.body;
+  const { category, name, price, cuisine, ingredients, description, ImageUrl } = request.body;
   const restroId = getUserIdFromToken(request.cookies.cookie, request.cookies.userrole);
   if (restroId) {
     let items = null;
     if (category === 'APPETIZERS') {
-      items = 'CALL insertAppetizerItems(?,?,?,?,?,?)';
+      items = 'CALL insertAppetizerItems(?,?,?,?,?,?,?)';
     } else if (category === 'BEVERAGES') {
-      items = 'CALL insertBeveragesItems(?,?,?,?,?,?)';
+      items = 'CALL insertBeveragesItems(?,?,?,?,?,?,?)';
     } else if (category === 'DESSERTS') {
-      items = 'CALL insertDessertsItems(?,?,?,?,?,?)';
+      items = 'CALL insertDessertsItems(?,?,?,?,?,?,?)';
     } else if (category === 'MAIN_COURSE') {
-      items = 'CALL insertMainCourseItems(?,?,?,?,?,?)';
+      items = 'CALL insertMainCourseItems(?,?,?,?,?,?,?)';
     } else {
-      items = 'CALL insertSaladsItems(?,?,?,?,?,?)';
+      items = 'CALL insertSaladsItems(?,?,?,?,?,?,?)';
     }
     const connection = await mysqlConnection();
     // eslint-disable-next-line no-unused-vars
@@ -367,6 +367,7 @@ const insertFood = async (request, response) => {
       cuisine,
       ingredients,
       description,
+      ImageUrl,
     ]);
     connection.end();
     console.log(results);
@@ -420,20 +421,29 @@ const deleteFoodItem = async (request, response) => {
 const updateFoodItem = async (request, response) => {
   try {
     const foodItem = request.body;
-    const { ID, category, Name, MainIngredients, CuisineID, Description, Price } = foodItem;
+    const {
+      ID,
+      category,
+      Name,
+      MainIngredients,
+      CuisineID,
+      Description,
+      Price,
+      ImageUrl,
+    } = foodItem;
     const restroID = getUserIdFromToken(request.cookies.cookie, request.cookies.userrole);
     let updateFoodItemQuery = '';
     if (restroID) {
       if (category === 'APPETIZERS') {
-        updateFoodItemQuery = 'CALL updateAppetizerItems(?,?,?,?,?,?,?)';
+        updateFoodItemQuery = 'CALL updateAppetizerItems(?,?,?,?,?,?,?,?)';
       } else if (category === 'BEVERAGES') {
-        updateFoodItemQuery = 'CALL updateBeveragesItems(?,?,?,?,?,?,?)';
+        updateFoodItemQuery = 'CALL updateBeveragesItems(?,?,?,?,?,?,?,?)';
       } else if (category === 'DESSERTS') {
-        updateFoodItemQuery = 'CALL updateDessertItems(?,?,?,?,?,?,?)';
+        updateFoodItemQuery = 'CALL updateDessertItems(?,?,?,?,?,?,?,?)';
       } else if (category === 'MAIN_COURSE') {
-        updateFoodItemQuery = 'CALL updateMainCourseItems(?,?,?,?,?,?,?)';
+        updateFoodItemQuery = 'CALL updateMainCourseItems(?,?,?,?,?,?,?,?)';
       } else {
-        updateFoodItemQuery = 'CALL updateSaladsItems(?,?,?,?,?,?,?)';
+        updateFoodItemQuery = 'CALL updateSaladsItems(?,?,?,?,?,?,?,?)';
       }
       const connection = await mysqlConnection();
       // eslint-disable-next-line no-unused-vars
@@ -445,6 +455,7 @@ const updateFoodItem = async (request, response) => {
         Price,
         CuisineID,
         Description,
+        ImageUrl,
       ]);
       connection.end();
       console.log(results);
@@ -708,6 +719,7 @@ const getCustomerList = async (request, response) => {
   return response;
 };
 
+// upload restaurant profile to s3 bucket
 const uploadRestaurantProfilePic = async (req, res) => {
   try {
     const restroId = getUserIdFromToken(req.cookies.cookie, req.cookies.userrole);
@@ -751,6 +763,7 @@ const uploadRestaurantProfilePic = async (req, res) => {
   return res;
 };
 
+// upload restaurant image to db
 const uploadPicToDB = async (req, response) => {
   try {
     const image = req.body;
@@ -758,7 +771,7 @@ const uploadPicToDB = async (req, response) => {
     const restroID = getUserIdFromToken(req.cookies.cookie, req.cookies.userrole);
 
     if (restroID) {
-      const uploadRestaurantProfilePicQuery = 'CALL uploadRestaurantProfilePic(?,?)';
+      const uploadRestaurantProfilePicQuery = 'CALL uploadPicToDB(?,?)';
 
       const connection = await mysqlConnection();
       // eslint-disable-next-line no-unused-vars
@@ -787,6 +800,38 @@ const uploadPicToDB = async (req, response) => {
   return response;
 };
 
+const uploadFoodImage = async (req, res) => {
+  try {
+    const restroId = getUserIdFromToken(req.cookies.cookie, req.cookies.userrole);
+    if (restroId) {
+      multipleUpload(req, res, function (err) {
+        if (err instanceof multer.MulterError) {
+          res.json({ status: 400, error: err.message });
+        } else if (err) {
+          res.json({ status: 400, error: err.message });
+        } else {
+          console.log(req.file.location);
+
+          res.writeHead(200, {
+            'Content-Type': 'text/plain',
+          });
+          res.end(req.file.location);
+        }
+      });
+    } else {
+      res.writeHead(401, {
+        'Content-Type': 'text/plain',
+      });
+      res.end('Invalid User');
+    }
+  } catch (error) {
+    res.writeHead(401, {
+      'Content-Type': 'text/plain',
+    });
+    res.end('Network Error');
+  }
+  return res;
+};
 module.exports = {
   signup,
   getBasicInfo,
@@ -805,4 +850,5 @@ module.exports = {
   getCustomerList,
   uploadRestaurantProfilePic,
   uploadPicToDB,
+  uploadFoodImage,
 };
