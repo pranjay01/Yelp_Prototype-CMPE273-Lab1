@@ -1,13 +1,39 @@
 /* eslint-disable no-console */
 
 const bcrypt = require('bcrypt');
+
+const AWS = require('aws-sdk');
+const multer = require('multer');
+const multerS3 = require('multer-s3');
 const url = require('url');
 // const { request } = require('http');
 const { getUserIdFromToken } = require('../common/loginLogout');
 
 const mysqlConnection = require('../mysqlConnection');
 
+const { BUCKET_NAME } = process.env;
+const s3Storage = new AWS.S3({
+  accessKeyId: process.env.ACCESS_KEY_ID,
+  secretAccessKey: process.env.SECRET_ACCESS_KEY,
+});
 require('dotenv').config();
+
+const multipleUpload = multer({
+  storage: multerS3({
+    s3: s3Storage,
+    bucket: BUCKET_NAME,
+    acl: 'public-read',
+    contentType: multerS3.AUTO_CONTENT_TYPE,
+    // eslint-disable-next-line func-names
+    // eslint-disable-next-line object-shorthand
+    key: function (req, file, cb) {
+      console.log(req.body);
+      const folderName = 'yelpPrototype-customer-';
+      console.log('Multer Called', folderName);
+      cb(null, `${folderName}/${Date.now().toString()}${file.originalname}`);
+    },
+  }),
+}).single('file');
 
 const getOrderList = async (_order, _appetizers, _desserts, _beverages, _salads, _mainCourse) => {
   const results = [];
@@ -682,6 +708,85 @@ const getCustomerList = async (request, response) => {
   return response;
 };
 
+const uploadRestaurantProfilePic = async (req, res) => {
+  try {
+    const restroId = getUserIdFromToken(req.cookies.cookie, req.cookies.userrole);
+    if (restroId) {
+      multipleUpload(req, res, function (err) {
+        if (err instanceof multer.MulterError) {
+          res.json({ status: 400, error: err.message });
+        } else if (err) {
+          res.json({ status: 400, error: err.message });
+        } else {
+          console.log(req.file.location);
+          // const uploadRestaurantProfilePicQuery = 'CALL uploadRestaurantProfilePic(?,?)';
+
+          // const connection = await mysqlConnection();
+          // const imageUrl = req.file.location;
+          // // eslint-disable-next-line no-unused-vars
+          // const [results, fields] = await connection.query(uploadRestaurantProfilePicQuery, [
+          //   restroId,
+          //   imageUrl,
+          // ]);
+          // connection.end();
+          // console.log(results);
+          res.writeHead(200, {
+            'Content-Type': 'text/plain',
+          });
+          res.end(req.file.location);
+        }
+      });
+    } else {
+      res.writeHead(401, {
+        'Content-Type': 'text/plain',
+      });
+      res.end('Invalid User');
+    }
+  } catch (error) {
+    res.writeHead(401, {
+      'Content-Type': 'text/plain',
+    });
+    res.end('Network Error');
+  }
+  return res;
+};
+
+const uploadPicToDB = async (req, response) => {
+  try {
+    const image = req.body;
+    const { ImageUrl } = image;
+    const restroID = getUserIdFromToken(req.cookies.cookie, req.cookies.userrole);
+
+    if (restroID) {
+      const uploadRestaurantProfilePicQuery = 'CALL uploadRestaurantProfilePic(?,?)';
+
+      const connection = await mysqlConnection();
+      // eslint-disable-next-line no-unused-vars
+      const [results, fields] = await connection.query(uploadRestaurantProfilePicQuery, [
+        restroID,
+        ImageUrl,
+      ]);
+      connection.end();
+      console.log(results);
+      response.writeHead(200, {
+        'Content-Type': 'text/plain',
+      });
+      response.end('Image saved successfully');
+    } else {
+      response.writeHead(401, {
+        'Content-Type': 'text/plain',
+      });
+      response.end('Invalid User');
+    }
+  } catch (error) {
+    response.writeHead(401, {
+      'Content-Type': 'text/plain',
+    });
+    response.end('Network Error');
+  }
+  return response;
+};
+
 module.exports = {
   signup,
   getBasicInfo,
@@ -698,4 +803,6 @@ module.exports = {
   createNewEvent,
   getEventList,
   getCustomerList,
+  uploadRestaurantProfilePic,
+  uploadPicToDB,
 };

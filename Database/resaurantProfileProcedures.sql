@@ -59,7 +59,7 @@ create procedure `getBasicInfo`(in userID int)
 begin
 declare exit handler for sqlexception rollback;
 start transaction;
-	select RESTAURANT.Name as Name,City,Street,Zip,STATE.Name as State 
+	select RESTAURANT.Name as Name,City,Street,Zip,STATE.Name as State, ImageURL
     from RESTAURANT JOIN STATE ON (RESTAURANT.State_ID=STATE.ID) where RESTAURANT.Restaurant_ID=userID;
     
     select count(REVIEWS.ID) as ReviewCount
@@ -157,5 +157,20 @@ Rating , concat(City, Zip )
 FROM REVIEWS JOIN CUSTOMER on REVIEWS.Customer_ID = CUSTOMER.Customer_ID
 WHERE Restaurant_ID = RestroID;
 commit;
+END$$
+DELIMITER ;
+
+
+
+
+-- Procedure to fetch review for the Restaurant
+drop procedure  if exists uploadRestaurantProfilePic;
+DELIMITER $$
+CREATE PROCEDURE `uploadRestaurantProfilePic` (IN RestroID INT, 
+IN _ImagrUrl VARCHAR(500))
+BEGIN
+declare exit handler for sqlexception rollback;
+start transaction;
+UPDATE RESTAURANT SET ImageURL=_ImagrUrl where Restaurant_ID=RestroID;
 END$$
 DELIMITER ;

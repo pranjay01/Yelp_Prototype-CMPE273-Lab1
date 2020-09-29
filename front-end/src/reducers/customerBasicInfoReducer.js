@@ -5,6 +5,7 @@ const defaultState = {
     Name: '',
     Address: '',
     ReviewCount: 0,
+    ImageUrl: '',
   },
 };
 

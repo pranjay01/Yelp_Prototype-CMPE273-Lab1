@@ -4,6 +4,7 @@ const defaultState = {
   restaurantHome: {
     restaurantName: '',
     restaurantAddress: '',
+    ImageUrl: '',
   },
 };
 

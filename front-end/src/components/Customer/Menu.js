@@ -36,6 +36,8 @@ class Menu extends Component {
     });
   };
   render() {
+    const defaultImage =
+      'https://s3-media0.fl.yelpcdn.com/assets/public/user_60_square.yji-514f6997a3184af475d5adc800b6d0b1.png';
     return (
       <div
         id="topbar-account-wrap"
@@ -60,7 +62,13 @@ class Menu extends Component {
                     class="photo-box-img"
                     height="60"
                     loading="lazy"
-                    src="https://s3-media0.fl.yelpcdn.com/assets/public/user_60_square.yji-514f6997a3184af475d5adc800b6d0b1.png"
+                    src={
+                      this.props.customerInfo.ImageUrl !== null &&
+                      this.props.customerInfo.ImageUrl.length > 0
+                        ? this.props.customerInfo.ImageUrl
+                        : defaultImage
+                    }
+                    // src="https://s3-media0.fl.yelpcdn.com/assets/public/user_60_square.yji-514f6997a3184af475d5adc800b6d0b1.png"
                     width="60"
                   />
                 </a>

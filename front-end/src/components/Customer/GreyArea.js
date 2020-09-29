@@ -9,6 +9,8 @@ class GreyArea extends Component {
     this.state = {};
   }
   render() {
+    const defaultImage =
+      'https://s3-media0.fl.yelpcdn.com/assets/srv0/yelp_styleguide/7e4e0dfd903f/assets/img/default_avatars/user_large_square.png';
     return (
       <div class="top-shelf top-shelf-grey">
         <div class="content-container">
@@ -23,8 +25,13 @@ class GreyArea extends Component {
                 <div
                   class="photo-slideshow_slide is-active"
                   style={{
-                    backgroundImage:
-                      'url(https://s3-media0.fl.yelpcdn.com/assets/srv0/yelp_styleguide/7e4e0dfd903f/assets/img/default_avatars/user_large_square.png)',
+                    backgroundImage: `url(${
+                      this.props.customerInfo.ImageUrl !== null &&
+                      this.props.customerInfo.ImageUrl.length > 0
+                        ? this.props.customerInfo.ImageUrl
+                        : defaultImage
+                    })`,
+                    //'url(https://s3-media0.fl.yelpcdn.com/assets/srv0/yelp_styleguide/7e4e0dfd903f/assets/img/default_avatars/user_large_square.png)',
                   }}
                 >
                   <div class="photo-slideshow_image">
@@ -33,26 +40,41 @@ class GreyArea extends Component {
                         class="photo-box-img"
                         height="250"
                         loading="lazy"
-                        src="https://s3-media0.fl.yelpcdn.com/assets/srv0/yelp_styleguide/7e4e0dfd903f/assets/img/default_avatars/user_large_square.png"
+                        src={
+                          this.props.customerInfo.ImageUrl !== null &&
+                          this.props.customerInfo.ImageUrl.length > 0
+                            ? this.props.customerInfo.ImageUrl
+                            : defaultImage
+                        }
+                        // src="https://s3-media0.fl.yelpcdn.com/assets/srv0/yelp_styleguide/7e4e0dfd903f/assets/img/default_avatars/user_large_square.png"
                         width="250"
                       />
                     </a>
                   </div>
 
-                  <div class="photo-box_actions">
+                  {/*<div class="photo-box_actions">
                     <a class="photo-box_action-link" href="/user_photos/add">
-                      <span
+                      {/*<span
                         aria-hidden="true"
                         style={{ width: '18px', height: '18px' }}
                         class="icon icon--18-add-photo icon--size-18 icon--currentColor u-space-r-half"
                       >
                         <svg role="img" class="icon_svg">
                           {/*<use xlink:href="#18x18_add_photo"></use>*/}
-                        </svg>
-                      </span>
-                      <span class="photo-box_action-text">Add a photo</span>
+                  {/*  </svg>
+                      </span>*/}
+                  {/*<input
+                        type="file"
+                        accept="image/*"
+                        onChange={this.onChangeFileHandler}
+                        name="fileName"
+                        id="filename"
+                        placeholder="Add image"
+                      />
+
+                      <span class="photo-box_action-text">{/*Add a photo*</span>
                     </a>
-                  </div>
+                    </div>*/}
                 </div>
               </div>
             </div>

@@ -19,6 +19,7 @@ class UpdateProfile extends Component {
       genders: [],
       Countries: [],
       States: [],
+      uploadedPic: '',
       Profile: {
         First_Name: '',
         Last_Name: '',
@@ -34,6 +35,7 @@ class UpdateProfile extends Component {
         I_Love: '',
         Find_Me_In: '',
         Website: '',
+        ImageUrl: '',
       },
     };
   }
@@ -61,6 +63,8 @@ class UpdateProfile extends Component {
           I_Love: response.data[0][0].I_Love,
           Find_Me_In: response.data[0][0].Find_Me_In,
           Website: response.data[0][0].Website,
+          ImageUrl: response.data[0][0].ImageURL,
+          //'https://yelp-prototype-273-shim.s3.amazonaws.com/yelpPrototype-customer-/1601327853634IMG-20190817-WA0094.jpg',
         };
         let allCountries = response.data[1].map((country) => {
           return { key: country.ID, value: country.Name };
@@ -172,6 +176,44 @@ class UpdateProfile extends Component {
     }
   };
 
+  onChangeFileHandler = (event) => {
+    if (event.target.files.length === 1) {
+      event.preventDefault();
+      let formData = new FormData();
+      formData.append('file', event.target.files[0], event.target.files[0].name);
+      axios({
+        method: 'post',
+        url: serverUrl + 'customer/uploadCustomerProfilePic',
+        data: formData,
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+        .then((response) => {
+          console.log('Status Code : ', response.status);
+          if (parseInt(response.status) === 200) {
+            console.log('Product Saved');
+            this.setState({
+              Profile: { ...this.state.Profile, ...{ ImageUrl: response.data } },
+
+              //authFlag: true,
+              //savedId: response.data.message,
+            });
+            //Router.push('/vendor/' + localStorage.getItem('user_id'));
+          } else if (parseInt(response.status) === 400) {
+            console.log(response.data);
+          }
+        })
+        .catch((error) => {
+          this.setState({
+            errorMsg: error.message,
+            authFlag: false,
+          });
+        });
+      // this.setState({
+      //   uploadedPic: event.target.files,
+      // });
+    }
+  };
+
   updateProfile = (e) => {
     e.preventDefault();
     const data = {
@@ -199,6 +241,8 @@ class UpdateProfile extends Component {
   };
 
   render() {
+    const defaultImage =
+      'https://s3-media0.fl.yelpcdn.com/assets/srv0/yelp_styleguide/bf5ff8a79310/assets/img/default_avatars/user_medium_square.png';
     let redirectVar = null;
     if (!cookie.load('cookie')) {
       console.log('cookie not found');
@@ -232,6 +276,44 @@ class UpdateProfile extends Component {
                     onSubmit={this.updateProfile}
                     className="profile-bio yform yform-vertical-spacing"
                   >
+                    <div class="ysection">
+                      <h4>
+                        Your Profile Photo
+                        <strong>
+                          <a href="/#">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={this.onChangeFileHandler}
+                              name="fileName"
+                              id="filename"
+                              multiple
+                            />
+                          </a>
+                        </strong>
+                      </h4>
+
+                      <div class="photo-box pb-m">
+                        <a
+                          class="js-analytics-click"
+                          data-analytics-label="user-photo"
+                          href="/user_photos?return_url=%2Fprofile%3Freturn_url%3D%252Fuser_details%253Fuserid%253DSbr_JFt86Dss0N-hb9StQg"
+                        >
+                          <img
+                            style={{ width: '150px', height: '120px' }}
+                            alt=""
+                            class="photo-box-img"
+                            src={
+                              this.state.Profile.ImageUrl !== null &&
+                              this.state.Profile.ImageUrl.length > 0
+                                ? this.state.Profile.ImageUrl
+                                : defaultImage
+                            }
+                            // src="https://s3-media0.fl.yelpcdn.com/assets/srv0/yelp_styleguide/bf5ff8a79310/assets/img/default_avatars/user_medium_square.png"
+                          />
+                        </a>
+                      </div>
+                    </div>
                     <label for="first_name">First Name</label>
                     <span class="help-block">This field is required.</span>
                     <input

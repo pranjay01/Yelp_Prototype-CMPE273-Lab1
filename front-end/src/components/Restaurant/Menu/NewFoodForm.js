@@ -7,7 +7,16 @@ class NewFoodForm extends Component {
   }
   render() {
     return (
-      <li class="job-form-section-group-viewer-styles__viewer--2SPgS">
+      <li
+        class="job-form-section-group-viewer-styles__viewer--2SPgS"
+        style={{
+          background: 'right',
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: 'contain',
+          width: '100%',
+          backgroundImage: `url(${this.props.food.ImageURL})`,
+        }}
+      >
         <div data-ui="group">
           <form
             onSubmit={this.props.onSaveCreateNew}
@@ -110,6 +119,19 @@ class NewFoodForm extends Component {
                     type="text"
                     onChange={(event) => this.props.onDescriptionChangeHandler(event.target.value)}
                     value={this.props.food.Description}
+                  />
+                </li>
+                <li>
+                  <input
+                    style={{ cursor: 'pointer' }}
+                    type="file"
+                    accept="image/*"
+                    onChange={(event) => this.props.onChangeFileHandler(event)}
+                    //onChange={this.onChangeFileHandler}
+                    name="fileName"
+                    id="filename"
+                    multiple
+                    placeholder="update Profile Pic"
                   />
                 </li>
               </ul>

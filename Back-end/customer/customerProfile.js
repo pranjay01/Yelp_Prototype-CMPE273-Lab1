@@ -1,9 +1,18 @@
 /* eslint-disable camelcase */
 /* eslint-disable no-console */
 const bcrypt = require('bcrypt');
+
+const AWS = require('aws-sdk');
+const multer = require('multer');
+const multerS3 = require('multer-s3');
 const { getUserIdFromToken } = require('../common/loginLogout');
 const mysqlConnection = require('../mysqlConnection');
 
+const { BUCKET_NAME } = process.env;
+const s3Storage = new AWS.S3({
+  accessKeyId: process.env.ACCESS_KEY_ID,
+  secretAccessKey: process.env.SECRET_ACCESS_KEY,
+});
 require('dotenv').config();
 
 const checkEmailExists = async (email) => {
@@ -20,6 +29,23 @@ const checkEmailExists = async (email) => {
   }
   return false;
 };
+
+const multipleUpload = multer({
+  storage: multerS3({
+    s3: s3Storage,
+    bucket: BUCKET_NAME,
+    acl: 'public-read',
+    contentType: multerS3.AUTO_CONTENT_TYPE,
+    // eslint-disable-next-line func-names
+    // eslint-disable-next-line object-shorthand
+    key: function (req, file, cb) {
+      console.log(req.body);
+      const folderName = 'yelpPrototype-customer-';
+      console.log('Multer Called', folderName);
+      cb(null, `${folderName}/${Date.now().toString()}${file.originalname}`);
+    },
+  }),
+}).single('file');
 
 const signup = async (customer, response) => {
   // eslint-disable-next-line camelcase
@@ -153,12 +179,13 @@ const updateProfile = async (request, response) => {
     Website,
     token,
     userrole,
+    ImageUrl,
   } = request.body;
   try {
     const cusID = getUserIdFromToken(token, userrole);
     if (cusID) {
       const updateCustomerProfileQuery =
-        'CALL updateCustomerProfile(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
+        'CALL updateCustomerProfile(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
 
       const connection = await mysqlConnection();
       // eslint-disable-next-line no-unused-vars
@@ -178,6 +205,7 @@ const updateProfile = async (request, response) => {
         I_Love,
         Find_Me_In,
         Website,
+        ImageUrl,
       ]);
       connection.end();
       console.log(results);
@@ -337,6 +365,38 @@ const getCustomerCompleteProfile = async (request, response) => {
   return response;
 };
 
+const uploadCustomerProfilePic = async (req, res) => {
+  try {
+    const userID = getUserIdFromToken(req.cookies.cookie, req.cookies.userrole);
+    if (userID) {
+      multipleUpload(req, res, function (err) {
+        if (err instanceof multer.MulterError) {
+          res.json({ status: 400, error: err.message });
+        } else if (err) {
+          res.json({ status: 400, error: err.message });
+        } else {
+          console.log(req.file.location);
+          res.writeHead(200, {
+            'Content-Type': 'text/plain',
+          });
+          res.end(req.file.location);
+        }
+      });
+    } else {
+      res.writeHead(401, {
+        'Content-Type': 'text/plain',
+      });
+      res.end('Invalid User');
+    }
+  } catch (error) {
+    res.writeHead(401, {
+      'Content-Type': 'text/plain',
+    });
+    res.end('Network Error');
+  }
+  return res;
+};
+
 module.exports = {
   signup,
   getBasicInfo,
@@ -345,4 +405,5 @@ module.exports = {
   getContactInfo,
   updateContactInfo,
   getCustomerCompleteProfile,
+  uploadCustomerProfilePic,
 };

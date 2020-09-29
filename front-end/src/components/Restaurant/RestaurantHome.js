@@ -46,6 +46,7 @@ class RestaurantHome extends Component {
           });
           let payload = {
             restaurantName: response.data[0][0].Name,
+            ImageUrl: response.data[0][0].ImageURL,
             restaurantAddress:
               response.data[0][0].Street +
               ' ' +
@@ -88,6 +89,7 @@ class RestaurantHome extends Component {
           });
           let payload = {
             restaurantName: response.data[0][0].Name,
+            ImageUrl: response.data[0][0].ImageURL,
             restaurantAddress:
               response.data[0][0].Street +
               ' ' +
@@ -119,26 +121,32 @@ class RestaurantHome extends Component {
       role: cookie.load('userrole'),
     };
     e.preventDefault();
-    axios.post(serverUrl + 'biz/logout', data).then((response) => {
-      if (response.status === 200) {
-        localStorage.clear();
-        let payload = {
-          userEmail: '',
-          role: '',
-          loginStatus: false,
-        };
-        this.props.updateLogoutSuccess(payload);
-        payload = {
-          restaurantName: '',
-          restaurantAddress: '',
-        };
-        this.props.updateHomeProfile(payload);
-        this.setState({
-          loggedIn: false,
-        });
-        // window.location.reload(false);
+    axios.post(serverUrl + 'biz/logout', data).then(
+      (response) => {
+        if (response.status === 200) {
+          localStorage.clear();
+          let payload = {
+            userEmail: '',
+            role: '',
+            loginStatus: false,
+          };
+          this.props.updateLogoutSuccess(payload);
+          payload = {
+            restaurantName: '',
+            restaurantAddress: '',
+          };
+          this.props.updateHomeProfile(payload);
+          this.setState({
+            loggedIn: false,
+          });
+          // window.location.reload(false);
+        }
+      },
+      (error) => {
+        console.log(error.response.data);
+        window.location.reload(false);
       }
-    });
+    );
     cookie.remove('cookie', { path: '/' });
     cookie.remove('userrole', { path: '/' });
   };
@@ -247,7 +255,10 @@ class RestaurantHome extends Component {
 
     let tabName = this.state.tabName;
     let basicProfile = this.state;
-
+    const defaultImage =
+      'https://s3-media0.fl.yelpcdn.com/assets/public/default_user_avatar_40x40_v2.yji-925e5d7fcbd2b314d1a618150d57d7f6.png';
+    const defaultImageSrcSet =
+      'https://s3-media0.fl.yelpcdn.com/assets/public/default_user_avatar_40x40_v2@2x.yji-e91480537628f15542f0f07cc8d278c5.png';
     return (
       <div className="lemon--div__06b83__1mboc responsive responsive-biz border-color--default__06b83__3-ifU">
         {redirectVar}
@@ -304,8 +315,20 @@ class RestaurantHome extends Component {
                                 <span class="lemon--span__06b83__3997G display--inline__06b83__3JqBP border-color--default__06b83__3-ifU">
                                   <img
                                     class="lemon--img__06b83__3GQUb photo__06b83__3O0Op"
-                                    src="https://s3-media0.fl.yelpcdn.com/assets/public/default_user_avatar_40x40_v2.yji-925e5d7fcbd2b314d1a618150d57d7f6.png"
-                                    srcSet="https://s3-media0.fl.yelpcdn.com/assets/public/default_user_avatar_40x40_v2@2x.yji-e91480537628f15542f0f07cc8d278c5.png"
+                                    src={
+                                      this.props.restaurantProfile.ImageUrl !== null &&
+                                      this.props.restaurantProfile.ImageUrl.length > 0
+                                        ? this.props.restaurantProfile.ImageUrl
+                                        : defaultImage
+                                    }
+                                    srcSet={
+                                      this.props.restaurantProfile.ImageUrl !== null &&
+                                      this.props.restaurantProfile.ImageUrl.length > 0
+                                        ? this.props.restaurantProfile.ImageUrl
+                                        : defaultImageSrcSet
+                                    }
+                                    // src="https://s3-media0.fl.yelpcdn.com/assets/public/default_user_avatar_40x40_v2.yji-925e5d7fcbd2b314d1a618150d57d7f6.png"
+                                    //srcSet="https://s3-media0.fl.yelpcdn.com/assets/public/default_user_avatar_40x40_v2@2x.yji-e91480537628f15542f0f07cc8d278c5.png"
                                     alt="Pranjay S."
                                     height="36"
                                     width="36"
@@ -369,6 +392,14 @@ class RestaurantHome extends Component {
 //     tabOpened: restaurantHome.tabOpened,
 //   };
 // };
+
+const mapStateToProps = (state) => {
+  const { restaurantHome } = state.restaurantHomePageReducer;
+  return {
+    restaurantProfile: restaurantHome,
+  };
+};
+
 const mapDispatchToProps = (dispatch) => {
   return {
     updateLogoutSuccess: (payload) => {
@@ -386,4 +417,4 @@ const mapDispatchToProps = (dispatch) => {
   };
 };
 
-export default connect(null, mapDispatchToProps)(RestaurantHome);
+export default connect(mapStateToProps, mapDispatchToProps)(RestaurantHome);

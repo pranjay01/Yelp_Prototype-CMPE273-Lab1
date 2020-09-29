@@ -923,6 +923,7 @@ class FoodMenu extends Component {
                     onDescriptionChangeHandler={(evt) => this.onDescriptionChangeHandler(evt)}
                     onNameChangeHandler={(evt) => this.onNameChangeHandler(evt)}
                     food={this.state.newFood}
+                    onChangeFileHandler={(event) => this.onChangeFileHandler(event)}
                     onSaveCreateNew={() => this.onSaveCreateNew()}
                   ></NewFoodForm>
                 </div>

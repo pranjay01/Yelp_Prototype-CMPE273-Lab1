@@ -22,6 +22,7 @@ class menuBlock extends Component {
           Name: response.data[0][0].Name,
           Address: response.data[0][0].Address,
           ReviewCount: response.data[1][0].ReviewCount,
+          ImageUrl: response.data[0][0].ImageURL,
         };
         this.props.getCustomerBasicInfo(payload);
       });
@@ -32,6 +33,8 @@ class menuBlock extends Component {
     });
   };
   render() {
+    const defaultImage =
+      'https://s3-media0.fl.yelpcdn.com/assets/public/user_medium_square.yji-bf5ff8a79310030f79328ae60713730f.png';
     return (
       <div className="arrange_unit nowrap">
         <div class="main-header_account">
@@ -43,7 +46,13 @@ class menuBlock extends Component {
                   class="photo-box-img"
                   height="90"
                   loading="lazy"
-                  src="https://s3-media0.fl.yelpcdn.com/assets/public/user_medium_square.yji-bf5ff8a79310030f79328ae60713730f.png"
+                  src={
+                    this.props.customerInfo.ImageUrl !== null &&
+                    this.props.customerInfo.ImageUrl.length > 0
+                      ? this.props.customerInfo.ImageUrl
+                      : defaultImage
+                  }
+                  // src="https://s3-media0.fl.yelpcdn.com/assets/public/user_medium_square.yji-bf5ff8a79310030f79328ae60713730f.png"
                   width="90"
                 />
               </span>
@@ -76,7 +85,12 @@ class menuBlock extends Component {
 }
 
 //export default menuBlock;
-
+const mapStateToProps = (state) => {
+  const { customerInfo } = state.customerBasicInfoReducer;
+  return {
+    customerInfo: customerInfo,
+  };
+};
 const mapDispatchToProps = (dispatch) => {
   return {
     getCustomerBasicInfo: (payload) => {
@@ -88,4 +102,4 @@ const mapDispatchToProps = (dispatch) => {
   };
 };
 
-export default connect(null, mapDispatchToProps)(menuBlock);
+export default connect(mapStateToProps, mapDispatchToProps)(menuBlock);

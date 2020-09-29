@@ -10,6 +10,7 @@ const {
   getContactInfo,
   updateContactInfo,
   getCustomerCompleteProfile,
+  uploadCustomerProfilePic,
 } = require('../customer/customerProfile');
 const { login, logout } = require('../common/loginLogout');
 
@@ -78,4 +79,13 @@ Router.get('/getCustomerCompleteProfile', async (req, res) => {
   results = await getCustomerCompleteProfile(req, res);
   return results;
 });
+
+// Upload profile pic to s3 bucket
+Router.post('/uploadCustomerProfilePic', async (req, res) => {
+  console.log('uploadCustomerProfilePic');
+  let results = null;
+  results = await uploadCustomerProfilePic(req, res);
+  return results;
+});
+
 module.exports = Router;

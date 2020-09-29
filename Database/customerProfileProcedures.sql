@@ -39,7 +39,7 @@ CREATE PROCEDURE getBasicInfoCustomer
 (IN userID INT)
 BEGIN
 
-select concat(First_Name,' ',substr(Last_Name,1,1),'.') as Name, City as Address 
+select concat(First_FOOD_IMAGESName,' ',substr(Last_Name,1,1),'.') as Name, City as Address, ImageURL
 From CUSTOMER where Customer_ID=userID;
 
 select count(ID) as ReviewCount from REVIEWS where Customer_ID = userID;
@@ -80,7 +80,7 @@ create procedure `updateCustomerProfile`
 IN _Nick_Name VARCHAR(50), IN _Gender INT, IN _Date_Of_Birth DATE,  IN _Country_ID int,
 IN _State_ID INT, IN _City VARCHAR(25), IN _Zip INT, IN _Street VARCHAR(100),
 IN _Headline VARCHAR(100), IN _I_Love VARCHAR(1024), IN _Find_Me_In VARCHAR(100), 
-IN _Website VARCHAR(100))
+IN _Website VARCHAR(100),IN _ImageUrl VARCHAR(500))
 begin
 
 declare exit handler for sqlexception rollback;
@@ -100,7 +100,8 @@ start transaction;
     Headline=_Headline,
     I_Love=_I_Love,
     Find_Me_In=_Find_Me_In,
-    Website=_Website
+    Website=_Website,
+    ImageURL=_ImageUrl
     where Customer_ID=_Customer_ID;
     
     commit;
