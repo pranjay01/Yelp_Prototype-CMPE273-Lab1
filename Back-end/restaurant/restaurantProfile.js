@@ -134,7 +134,7 @@ const signup = async (restaurant, response) => {
       const signupQuery = 'CALL resturantSignup(?,?,?,?,?,?,?,?,?,?)';
 
       const connection = await mysqlConnection();
-      const { _results } = await connection.query(signupQuery, [
+      const [results] = await connection.query(signupQuery, [
         Email,
         hashedPassword,
         Name,
@@ -147,7 +147,7 @@ const signup = async (restaurant, response) => {
         Number(Phone_no),
       ]);
       connection.end();
-      console.log(_results);
+      console.log(results);
       response.writeHead(201, {
         'Content-Type': 'text/plain',
       });

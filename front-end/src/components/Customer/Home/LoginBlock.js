@@ -15,17 +15,20 @@ class loginBlock extends Component {
             // onClick={() => {
             //   history.push('/login');
             // }}
-            className="header-nav_item u-space-r2"
+            className="header-nav_item u-space-r2 "
           >
             <Link
-              className="header-nav_link header-nav_link--log-in js-analytics-click"
+              className="header-nav_link header-nav_link--log-in js-analytics-click restaurant-search-result-page"
               to="/customerLogin"
             >
               Login
             </Link>
           </li>
-          <li className="header-nav_item u-space-r0 js-analytics-click">
-            <Link className="ybtn ybtn--primary header-nav_button nowrap" to="/customerSignup">
+          <li className="header-nav_item u-space-r0 js-analytics-click restaurant-search-result-page">
+            <Link
+              className="ybtn ybtn--primary header-nav_button nowrap restaurant-search-result-page"
+              to="/customerSignup"
+            >
               Signup
             </Link>
           </li>

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import CustomerNavBar from '../CustomerNavBar';
+import CustomerNavBar from '../../Customer/CommonArea/CustomerNavBar';
 import cookie from 'react-cookies';
 import { Redirect } from 'react-router';
 import { Link } from 'react-router-dom';

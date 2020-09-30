@@ -6,6 +6,8 @@ const {
   getSignupMasterDataCustomer,
   getCusinesForMenu,
   getDeliverStatus,
+  getSearchStrings,
+  fetchRestaurantResults,
 } = require('../staticTables/staticTableFetch');
 
 const Router = express.Router();
@@ -39,6 +41,20 @@ Router.get('/getDeliverStatus', async (req, res) => {
   console.log('Get Cusines for menu');
   let results = null;
   results = await getDeliverStatus(res);
+  return results;
+});
+
+Router.get('/getSearchStrings', async (req, res) => {
+  console.log('getSearchStrings');
+  let results = null;
+  results = await getSearchStrings(req, res);
+  return results;
+});
+
+Router.get('/fetchRestaurantResults', async (req, res) => {
+  console.log('fetchRestaurantResults');
+  let results = null;
+  results = await fetchRestaurantResults(req, res);
   return results;
 });
 

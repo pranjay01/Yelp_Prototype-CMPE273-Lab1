@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import cookie from 'react-cookies';
 import axios from 'axios';
-import serverUrl from '../../config';
-import { updateLogoutSuccess, getCustomerBasicInfo } from '../../constants/action-types';
+import serverUrl from '../../../config';
+import { updateLogoutSuccess, getCustomerBasicInfo } from '../../../constants/action-types';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 

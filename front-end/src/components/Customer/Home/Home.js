@@ -2,17 +2,120 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import cookie from 'react-cookies';
 import { Redirect } from 'react-router';
-
+import axios from 'axios';
+import serverUrl from '../../../config';
 import './Home.css';
 // import { history } from '../../App';
-import MenuBlock from '../Customer/MenuBlock';
+import MenuBlock from '../../Customer/CommonArea/MenuBlock';
 import LoginBlock from './LoginBlock';
+import SuggestedNames from './SuggestedNames';
+import {
+  updateSeprateStrings,
+  updateSelectedFilter,
+  updateSearchedString,
+  updateSearchStrings,
+} from '../../../constants/action-types';
+import { connect } from 'react-redux';
+import { history } from '../../../App';
 
 class Home extends Component {
   constructor(props) {
     super(props);
-    this.state = { menuDisabled: true, loginOrLogout: false };
+    this.state = {
+      SearchFilters: [
+        { ID: 1, Value: 'Restaurant Name' },
+        { ID: 2, Value: 'Food Items' },
+        { ID: 3, Value: 'Cuisines' },
+        { ID: 4, Value: 'Location' },
+      ],
+    };
   }
+
+  componentDidMount() {
+    axios
+      .get(
+        serverUrl + 'static/getSearchStrings',
+
+        { withCredentials: true }
+      )
+      .then((response) => {
+        let RestaurantNameStrings = response.data[0].map((strings) => {
+          return strings.Name;
+        });
+        let FoodItemsStrings = response.data[1].map((strings) => {
+          return strings.Name;
+        });
+        let CuisinesStrings = response.data[2].map((strings) => {
+          return strings.Name;
+        });
+        let LocationStrings = response.data[3].map((strings) => {
+          return strings.Name;
+        });
+
+        console.log(response.data);
+        let payload = {
+          RestaurantNameStrings,
+          FoodItemsStrings,
+          CuisinesStrings,
+          LocationStrings,
+        };
+        this.props.updateSeprateStrings(payload);
+      });
+
+    localStorage.setItem('SearchedString', '');
+    localStorage.setItem('SearchFilter', '');
+    //localStorage.setItem('SearchedString', '');
+  }
+
+  onChangeselectedFilter = (event) => {
+    localStorage.setItem('SearchFilter', event.target.value);
+    let SearchStrings = [];
+    switch (event.target.value) {
+      case '1':
+        SearchStrings = this.props.searchTabInfo.RestaurantNameStrings;
+        break;
+      case '2':
+        SearchStrings = this.props.searchTabInfo.FoodItemsStrings;
+        break;
+      case '3':
+        SearchStrings = this.props.searchTabInfo.CuisinesStrings;
+        break;
+      case '4':
+        SearchStrings = this.props.searchTabInfo.LocationStrings;
+        break;
+    }
+
+    const payload = { selectedFilter: event.target.value, SearchStrings };
+    this.props.updateSelectedFilter(payload);
+    // this.setState({
+    //   selectedFilter: event.target.value,
+    // });
+  };
+
+  onChangeStringSearchHanler = (event) => {
+    localStorage.setItem('SearchedString', event.target.value);
+    const payload = { serchedString: event.target.value };
+    this.props.updateSearchedString(payload);
+  };
+
+  filterStrings = () => {
+    return this.props.searchTabInfo.SearchStrings.filter((string) =>
+      string.toLowerCase().includes(this.props.searchTabInfo.serchedString.toLowerCase())
+    );
+  };
+
+  openRestroListPage = (string) => {
+    localStorage.setItem('SearchedString', string);
+    console.log(string);
+    const payload = { serchedString: string };
+    this.props.updateSearchedString(payload);
+    history.push('/RestaurantList');
+    window.location.reload(false);
+  };
+
+  getRestaurants = (event) => {
+    history.push('/RestaurantList');
+  };
 
   render() {
     let redirectVar = null;
@@ -89,12 +192,14 @@ class Home extends Component {
                 </h1>
               </div>
               <form
-                method="get"
-                action="/search"
+                onSubmit={this.getRestaurants}
                 id="header_find_form"
                 className="business-search-form main-search yform u-space-b0 js-business-search-form"
               >
-                <div className="arrange arrange--equal arrange--stack-small">
+                <div
+                  className="arrange arrange--equal arrange--stack-small"
+                  style={{ display: 'flex' }}
+                >
                   <div className="arrange_unit">
                     <div className="main-search_suggestions-field search-field-container find-decorator">
                       <label
@@ -135,11 +240,13 @@ class Home extends Component {
                               }}
                             />
                             <input
+                              disabled={this.props.searchTabInfo.selectedFilter === '-Select-'}
+                              onChange={this.onChangeStringSearchHanler}
                               autocomplete="off"
                               id="find_desc"
                               maxlength="64"
                               placeholder="restaurant"
-                              value=""
+                              value={this.props.searchTabInfo.serchedString}
                               className="pseudo-input_field business-search-form_input-field"
                               style={{
                                 display: 'inline-block',
@@ -153,6 +260,17 @@ class Home extends Component {
                           </span>
                         </div>
                       </label>
+
+                      <div
+                        className={`main-search_suggestions suggestions-list-container search-suggestions-list-container ${
+                          this.props.searchTabInfo.serchedString.length === 0 ? 'hidden' : ''
+                        }`}
+                      >
+                        <SuggestedNames
+                          openRestroListPage={(string) => this.openRestroListPage(string)}
+                          searchStrings={this.filterStrings()}
+                        />
+                      </div>
                     </div>
                   </div>
                   <div className="arrange_unit">
@@ -162,10 +280,48 @@ class Home extends Component {
                           <label className="pseudo-input business-search-form_input business-search-form_input--near">
                             <div className="pseudo-input_wrapper">
                               <span className="pseudo-input_text business-search-form_input-text">
-                                Near
+                                Search By
                               </span>
                               <span className="pseudo-input_field-holder">
-                                <input
+                                <select
+                                  style={{
+                                    width: '104%',
+                                    position: 'inherit',
+                                    fontWeight: '700',
+                                    color: '#666',
+                                  }}
+                                  placeholder="searchFilter"
+                                  className="form-control"
+                                  onChange={this.onChangeselectedFilter}
+                                  value={this.props.searchTabInfo.selectedFilter}
+                                  required
+                                >
+                                  <option
+                                    className="Dropdown-menu"
+                                    key=""
+                                    value={null}
+                                    style={{
+                                      fontWeight: '700',
+                                      color: '#666',
+                                    }}
+                                  >
+                                    -Select-
+                                  </option>
+                                  {this.state.SearchFilters.map((searchFilter) => (
+                                    <option
+                                      style={{
+                                        fontWeight: '700',
+                                        color: '#666',
+                                      }}
+                                      className="Dropdown-menu"
+                                      key={searchFilter.ID}
+                                      value={searchFilter.ID}
+                                    >
+                                      {searchFilter.Value}
+                                    </option>
+                                  ))}
+                                </select>
+                                {/* <input
                                   maxlength="80"
                                   placeholder="address, neighborhood, city, state or zip"
                                   vale=""
@@ -176,7 +332,7 @@ class Home extends Component {
                                   maxlength="80"
                                   name="find_loc"
                                   value="Willow Glen, San Jose, CA"
-                                ></input>
+                               ></input>*/}
                                 <input type="hidden" name="ns" value=""></input>
                               </span>
                             </div>
@@ -277,4 +433,40 @@ class Home extends Component {
   }
 }
 
-export default Home;
+//export default Home;
+const mapStateToProps = (state) => {
+  const { searchTabInfo } = state.searchTabReducer;
+  return {
+    searchTabInfo: searchTabInfo,
+  };
+};
+const mapDispatchToProps = (dispatch) => {
+  return {
+    updateSeprateStrings: (payload) => {
+      dispatch({
+        type: updateSeprateStrings,
+        payload,
+      });
+    },
+    updateSelectedFilter: (payload) => {
+      dispatch({
+        type: updateSelectedFilter,
+        payload,
+      });
+    },
+    updateSearchedString: (payload) => {
+      dispatch({
+        type: updateSearchedString,
+        payload,
+      });
+    },
+    updateSearchStrings: (payload) => {
+      dispatch({
+        type: updateSearchStrings,
+        payload,
+      });
+    },
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Home);

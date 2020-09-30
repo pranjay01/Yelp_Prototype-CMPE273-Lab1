@@ -1,3 +1,4 @@
+const url = require('url');
 const mysqlConnection = require('../mysqlConnection');
 
 require('dotenv').config();
@@ -70,9 +71,62 @@ const getDeliverStatus = async (response) => {
   return response;
 };
 
+const getSearchStrings = async (request, response) => {
+  try {
+    const fetchSTringsForSearchQuery = 'CALL fetchSTringsForSearch()';
+
+    const connection = await mysqlConnection();
+    // eslint-disable-next-line no-unused-vars
+    const [results, fields] = await connection.query(fetchSTringsForSearchQuery);
+    connection.end();
+    // console.log(results);
+
+    response.writeHead(200, {
+      'Content-Type': 'text/plain',
+    });
+    response.end(JSON.stringify(results));
+  } catch (error) {
+    response.writeHead(401, {
+      'Content-Type': 'text/plain',
+    });
+    response.end('Network Error');
+  }
+  return response;
+};
+
+// get restuarant result on basis of searched string and filter criteria
+const fetchRestaurantResults = async (req, res) => {
+  const { filter, searchString } = url.parse(req.url, true).query;
+  try {
+    const fetchRestaurantResultsQuery = 'CALL fetchRestaurantResults(?,?)';
+
+    const connection = await mysqlConnection();
+    // eslint-disable-next-line no-unused-vars
+    const [results, fields] = await connection.query(fetchRestaurantResultsQuery, [
+      filter,
+      searchString,
+    ]);
+    connection.end();
+    // console.log(results);
+
+    res.writeHead(200, {
+      'Content-Type': 'text/plain',
+    });
+    res.end(JSON.stringify(results));
+  } catch (error) {
+    res.writeHead(401, {
+      'Content-Type': 'text/plain',
+    });
+    res.end('Network Error');
+  }
+  return res;
+};
+
 module.exports = {
   getSignupMasterData,
   getSignupMasterDataCustomer,
   getCusinesForMenu,
   getDeliverStatus,
+  getSearchStrings,
+  fetchRestaurantResults,
 };

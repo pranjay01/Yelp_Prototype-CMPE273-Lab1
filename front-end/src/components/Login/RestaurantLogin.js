@@ -239,6 +239,7 @@ class RestaurantLogin extends Component {
             street: null,
             contactNo: null,
           });
+          setTimeout(window.location.reload(false), 10000);
         } else {
           this.setState({
             authFlag: false,

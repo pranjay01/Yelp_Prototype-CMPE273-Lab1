@@ -65,7 +65,7 @@ start transaction;
     select count(REVIEWS.ID) as ReviewCount
     FROM REVIEWS
     where Restaurant_ID=userID
-    GROUP BY ID,Restaurant_ID;
+    GROUP BY Restaurant_ID;
     commit;
 end $$
 

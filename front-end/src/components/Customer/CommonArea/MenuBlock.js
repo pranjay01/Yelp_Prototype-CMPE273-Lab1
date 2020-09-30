@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import Menu from './Menu';
 import axios from 'axios';
-import serverUrl from '../../config';
-import { getCustomerBasicInfo } from '../../constants/action-types';
+import serverUrl from '../../../config';
+import { getCustomerBasicInfo } from '../../../constants/action-types';
 import { connect } from 'react-redux';
 class menuBlock extends Component {
   constructor(props) {

@@ -2,12 +2,121 @@ import React, { Component } from 'react';
 import './CustomerNavBar.css';
 import MenuBlock from './MenuBlock';
 import '../Home/Home.css';
+import cookie from 'react-cookies';
+import LoginBlock from '../Home/LoginBlock';
+import axios from 'axios';
+import serverUrl from '../../../config';
+import {
+  updateSeprateStrings,
+  updateSelectedFilter,
+  updateSearchedString,
+  updateSearchStrings,
+} from '../../../constants/action-types';
+import { connect } from 'react-redux';
+import { history } from '../../../App';
+import SuggestedNames from '../Home/SuggestedNames';
 
 class CustomerNavBar extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      SearchFilters: [
+        { ID: 1, Value: 'Restaurant Name' },
+        { ID: 2, Value: 'Food Items' },
+        { ID: 3, Value: 'Cuisines' },
+        { ID: 4, Value: 'Location' },
+      ],
+    };
   }
+  componentDidMount() {
+    axios
+      .get(
+        serverUrl + 'static/getSearchStrings',
+
+        { withCredentials: true }
+      )
+      .then((response) => {
+        let RestaurantNameStrings = response.data[0].map((strings) => {
+          return strings.Name;
+        });
+        let FoodItemsStrings = response.data[1].map((strings) => {
+          return strings.Name;
+        });
+        let CuisinesStrings = response.data[2].map((strings) => {
+          return strings.Name;
+        });
+        let LocationStrings = response.data[3].map((strings) => {
+          return strings.Name;
+        });
+
+        console.log(response.data);
+        let payload = {
+          RestaurantNameStrings,
+          FoodItemsStrings,
+          CuisinesStrings,
+          LocationStrings,
+        };
+        this.props.updateSeprateStrings(payload);
+      });
+
+    // localStorage.setItem('SearchedString', '');
+    // localStorage.setItem('SearchFilter', '');
+    //localStorage.setItem('SearchedString', '');
+  }
+
+  onChangeselectedFilter = (event) => {
+    localStorage.setItem('SearchFilter', event.target.value);
+    let SearchStrings = [];
+    switch (event.target.value) {
+      case '1':
+        SearchStrings = this.props.searchTabInfo.RestaurantNameStrings;
+        break;
+      case '2':
+        SearchStrings = this.props.searchTabInfo.FoodItemsStrings;
+        break;
+      case '3':
+        SearchStrings = this.props.searchTabInfo.CuisinesStrings;
+        break;
+      case '4':
+        SearchStrings = this.props.searchTabInfo.LocationStrings;
+        break;
+    }
+
+    const payload = { selectedFilter: event.target.value, SearchStrings };
+    this.props.updateSelectedFilter(payload);
+    // this.setState({
+    //   selectedFilter: event.target.value,
+    // });
+  };
+
+  onChangeStringSearchHanler = (event) => {
+    localStorage.setItem('SearchedString', event.target.value);
+    const payload = { serchedString: event.target.value };
+    this.props.updateSearchedString(payload);
+  };
+
+  filterStrings = () => {
+    return this.props.searchTabInfo.SearchStrings.filter((string) =>
+      string.toLowerCase().includes(this.props.searchTabInfo.serchedString.toLowerCase())
+    );
+  };
+
+  openRestroListPage = (string) => {
+    localStorage.setItem('SearchedString', string);
+    console.log(string);
+    const payload = { serchedString: string };
+    this.props.updateSearchedString(payload);
+    window.location.reload(false);
+    //history.push('/RestaurantList');
+  };
+
+  getRestaurants = (event) => {
+    window.location.reload(false);
+    //history.push('/RestaurantList');
+    //event.preventDefault();
+    //this.openRestroListPage(this.props.searchTabInfo.serchedString);
+  };
+
   render() {
     return (
       <div class="lemon--div__09f24__1mboc sticky-wrapper__09f24__3Aajw pageHeader__09f24__Ey1v7 border-color--default__09f24__R1nRO">
@@ -51,10 +160,8 @@ class CustomerNavBar extends Component {
                           <div class="lemon--div__09f24__1mboc">
                             <form
                               class="lemon--form__09f24__2fChY find-near-form__09f24__2y8Yy"
-                              action="/search"
                               id="header_find_form"
                               role="search"
-                              method="get"
                             >
                               <div class="lemon--div__09f24__1mboc undefined arrange__09f24__AiSIM border-color--default__09f24__R1nRO">
                                 <div class="lemon--div__09f24__1mboc arrange-unit__09f24__1gZC1 arrange-unit-fill__09f24__O6JFU border-color--default__09f24__R1nRO">
@@ -112,8 +219,13 @@ class CustomerNavBar extends Component {
                                               placeholder=" "
                                             />
                                             <input
+                                              disabled={
+                                                this.props.searchTabInfo.selectedFilter ===
+                                                '-Select-'
+                                              }
+                                              onChange={this.onChangeStringSearchHanler}
                                               type="text"
-                                              value=""
+                                              value={this.props.searchTabInfo.serchedString}
                                               autocomplete="off"
                                               aria-autocomplete="list"
                                               tabindex="0"
@@ -179,17 +291,44 @@ class CustomerNavBar extends Component {
                                               class="input__09f24__30UUZ input__09f24__1XNzA hidden-input__09f24__3e1WX"
                                               placeholder=" "
                                             />
-                                            <input
-                                              type="text"
-                                              value="San Jose, CA"
-                                              autocomplete="off"
-                                              aria-autocomplete="list"
-                                              tabindex="0"
-                                              data-testid="suggest-location-input"
-                                              id="search_location"
-                                              class="input__09f24__30UUZ input__09f24__1XNzA original-input__09f24__fFh2n"
-                                              placeholder="address, neighborhood, city, state or zip"
-                                            />
+                                            <select
+                                              style={{
+                                                width: '104%',
+                                                position: 'inherit',
+                                                fontWeight: '700',
+                                                color: '#666',
+                                              }}
+                                              placeholder="searchFilter"
+                                              className="form-control"
+                                              onChange={this.onChangeselectedFilter}
+                                              value={this.props.searchTabInfo.selectedFilter}
+                                              required
+                                            >
+                                              <option
+                                                className="Dropdown-menu"
+                                                key=""
+                                                value={null}
+                                                style={{
+                                                  fontWeight: '700',
+                                                  color: '#666',
+                                                }}
+                                              >
+                                                -Select-
+                                              </option>
+                                              {this.state.SearchFilters.map((searchFilter) => (
+                                                <option
+                                                  style={{
+                                                    fontWeight: '700',
+                                                    color: '#666',
+                                                  }}
+                                                  className="Dropdown-menu"
+                                                  key={searchFilter.ID}
+                                                  value={searchFilter.ID}
+                                                >
+                                                  {searchFilter.Value}
+                                                </option>
+                                              ))}
+                                            </select>
                                           </div>
                                           <input
                                             type="hidden"
@@ -285,6 +424,16 @@ class CustomerNavBar extends Component {
                               </div>
                             </form>
                           </div>
+                          <div
+                            className={`main-search_suggestions suggestions-list-container search-suggestions-list-container ${
+                              this.props.searchTabInfo.serchedString.length === 0 ? 'hidden' : ''
+                            }`}
+                          >
+                            <SuggestedNames
+                              openRestroListPage={(string) => this.openRestroListPage(string)}
+                              searchStrings={this.filterStrings()}
+                            />
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -310,7 +459,8 @@ class CustomerNavBar extends Component {
                   </a>
                 </span>
               </div>
-              {<MenuBlock />}
+              {/*<MenuBlock />*/}
+              {cookie.load('cookie') ? <MenuBlock /> : <LoginBlock />}
               <div class="lemon--div__09f24__1mboc auth-arrange-unit__09f24__1ndPl arrange-unit__09f24__1gZC1 border-color--default__09f24__R1nRO nowrap__09f24__26e9i"></div>
             </div>
             <div class="lemon--div__09f24__1mboc header-nav-container__09f24__1M4qU header-nav-mobile-form-closed__09f24__2ItVv border-color--default__09f24__R1nRO nowrap__09f24__26e9i">
@@ -353,4 +503,41 @@ class CustomerNavBar extends Component {
   }
 }
 
-export default CustomerNavBar;
+// export default CustomerNavBar;
+
+const mapStateToProps = (state) => {
+  const { searchTabInfo } = state.searchTabReducer;
+  return {
+    searchTabInfo: searchTabInfo,
+  };
+};
+const mapDispatchToProps = (dispatch) => {
+  return {
+    updateSeprateStrings: (payload) => {
+      dispatch({
+        type: updateSeprateStrings,
+        payload,
+      });
+    },
+    updateSelectedFilter: (payload) => {
+      dispatch({
+        type: updateSelectedFilter,
+        payload,
+      });
+    },
+    updateSearchedString: (payload) => {
+      dispatch({
+        type: updateSearchedString,
+        payload,
+      });
+    },
+    updateSearchStrings: (payload) => {
+      dispatch({
+        type: updateSearchStrings,
+        payload,
+      });
+    },
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(CustomerNavBar);

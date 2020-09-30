@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
-import CustomerNavBar from './CustomerNavBar';
-import GreyArea from './GreyArea';
+import CustomerNavBar from '../CommonArea/CustomerNavBar';
+import GreyArea from '../../Customer/CommonArea/GreyArea';
 import cookie from 'react-cookies';
 import { Redirect } from 'react-router';
-import LeftPannel from '../Customer/LeftPannel/LeftPannel';
+import LeftPannel from '../LeftPannel/LeftPannel';
 import './AboutMe.css';
 import { connect } from 'react-redux';
 import axios from 'axios';
-import serverUrl from '../../config';
+import serverUrl from '../../../config';
 
 class AboutMe extends Component {
   constructor(props) {
@@ -96,7 +96,7 @@ class AboutMe extends Component {
                   {this.state.Headline != null && this.state.Headline.length > 0 ? (
                     <h3 style={{ color: 'black' }}> {this.state.Headline}</h3>
                   ) : (
-                    <h3></h3>
+                    <h3>Please Update Heading!!!</h3>
                   )}
                   <br />
 
