@@ -20,14 +20,7 @@ class EventList extends Component {
       visible: true,
       formOpen: false,
       popSeen: false,
-      RegisteredCustomerList: [
-        { ID: 1, cusName: 'Pranjay', Email: 'asd@gmail.com' },
-        { ID: 2, cusName: 'Salman', Email: 'sss@gmail.com' },
-        { ID: 3, cusName: 'Apoorv', Email: 'acdd@gmail.com' },
-        { ID: 4, cusName: 'Sorabh', Email: 'ccd@gmail.com' },
-        { ID: 5, cusName: 'Joshi', Email: 'aeef@gmail.com' },
-        { ID: 6, cusName: 'Dimple', Email: 'cscds@gmail.com' },
-      ],
+      RegisteredCustomerList: [],
       EVENTS: [],
     };
   }

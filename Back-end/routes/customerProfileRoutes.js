@@ -13,6 +13,9 @@ const {
   uploadCustomerProfilePic,
   generateOrder,
   submitReview,
+  getEventList,
+  registerForEvent,
+  getRegisteredEventIds,
 } = require('../customer/customerProfile');
 const { login, logout } = require('../common/loginLogout');
 
@@ -101,6 +104,28 @@ Router.post('/submitReview', async (req, res) => {
   console.log('submitReview');
   let results = null;
   results = await submitReview(req, res);
+  return results;
+});
+
+// Fetch Events
+Router.get('/getEventList', async (req, res) => {
+  console.log('Fetch Events');
+  let results = null;
+  results = await getEventList(req, res);
+  return results;
+});
+
+Router.post('/registerForEvent', async (req, res) => {
+  console.log('registerForEvent');
+  let results = null;
+  results = await registerForEvent(req, res);
+  return results;
+});
+
+Router.get('/getRegisteredEventIds', async (req, res) => {
+  console.log('getRegisteredEventIds');
+  let results = null;
+  results = await getRegisteredEventIds(req, res);
   return results;
 });
 

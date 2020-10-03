@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt');
 const AWS = require('aws-sdk');
 const multer = require('multer');
 const multerS3 = require('multer-s3');
+const url = require('url');
 const { getUserIdFromToken } = require('../common/loginLogout');
 const mysqlConnection = require('../mysqlConnection');
 
@@ -473,7 +474,7 @@ const generateOrder = async (request, response) => {
   return response;
 };
 
-// Generate Order
+// Submit Review
 const submitReview = async (request, response) => {
   const { RestroId, review, rating, token, userrole } = request.body;
 
@@ -511,6 +512,105 @@ const submitReview = async (request, response) => {
   }
   return response;
 };
+
+// fetch events fased on filter
+const getEventList = async (request, response) => {
+  try {
+    const { sortValue } = url.parse(request.url, true).query;
+    const userID = getUserIdFromToken(request.cookies.cookie, request.cookies.userrole);
+    if (userID) {
+      const getEventListForCustomerQuery = 'CALL getEventListForCustomer(?,?)';
+
+      const connection = await mysqlConnection();
+      // eslint-disable-next-line no-unused-vars
+      const [results, fields] = await connection.query(getEventListForCustomerQuery, [
+        userID,
+        sortValue,
+      ]);
+      connection.end();
+      response.writeHead(200, {
+        'Content-Type': 'text/plain',
+      });
+      response.end(JSON.stringify(results));
+    } else {
+      response.writeHead(401, {
+        'Content-Type': 'text/plain',
+      });
+      response.end('Invalid User');
+    }
+  } catch (error) {
+    response.writeHead(500, {
+      'Content-Type': 'text/plain',
+    });
+    response.end('Network error');
+  }
+  return response;
+};
+
+// Submit Review
+const registerForEvent = async (request, response) => {
+  const { eventId, token, userrole } = request.body;
+
+  try {
+    const cusID = getUserIdFromToken(token, userrole);
+    if (cusID) {
+      const registerForEventQuery = 'CALL registerForEvent(?,?)';
+
+      const connection = await mysqlConnection();
+
+      // eslint-disable-next-line no-unused-vars
+      const [results, fields] = await connection.query(registerForEventQuery, [cusID, eventId]);
+      connection.end();
+      console.log(results);
+      response.writeHead(200, {
+        'Content-Type': 'text/plain',
+      });
+      response.end('Review Created Successfully');
+    } else {
+      response.writeHead(401, {
+        'Content-Type': 'text/plain',
+      });
+      response.end('Invalid User');
+    }
+  } catch (error) {
+    response.writeHead(500, {
+      'Content-Type': 'text/plain',
+    });
+    response.end('Network error');
+  }
+  return response;
+};
+
+// fetch events fased on filter
+const getRegisteredEventIds = async (request, response) => {
+  try {
+    const userID = getUserIdFromToken(request.cookies.cookie, request.cookies.userrole);
+    if (userID) {
+      const getRegisteredEventIdsQuery = 'CALL getRegisteredEventIds(?)';
+
+      const connection = await mysqlConnection();
+      // eslint-disable-next-line no-unused-vars
+      const [results, fields] = await connection.query(getRegisteredEventIdsQuery, [userID]);
+      connection.end();
+      response.writeHead(200, {
+        'Content-Type': 'text/plain',
+      });
+      response.end(JSON.stringify(results));
+    } else {
+      response.writeHead(401, {
+        'Content-Type': 'text/plain',
+      });
+      response.end('Invalid User');
+    }
+  } catch (error) {
+    response.writeHead(500, {
+      'Content-Type': 'text/plain',
+    });
+    response.end('Network error');
+  }
+  return response;
+};
+
 module.exports = {
   signup,
   getBasicInfo,
@@ -522,4 +622,7 @@ module.exports = {
   uploadCustomerProfilePic,
   generateOrder,
   submitReview,
+  getEventList,
+  registerForEvent,
+  getRegisteredEventIds,
 };

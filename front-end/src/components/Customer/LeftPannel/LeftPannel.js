@@ -97,7 +97,7 @@ class LeftPannel extends Component {
                     </Link>
                   </li>
 
-                  <li class="titled-nav_item">
+                  {/* <li class="titled-nav_item">
                     <Link
                       to="/Reviews"
                       class="titled-nav_link"
@@ -123,7 +123,7 @@ class LeftPannel extends Component {
                         </div>
                       </div>
                     </Link>
-                  </li>
+    </li>*/}
 
                   <li class="titled-nav_item">
                     <Link
