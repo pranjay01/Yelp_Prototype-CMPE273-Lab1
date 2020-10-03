@@ -136,9 +136,74 @@ commit;
 END  $$
 
 
+-- 
+drop procedure  if exists fetchRestaurantProfileForCustomer;
+ delimiter $$
+ 
+ create procedure `fetchRestaurantProfileForCustomer`(IN RestroId INT)
+ begin
+ declare exit handler for sqlexception rollback;
+ start transaction;
+ 
+ SELECT RESTAURANT.Restaurant_ID as ID, RESTAURANT.Name as Name, 
+ IFNULL((SELECT true FROM DELIVERY_TYPE_RESTAURANT_MAPPINGS WHERE 
+ DELIVERY_TYPE_RESTAURANT_MAPPINGS.Restaurant_ID=RESTAURANT.Restaurant_ID and Delivery_ID=1),false) 
+ as CurbsidePickup, 
+ IFNULL((SELECT true FROM DELIVERY_TYPE_RESTAURANT_MAPPINGS WHERE 
+ DELIVERY_TYPE_RESTAURANT_MAPPINGS.Restaurant_ID=RESTAURANT.Restaurant_ID and Delivery_ID=2),false) 
+ as DineIn, 
+ IFNULL((SELECT true FROM DELIVERY_TYPE_RESTAURANT_MAPPINGS WHERE 
+ DELIVERY_TYPE_RESTAURANT_MAPPINGS.Restaurant_ID=RESTAURANT.Restaurant_ID and Delivery_ID=3),false) 
+ as YelpDelivery,
+ RESTAURANT.ImageURL as ImageUrl,TIME_FORMAT(RESTAURANT.Opening_Time, "%h:%i %p") 
+  as OpeningTime,TIME_FORMAT(RESTAURANT.Closing_Time, "%h:%i %p")  as ClosingTime, 
+ count(REVIEWS.ID) as ReviewCounts, round(IFNULL(avg(REVIEWS.Rating),0)) as AvgRating
+ FROM  RESTAURANT LEFT JOIN REVIEWS ON REVIEWS.Restaurant_ID=RESTAURANT.Restaurant_ID
+ WHERE RESTAURANT.Restaurant_ID = RestroId;
+ 
+ commit;
+ end $$
 
 
 
+-- Fetch menu for order
+drop procedure  if exists menuFetchForOrder;
+delimiter $$
+
+create procedure `menuFetchForOrder`(IN RestroId INT)
+begin
+declare exit handler for sqlexception rollback;
+start transaction;
+
+SELECT APPETIZER.ID as ID, Name, Main_Ingredients as Ingredients, CUISINES.Category as cuisine,
+Description, Price 
+FROM APPETIZER LEFT JOIN CUISINES ON CUISINES.ID=Cuisine_ID
+WHERE Restaurant_ID=RestroId;
 
 
+SELECT BEVERAGES.ID as ID, Name, Main_Ingredients as Ingredients, CUISINES.Category as cuisine,
+Description, Price 
+FROM BEVERAGES LEFT JOIN CUISINES ON CUISINES.ID=Cuisine_ID
+WHERE Restaurant_ID=RestroId;
 
+
+SELECT MAIN_COURSE.ID as ID, Name, Main_Ingredients as Ingredients, CUISINES.Category as cuisine,
+Description, Price 
+FROM MAIN_COURSE LEFT JOIN CUISINES ON CUISINES.ID=Cuisine_ID
+WHERE Restaurant_ID=RestroId;
+
+
+SELECT SALADS.ID as ID, Name, Main_Ingredients as Ingredients, CUISINES.Category as cuisine,
+Description, Price 
+FROM SALADS LEFT JOIN CUISINES ON CUISINES.ID=Cuisine_ID
+WHERE Restaurant_ID=RestroId;
+
+
+SELECT DESSERTS.ID as ID, Name, Main_Ingredients as Ingredients, CUISINES.Category as cuisine,
+Description, Price 
+FROM DESSERTS LEFT JOIN CUISINES ON CUISINES.ID=Cuisine_ID
+WHERE Restaurant_ID=RestroId;
+
+
+commit;
+end $$

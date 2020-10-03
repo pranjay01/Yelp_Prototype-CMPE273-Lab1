@@ -11,6 +11,8 @@ const {
   updateContactInfo,
   getCustomerCompleteProfile,
   uploadCustomerProfilePic,
+  generateOrder,
+  submitReview,
 } = require('../customer/customerProfile');
 const { login, logout } = require('../common/loginLogout');
 
@@ -85,6 +87,20 @@ Router.post('/uploadCustomerProfilePic', async (req, res) => {
   console.log('uploadCustomerProfilePic');
   let results = null;
   results = await uploadCustomerProfilePic(req, res);
+  return results;
+});
+
+Router.post('/generateOrder', async (req, res) => {
+  console.log('generateOrder');
+  let results = null;
+  results = await generateOrder(req, res);
+  return results;
+});
+
+Router.post('/submitReview', async (req, res) => {
+  console.log('submitReview');
+  let results = null;
+  results = await submitReview(req, res);
   return results;
 });
 

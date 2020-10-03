@@ -140,13 +140,13 @@ class EventList extends Component {
     console.log('fetching food details');
   };
 
-  onShowAlert = () => {
-    this.setState({ visible: true }, () => {
-      window.setTimeout(() => {
-        this.setState({ visible: false });
-      }, 2000);
-    });
-  };
+  // onShowAlert = () => {
+  //   this.setState({ visible: true }, () => {
+  //     window.setTimeout(() => {
+  //       this.setState({ visible: false });
+  //     }, 2000);
+  //   });
+  // };
 
   createNewEvent = (e, eventInfo) => {
     e.preventDefault();

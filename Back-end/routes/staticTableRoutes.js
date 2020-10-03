@@ -8,6 +8,9 @@ const {
   getDeliverStatus,
   getSearchStrings,
   fetchRestaurantResults,
+  fetchReviews,
+  menuFetch,
+  fetchRestaurantProfileForCustomer,
 } = require('../staticTables/staticTableFetch');
 
 const Router = express.Router();
@@ -55,6 +58,27 @@ Router.get('/fetchRestaurantResults', async (req, res) => {
   console.log('fetchRestaurantResults');
   let results = null;
   results = await fetchRestaurantResults(req, res);
+  return results;
+});
+
+Router.get('/fetchReviews', async (req, res) => {
+  console.log('fetchReviews');
+  let results = null;
+  results = await fetchReviews(req, res);
+  return results;
+});
+
+Router.get('/menuFetch', async (req, res) => {
+  console.log('menuFetch');
+  let results = null;
+  results = await menuFetch(req, res);
+  return results;
+});
+
+Router.get('/fetchRestaurantProfileForCustomer', async (req, res) => {
+  console.log('fetchRestaurantProfileForCustomer');
+  let results = null;
+  results = await fetchRestaurantProfileForCustomer(req, res);
   return results;
 });
 

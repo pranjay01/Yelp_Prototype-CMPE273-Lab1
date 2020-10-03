@@ -9,6 +9,9 @@ import AboutMe from './Customer/AboutMe/AboutMe';
 import UpdateProfile from './Customer/UpdateInformation/UpdateProfile';
 import UpdateContactInformation from './Customer/UpdateInformation/UpdateContactInformation';
 import RestaurantList from './Customer/RestaurantResults/RestaurantList';
+import RestaurantPage from './Customer/RestaurantResults/RestaurantPage/RestaurantPage';
+import FoodOrderCart from './Customer/RestaurantResults/RestaurantPage/FoodOrderCart';
+
 // Create a Main Component
 class Main extends Component {
   render() {
@@ -27,7 +30,8 @@ class Main extends Component {
           <Route path="/UpdateProfile" component={UpdateProfile} />
           <Route path="/UpdateContactInformation" component={UpdateContactInformation} />
           <Route path="/RestaurantList" component={RestaurantList} />
-
+          <Route path="/RestaurantPage" component={RestaurantPage} />
+          <Route path="/FoodOrderCart" component={FoodOrderCart} />
           <Route exact path="/" component={Home} />
         </Switch>
       </div>

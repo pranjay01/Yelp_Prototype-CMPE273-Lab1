@@ -18,7 +18,7 @@ class SnackBar extends Component {
         className={`${success ? 'green' : '#ff0000'}`}
         style={{
           position: 'fixed',
-          top: '15%',
+          top: '18%',
           right: '50%',
           zIndex: '10000',
           backgroundColor: `${success ? '#57e457' : 'red'}`,

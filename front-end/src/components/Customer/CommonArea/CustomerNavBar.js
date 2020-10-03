@@ -106,15 +106,17 @@ class CustomerNavBar extends Component {
     console.log(string);
     const payload = { serchedString: string };
     this.props.updateSearchedString(payload);
-    window.location.reload(false);
-    //history.push('/RestaurantList');
+    history.push('/RestaurantList');
+    //window.location.reload(false);
   };
 
   getRestaurants = (event) => {
-    window.location.reload(false);
+    //history.push('/RestaurantList');
+
+    //window.location.reload(false);
     //history.push('/RestaurantList');
     //event.preventDefault();
-    //this.openRestroListPage(this.props.searchTabInfo.serchedString);
+    this.openRestroListPage(this.props.searchTabInfo.serchedString);
   };
 
   render() {

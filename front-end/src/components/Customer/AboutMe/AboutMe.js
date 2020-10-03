@@ -105,9 +105,9 @@ class AboutMe extends Component {
                       <li>
                         <h4>Location</h4>
                         {this.state.Address1 != null && this.state.Address1.length > 0 ? (
-                          <p>You haven't told us yet ... do tell!</p>
-                        ) : (
                           <p>{this.state.Address1}</p>
+                        ) : (
+                          <p>You haven't told us yet ... do tell!</p>
                         )}
                       </li>
                       <li>{this.state.Address2}</li>
@@ -115,9 +115,9 @@ class AboutMe extends Component {
                       <li>
                         <h4>Date Of Birth</h4>
                         {(this.state.DOB != null && this.state.DOB.length) > 0 ? (
-                          <p>You haven't told us yet ... do tell!</p>
-                        ) : (
                           <p>{this.state.DOB}</p>
+                        ) : (
+                          <p>You haven't told us yet ... do tell!</p>
                         )}
                       </li>
 
@@ -129,26 +129,26 @@ class AboutMe extends Component {
                       <li>
                         <h4>Things I Love</h4>
                         {this.state.ILove != null && this.state.ILove.length > 0 ? (
-                          <p>You haven't told us yet ... do tell!</p>
-                        ) : (
                           <p>{this.state.ILove}</p>
+                        ) : (
+                          <p>You haven't told us yet ... do tell!</p>
                         )}
                       </li>
 
                       <li>
                         <h4>Find Me IN</h4>
                         {this.state.FMI != null && this.state.FMI.length > 0 ? (
-                          <p>You haven't told us yet ... do tell!</p>
-                        ) : (
                           <p>{this.state.FMI}</p>
+                        ) : (
+                          <p>You haven't told us yet ... do tell!</p>
                         )}
                       </li>
                       <li>
                         <h4>Follow My Website/Blog</h4>
                         {this.state.Website != null && this.state.Website.length > 0 ? (
-                          <p>You haven't told us yet ... do tell!</p>
-                        ) : (
                           <p>{this.state.Website}</p>
+                        ) : (
+                          <p>You haven't told us yet ... do tell!</p>
                         )}
                       </li>
                     </ul>

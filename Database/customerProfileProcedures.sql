@@ -39,7 +39,7 @@ CREATE PROCEDURE getBasicInfoCustomer
 (IN userID INT)
 BEGIN
 
-select concat(First_FOOD_IMAGESName,' ',substr(Last_Name,1,1),'.') as Name, City as Address, ImageURL
+select concat(First_Name,' ',substr(Last_Name,1,1),'.') as Name, City as Address, ImageURL
 From CUSTOMER where Customer_ID=userID;
 
 select count(ID) as ReviewCount from REVIEWS where Customer_ID = userID;
@@ -207,5 +207,33 @@ start transaction;
 
 commit;
 end $$
+
+
+
+-- Creating New Review
+drop procedure if exists submitReview ;
+
+DELIMITER  $$
+CREATE PROCEDURE `submitReview`
+(IN _rating INT
+,IN _restroID INT
+,IN _cusID INT
+,IN _description VARCHAR(1000))
+BEGIN
+    declare _customerId int;
+declare exit handler for sqlexception
+rollback;
+start transaction;
+
+INSERT INTO REVIEWS (Rating,Restaurant_ID,Customer_ID,Date,Description) 
+VALUES(_rating, _restroID, _cusID,curdate(),_description);
+
+
+commit;
+END  $$
+
+delimiter ;
+
+
 
 

@@ -115,8 +115,11 @@ class Restaurant extends Component {
                                   <span class="lemon--span__09f24__3997G text__09f24__2tZKC text-color--black-regular__09f24__1QxyO text-align--left__09f24__3Drs0 text-weight--bold__09f24__WGVdT text-size--inherit__09f24__2rwpp">
                                     1&nbsp;
                                     <a
+                                      style={{ cursor: 'pointer' }}
                                       class="lemon--a__09f24__IEZFH link__09f24__1kwXV link-color--inherit__09f24__3PYlA link-size--inherit__09f24__2Uj95"
-                                      href="/biz/mcdonalds-san-jose-48?osq=Mac+Donalds"
+                                      onClick={() => {
+                                        this.props.openRestaurantPage();
+                                      }}
                                       target=""
                                       name="McDonald’s"
                                       rel=""

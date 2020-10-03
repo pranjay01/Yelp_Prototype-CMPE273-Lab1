@@ -5,6 +5,7 @@ import Restaurant from './Restaurant';
 import axios from 'axios';
 import serverUrl from '../../../config';
 import { updateRestaurantArray } from '../../../constants/action-types';
+import { history } from '../../../App';
 
 import { connect } from 'react-redux';
 
@@ -76,6 +77,12 @@ class RestaurantList extends Component {
     return this.props.searchTabInfo.SearchStrings.filter((string) =>
       string.toLowerCase().includes(this.props.searchTabInfo.serchedString.toLowerCase())
     );
+  };
+
+  openRestaurantPage = (ID) => {
+    localStorage.setItem('restaurantPageID', ID);
+    history.push('/RestaurantPage');
+    window.location.reload(false);
   };
 
   render() {
@@ -162,6 +169,9 @@ class RestaurantList extends Component {
                       {this.props.restaurantArray.restaurantSearchResults.map((restaurant) => (
                         <Restaurant
                           restaurant={restaurant}
+                          openRestaurantPage={() => {
+                            this.openRestaurantPage(restaurant.ID);
+                          }}
 
                           //   }
                         />

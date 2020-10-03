@@ -397,6 +397,120 @@ const uploadCustomerProfilePic = async (req, res) => {
   return res;
 };
 
+const generateOrderMenuString = async (orderdCart) => {
+  let orderdString = '';
+  // eslint-disable-next-line no-restricted-syntax
+  for (const item of orderdCart) {
+    orderdString = orderdString.concat(item.ID);
+    orderdString = orderdString.concat(':');
+    switch (item.MenuCategory) {
+      case 'APPETIZERS':
+        orderdString = orderdString.concat('1');
+        break;
+      case 'DESSERTS':
+        orderdString = orderdString.concat('3');
+        break;
+      case 'BEVERAGES':
+        orderdString = orderdString.concat('4');
+        break;
+      case 'MAIN_COURSE':
+        orderdString = orderdString.concat('5');
+        break;
+      case 'SALADS':
+        orderdString = orderdString.concat('2');
+        break;
+      default:
+        break;
+    }
+    orderdString = orderdString.concat(':');
+    orderdString = orderdString.concat(item.Quantity);
+    orderdString = orderdString.concat(';');
+  }
+  orderdString = orderdString.substring(0, orderdString.length - 1);
+  return orderdString;
+};
+
+// Generate Order
+const generateOrder = async (request, response) => {
+  const { RestroId, Price, foodCart, address, deliveryMode, token, userrole } = request.body;
+
+  try {
+    const cusID = getUserIdFromToken(token, userrole);
+    if (cusID) {
+      const generateOrderQuery = 'CALL generateOrder(?,?,?,?,?,?)';
+
+      const connection = await mysqlConnection();
+      const deliveryType = deliveryMode === 'Delivery' ? 1 : 2;
+      const orderdMenu = await generateOrderMenuString(foodCart);
+
+      // eslint-disable-next-line no-unused-vars
+      const [results, fields] = await connection.query(generateOrderQuery, [
+        RestroId,
+        cusID,
+        deliveryType,
+        orderdMenu,
+        Price,
+        address,
+      ]);
+      connection.end();
+      console.log(results);
+      response.writeHead(200, {
+        'Content-Type': 'text/plain',
+      });
+      response.end('Order Created Successfully');
+    } else {
+      response.writeHead(401, {
+        'Content-Type': 'text/plain',
+      });
+      response.end('Invalid User');
+    }
+  } catch (error) {
+    response.writeHead(500, {
+      'Content-Type': 'text/plain',
+    });
+    response.end('Network error');
+  }
+  return response;
+};
+
+// Generate Order
+const submitReview = async (request, response) => {
+  const { RestroId, review, rating, token, userrole } = request.body;
+
+  try {
+    const cusID = getUserIdFromToken(token, userrole);
+    if (cusID) {
+      const submitReviewQuery = 'CALL submitReview(?,?,?,?)';
+
+      const connection = await mysqlConnection();
+
+      // eslint-disable-next-line no-unused-vars
+      const [results, fields] = await connection.query(submitReviewQuery, [
+        rating,
+        RestroId,
+        cusID,
+        review,
+      ]);
+      connection.end();
+      console.log(results);
+      response.writeHead(200, {
+        'Content-Type': 'text/plain',
+      });
+      response.end('Review Created Successfully');
+    } else {
+      response.writeHead(401, {
+        'Content-Type': 'text/plain',
+      });
+      response.end('Invalid User');
+    }
+  } catch (error) {
+    response.writeHead(500, {
+      'Content-Type': 'text/plain',
+    });
+    response.end('Network error');
+  }
+  return response;
+};
 module.exports = {
   signup,
   getBasicInfo,
@@ -406,4 +520,6 @@ module.exports = {
   updateContactInfo,
   getCustomerCompleteProfile,
   uploadCustomerProfilePic,
+  generateOrder,
+  submitReview,
 };

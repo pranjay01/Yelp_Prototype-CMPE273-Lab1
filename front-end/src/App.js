@@ -11,10 +11,10 @@ class App extends Component {
     return (
       // Use Browser Router to route to different pages
       <BrowserRouter history={history}>
-        <div>
-          {/* App Component Has a Child Component called Main */}
-          <Main />
-        </div>
+        {/*<div>*/}
+        {/* App Component Has a Child Component called Main */}
+        <Main />
+        {/*</div>*/}
       </BrowserRouter>
     );
   }

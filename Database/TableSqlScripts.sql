@@ -140,7 +140,7 @@ Description VARCHAR(100)
 CREATE TABLE REVIEWS(
 ID INT NOT NULL,
 Rating INT NOT NULL CHECK (Rating BETWEEN 1 and 5),
-Description VARCHAR(200),
+Description VARCHAR(1000),
 Restaurant_ID INT NOT NULL,
 Customer_ID INT NOT NULL,
 Date DATE NOT NULL
@@ -155,7 +155,9 @@ Order_Type ENUM('Delivery','Pick_up') NOT NULL,
 Delivery_Status INT NOT NULL,
 Order_Status ENUM('New Order','Delivered Order','Cancelled Order') NOT NULL,
 Ordered_Dishes VARCHAR(1000) NOT NULL,
-Bill DECIMAL(5,2) NOT NULL
+Bill DECIMAL(5,2) NOT NULL,
+Address VARCHAR(100),
+
 );
 
 CREATE TABLE EVENTS

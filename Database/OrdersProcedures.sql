@@ -99,3 +99,28 @@ WHERE ID=orderID and Restaurant_ID=restroID;
 commit;
 END  $$
 
+
+-- Order Creation
+
+drop procedure  if exists generateOrder;
+
+DELIMITER  $$
+CREATE PROCEDURE `generateOrder`
+(IN _Restaurant_ID INT,IN _Customer_ID INT,IN _Order_Type enum('Delivery','Pick_up'),IN _Ordered_Dishes VARCHAR(1000)
+,IN _Bill DECIMAL(5,2),IN _Address VARCHAR(100))
+BEGIN
+    
+declare exit handler for sqlexception
+rollback;
+start transaction;
+
+INSERT INTO ORDERS(Restaurant_ID,Customer_ID,Order_Type,Delivery_Status,Ordered_Dishes
+,Bill,Date,Address)
+Values(_Restaurant_ID,_Customer_ID,_Order_Type,1,_Ordered_Dishes,_Bill,NOW(),_Address);
+
+
+commit;
+END  $$
+
+
+

@@ -229,6 +229,7 @@ class UpdateContactInformation extends Component {
                       type="password"
                       value={this.state.Profile.Password}
                       onChange={this.onPasswordChangeHandler}
+                      required
                     />
 
                     <label for="nickname">
@@ -246,6 +247,7 @@ class UpdateContactInformation extends Component {
                       type="password"
                       value={this.state.Profile.RetypePassword}
                       onChange={this.onRePasswordChangeHandler}
+                      required
                     />
                     <span style={{ color: 'red' }}>{this.state.errors['submitError']}</span>
                     <br />
