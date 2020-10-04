@@ -169,7 +169,7 @@ class LeftPannel extends Component {
                     <Link
                       to="/OrdersList"
                       class={`titled-nav_link ${ordersTabIsActive && 'is - active'}`}
-                      class="titled-nav_link"
+                      // class="titled-nav_link"
                       href="#"
                     >
                       <div class="titled-nav_link-content arrange arrange--middle arrange--6">

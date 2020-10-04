@@ -26,6 +26,8 @@ class Review extends Component {
       case 5:
         rating = { backgroundPosition: '0 -500px' };
         break;
+      default:
+        break;
     }
     return (
       <li className="lemon--li__373c0__1r9wz margin-b3__373c0__q1DuY padding-b3__373c0__342DA border--bottom__373c0__3qNtD border-color--default__373c0__3-ifU">

@@ -138,6 +138,8 @@ class RestaurantLeftReviewPart extends Component {
       case 5:
         rating = { backgroundPosition: '0 -288px' };
         break;
+      default:
+        break;
     }
     return (
       <div class="lemon--div__373c0__1mboc arrange-unit__373c0__o3tjT arrange-unit-grid-column--8__373c0__2dUx_ padding-r6__373c0__2Qlev border-color--default__373c0__3-ifU">

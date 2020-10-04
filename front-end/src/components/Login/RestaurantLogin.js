@@ -143,7 +143,7 @@ class RestaurantLogin extends Component {
 
   ValiditySignup = () => {
     let ErrorStr = '';
-    if (this.state.Name.length == 0) {
+    if (this.state.Name.length === 0) {
       ErrorStr = ErrorStr + 'Name cannot be Empty';
     }
     if (this.state.countryCode === '') {
@@ -187,7 +187,7 @@ class RestaurantLogin extends Component {
       ErrorStr = ErrorStr + 'Validate Phone Number';
     }
 
-    if (ErrorStr.length == 0) {
+    if (ErrorStr.length === 0) {
       ErrorStr = 'Correct';
     }
     return ErrorStr;
@@ -225,7 +225,6 @@ class RestaurantLogin extends Component {
           this.setState({
             authFlag: true,
             sigupSuccessful: true,
-            authFlag: false,
             errorBlock: null,
             inputBlockHighlight: null,
             errorFlag: 1,
@@ -390,6 +389,7 @@ class RestaurantLogin extends Component {
                         <img
                           height="24"
                           width="24"
+                          alt="Yelp"
                           src="https://s3-media0.fl.yelpcdn.com/assets/srv0/yelp_styleguide/cae242fd3929/assets/img/structural/24x24_google_rainbow.png"
                           srcset="https://s3-media0.fl.yelpcdn.com/assets/srv0/yelp_styleguide/c193df424e16/assets/img/structural/24x24_google_rainbow@2x.png 2x"
                         />
@@ -445,7 +445,7 @@ class RestaurantLogin extends Component {
 
                   <div class="js-password-meter-wrapper password-meter-wrapper u-hidden">
                     <div class="progress-bar-container--minimal">
-                      <h4 class="progress-bar-text"></h4>
+                      {/*<h4 class="progress-bar-text"></h4>*/}
                       <div class="progress-bar new js-progress-bar">
                         <div
                           class="progress-bar_fill js-progress-bar_fill new"
@@ -675,6 +675,7 @@ class RestaurantLogin extends Component {
                     <div class="u-text-centered">
                       <span class="icon--png">
                         <img
+                          alt="YELP"
                           height="24"
                           width="24"
                           src="https://s3-media0.fl.yelpcdn.com/assets/srv0/yelp_styleguide/cae242fd3929/assets/img/structural/24x24_google_rainbow.png"
@@ -814,7 +815,10 @@ class RestaurantLogin extends Component {
                   </div>
                   <div class="column column-beta responsive-visible-large-block">
                     <div class="picture-container">
-                      <img src="https://s3-media0.fl.yelpcdn.com/assets/2/www/img/7922e77f338d/signup/signup_illustration.png" />
+                      <img
+                        alt="YELP"
+                        src="https://s3-media0.fl.yelpcdn.com/assets/2/www/img/7922e77f338d/signup/signup_illustration.png"
+                      />
                     </div>
                   </div>
                 </div>

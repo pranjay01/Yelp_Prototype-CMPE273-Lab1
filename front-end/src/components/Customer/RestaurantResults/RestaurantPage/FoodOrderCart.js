@@ -207,6 +207,9 @@ class FoodOrderCart extends Component {
         SALADS[index] = foodItem;
         this.setState({ SALADS });
         break;
+
+      default:
+        break;
     }
   };
 
