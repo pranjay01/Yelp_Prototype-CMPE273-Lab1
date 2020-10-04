@@ -558,7 +558,7 @@ class CustomerLogin extends Component {
     return (
       <div>
         {redirectVar}
-        {this.props.snackbarData != null && <SnackBar />}
+        {/*this.props.snackbarData != null && <SnackBar />*/}
         <button onClick={this.checkSnackbar}></button>
         <div>
           <div class="lemon--div__373c0__1mboc header__373c0__AlFmH border-color--default__373c0__2oFDT">

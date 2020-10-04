@@ -154,7 +154,7 @@ class Events extends Component {
     }
     return (
       <div style={{ background: 'white' }}>
-        {this.props.snackbarData != null && <SnackBar />}
+        {/*this.props.snackbarData != null && <SnackBar />*/}
         {redirectVar}
         {<CustomerNavBar />}
         <span id="page-content" class="offscreen">

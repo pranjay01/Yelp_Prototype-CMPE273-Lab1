@@ -53,10 +53,10 @@ class RestaurantRightPart extends Component {
         console.log('Status Code : ', response.status);
         if (response.status === 200) {
           console.log(response.data);
-           this.setState({
-             showFoodMenu: !this.state.showFoodMenu,
-             //RegisteredCustomerList: [],
-           });
+          this.setState({
+            showFoodMenu: !this.state.showFoodMenu,
+            //RegisteredCustomerList: [],
+          });
           let payload = {
             success: true,
             message: 'Order Created Successfully!',
@@ -197,7 +197,7 @@ class RestaurantRightPart extends Component {
                         <div class="lemon--div__373c0__1mboc margin-t1__373c0__oLmO6 border-color--default__373c0__3-ifU">
                           <div class="lemon--div__373c0__1mboc border-color--default__373c0__3-ifU">
                             <div class="lemon--div__373c0__1mboc border-color--default__373c0__3-ifU">
-                              {this.props.snackbarData != null && <SnackBar />}
+                              {/*this.props.snackbarData != null && <SnackBar />*/}
                               {this.state.showFoodMenu ? (
                                 <FoodOrderCart
                                   openFoodMenu={() => this.openFoodMenu()}

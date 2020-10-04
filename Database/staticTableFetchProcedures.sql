@@ -1,4 +1,4 @@
-drop procedure getSignupMasterData;
+drop procedure if EXISTS getSignupMasterData;
 delimiter $$
 
 create procedure getSignupMasterData()
@@ -12,7 +12,7 @@ end $$
 delimiter ;
 
 
-drop procedure getSignupMasterDataCustomer;
+drop procedure IF EXISTS getSignupMasterDataCustomer;
 delimiter $$
 
 create procedure getSignupMasterDataCustomer()

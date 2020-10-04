@@ -14,12 +14,15 @@ import FoodOrderCart from './Customer/RestaurantResults/RestaurantPage/FoodOrder
 import Events from './Customer/Events/Events';
 import OrdersList from './Customer/OrdersTab/OrdersList';
 import CustomerStaticProfile from './Restaurant/CommonComponent/CustomerStaticProfile';
+import SnackBar from './CommonComponents/SnackBar';
+import { connect } from 'react-redux';
 
 // Create a Main Component
 class Main extends Component {
   render() {
     return (
       <div>
+        {this.props.snackbarData != null && <SnackBar />}
         {/* Render Different Component based on Route */}
         <Switch>
           <Route path="/customerLogin" component={CustomerLogin} />
@@ -45,4 +48,13 @@ class Main extends Component {
   }
 }
 // Export The Main Component
-export default Main;
+// export default Main;
+// export default EventList;
+const mapStateToProps = (state) => {
+  const snackbarData = state.snackBarReducer.snackbarData;
+  return {
+    snackbarData: snackbarData,
+  };
+};
+
+export default connect(mapStateToProps, null)(Main);

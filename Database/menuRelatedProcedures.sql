@@ -1,3 +1,5 @@
+USE Yelp_Prototype;
+
 -- Procedure to fetch the items froM the menu table asked
 drop procedure IF EXISTS fetchAppetizerItems;
 

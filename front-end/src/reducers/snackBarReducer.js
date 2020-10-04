@@ -1,10 +1,7 @@
 import { updateSnackbarData } from '../constants/action-types';
 
 const defaultState = {
-  snackbarData: {
-    success: '',
-    message: '',
-  },
+  snackbarData: null,
 };
 
 const snackBarReducer = (state = defaultState, action) => {
@@ -12,7 +9,7 @@ const snackBarReducer = (state = defaultState, action) => {
     case updateSnackbarData: {
       return {
         ...state,
-        snackbarData: { ...state.snackbarData, ...action.payload },
+        snackbarData: action.payload,
         //   return Object.assign(state, action.payload);
       };
     }

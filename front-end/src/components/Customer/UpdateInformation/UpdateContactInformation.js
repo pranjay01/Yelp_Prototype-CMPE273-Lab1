@@ -149,7 +149,7 @@ class UpdateContactInformation extends Component {
       <div>
         {redirectVar}
         {<CustomerNavBar />}
-        {this.props.snackbarData != null && <SnackBar />}
+        {/*this.props.snackbarData != null && <SnackBar />*/}
         <span id="page-content" class="offscreen">
           &nbsp;
         </span>

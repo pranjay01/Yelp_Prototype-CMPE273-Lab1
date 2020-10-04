@@ -211,7 +211,7 @@ class RestaurantLeftReviewPart extends Component {
         </div>
         <div class="lemon--div__373c0__1mboc arrange__373c0__2C9bH gutter-1__373c0__2l5bx border-color--default__373c0__3-ifU">
           <div class="lemon--div__373c0__1mboc arrange-unit__373c0__o3tjT border-color--default__373c0__3-ifU nowrap__373c0__35McF">
-            {this.props.snackbarData != null && <SnackBar />}
+            {/*this.props.snackbarData != null && <SnackBar />*/}
             {this.state.showReview ? (
               <WriteAReview
                 openReviewForm={() => this.openReviewForm()}

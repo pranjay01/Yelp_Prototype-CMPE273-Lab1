@@ -176,7 +176,6 @@ class EventList extends Component {
       <div>
         {/*redirectVar*/}
 
-        {this.props.snackbarData != null && <SnackBar />}
         <nav class="navbar navbar-inverse">
           <div class="container-fluid">
             <div class="navbar-header">
