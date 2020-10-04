@@ -13,6 +13,7 @@ import RestaurantPage from './Customer/RestaurantResults/RestaurantPage/Restaura
 import FoodOrderCart from './Customer/RestaurantResults/RestaurantPage/FoodOrderCart';
 import Events from './Customer/Events/Events';
 import OrdersList from './Customer/OrdersTab/OrdersList';
+import CustomerStaticProfile from './Restaurant/CommonComponent/CustomerStaticProfile';
 
 // Create a Main Component
 class Main extends Component {
@@ -36,6 +37,7 @@ class Main extends Component {
           <Route path="/FoodOrderCart" component={FoodOrderCart} />
           <Route path="/Events" component={Events} />
           <Route path="/OrdersList" component={OrdersList} />
+          <Route path="/CustomerStaticProfile" component={CustomerStaticProfile} />
           <Route exact path="/" component={Home} />
         </Switch>
       </div>

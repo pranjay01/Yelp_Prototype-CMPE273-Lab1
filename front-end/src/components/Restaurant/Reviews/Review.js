@@ -42,8 +42,9 @@ class Review extends Component {
                     <div class="lemon--div__373c0__1mboc border-color--default__373c0__3-ifU">
                       <div class="lemon--div__373c0__1mboc on-click-container border-color--default__373c0__3-ifU">
                         <a
+                          onClick={(event) => this.props.openStaticProfile(event)}
                           class="lemon--a__373c0__IEZFH link__373c0__1G70M photo-box-link__373c0__1YC9Y link-color--blue-dark__373c0__85-Nu link-size--default__373c0__7tls6"
-                          href="/user_details?userid=1x4hrPkx02C9HVcrhvwmaA"
+                          href="#"
                           target=""
                           name=""
                           rel=""
@@ -77,6 +78,7 @@ class Review extends Component {
                     <div class="lemon--div__373c0__1mboc user-passport-info border-color--default__373c0__3-ifU">
                       <span class="lemon--span__373c0__3997G text__373c0__2Kxyz fs-block text-color--blue-dark__373c0__1jX7S text-align--left__373c0__2XGa- text-weight--bold__373c0__1elNz">
                         <a
+                          onClick={(event) => this.props.openStaticProfile(event)}
                           class="lemon--a__373c0__IEZFH link__373c0__1G70M link-color--inherit__373c0__3dzpk link-size--inherit__373c0__1VFlE"
                           href="/#"
                           target=""

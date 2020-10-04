@@ -832,6 +832,40 @@ const uploadFoodImage = async (req, res) => {
   }
   return res;
 };
+
+// Get Contact Information
+const getCustomerCompleteProfileForRestaurant = async (request, response) => {
+  const { cusID } = url.parse(request.url, true).query;
+  try {
+    const userID = getUserIdFromToken(request.cookies.cookie, request.cookies.userrole);
+    if (userID) {
+      const getCustomerCompleteProfileQuery = 'CALL getCustomerCompleteProfile(?)';
+
+      const connection = await mysqlConnection();
+      // eslint-disable-next-line no-unused-vars
+      const [results, fields] = await connection.query(getCustomerCompleteProfileQuery, cusID);
+      connection.end();
+      console.log(results);
+
+      response.writeHead(200, {
+        'Content-Type': 'text/plain',
+      });
+      response.end(JSON.stringify(results));
+    } else {
+      response.writeHead(401, {
+        'Content-Type': 'text/plain',
+      });
+      response.end('Invalid User');
+    }
+  } catch (error) {
+    response.writeHead(401, {
+      'Content-Type': 'text/plain',
+    });
+    response.end('Network Error');
+  }
+  return response;
+};
+
 module.exports = {
   signup,
   getBasicInfo,
@@ -852,4 +886,5 @@ module.exports = {
   uploadPicToDB,
   uploadFoodImage,
   getOrderList,
+  getCustomerCompleteProfileForRestaurant,
 };

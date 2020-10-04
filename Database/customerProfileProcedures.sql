@@ -198,11 +198,11 @@ declare exit handler for sqlexception rollback;
 start transaction;
 
 
-	SELECT Nick_Name as NickName, DATE_FORMAT(Date_Of_Birth,'%D %M %Y') as DOB, 
+	SELECT Nick_Name as NickName,concat(First_Name, ' ', Last_Name) as Name, DATE_FORMAT(Date_Of_Birth,'%D %M %Y') as DOB, 
     concat(City,', ',STATE.Name) as Address1, Street as Address2,
     Headline, I_Love as ILove, Find_Me_In as FMI, 
     DATE_FORMAT(Join_Date,'%M %Y') as JoinDate, Website , ImageURL
-    FROM CUSTOMER JOIN STATE ON STATE.ID=State_ID
+    FROM CUSTOMER LEFT JOIN STATE ON STATE.ID=State_ID
     WHERE Customer_ID=cusID;
 
 commit;
