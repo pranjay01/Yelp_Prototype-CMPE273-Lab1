@@ -33,11 +33,12 @@ class OrderDetails extends Component {
     this.props.toggle();
   };
   render() {
+    let TopStyle = this.props.modeTop;
     return (
       <div className="modal" style={{ top: '0', left: '0', width: '100%', height: '100%' }}>
         <div
           className="modal_content"
-          style={{ top: '10%', left: '20%', width: '60%', height: '70%' }}
+          style={{ top: `${TopStyle}`, left: '20%', width: '60%', height: '70%' }}
         >
           <span className="close" onClick={this.handleClick}>
             &times;{' '}

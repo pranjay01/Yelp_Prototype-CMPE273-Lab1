@@ -16,6 +16,8 @@ const {
   getEventList,
   registerForEvent,
   getRegisteredEventIds,
+  getAllOrders,
+  orderDetailsFetch,
 } = require('../customer/customerProfile');
 const { login, logout } = require('../common/loginLogout');
 
@@ -129,4 +131,17 @@ Router.get('/getRegisteredEventIds', async (req, res) => {
   return results;
 });
 
+Router.get('/getAllOrders', async (req, res) => {
+  console.log('getAllOrders');
+  let results = null;
+  results = await getAllOrders(req, res);
+  return results;
+});
+
+Router.get('/orderDetailsFetch', async (req, res) => {
+  console.log('orderDetailsFetch');
+  let results = null;
+  results = await orderDetailsFetch(req, res);
+  return results;
+});
 module.exports = Router;

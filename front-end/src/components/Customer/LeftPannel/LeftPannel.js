@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import './LeftPannel.css';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
+import { history } from '../../../App';
 
 class LeftPannel extends Component {
   constructor(props) {
@@ -9,6 +10,17 @@ class LeftPannel extends Component {
     this.state = {};
   }
   render() {
+    let profileIsActive = false;
+    let eventsTabIsActive = false;
+    let ordersTabIsActive = false;
+    console.log('this.props: ', history.location.pathname);
+    // if (this.props.location.pathname === '/AboutMe') {
+    //   profileIsActive = true;
+    // } else if (this.props.location.pathname === '/Events') {
+    //   eventsTabIsActive = true;
+    // } else if (this.props.location.pathname === '/OrdersList') {
+    //   ordersTabIsActive = true;
+    // }
     return (
       <div class="column column-alpha user-details_sidebar">
         <div class="ysection">
@@ -72,8 +84,8 @@ class LeftPannel extends Component {
                   <li class="titled-nav_item">
                     <Link
                       to="/AboutMe"
-                      class="titled-nav_link is-active"
-                      href="/user_details?userid=Sbr_JFt86Dss0N-hb9StQg"
+                      class={`titled-nav_link ${profileIsActive && 'is - active'}`}
+                      href="#"
                     >
                       <div class="titled-nav_link-content arrange arrange--middle arrange--6">
                         <div class="arrange_unit">
@@ -128,8 +140,8 @@ class LeftPannel extends Component {
                   <li class="titled-nav_item">
                     <Link
                       to="/Events"
-                      class="titled-nav_link"
-                      href="/user_details_events?userid=Sbr_JFt86Dss0N-hb9StQg"
+                      class={`titled-nav_link ${eventsTabIsActive && 'is - active'}`}
+                      href="#"
                     >
                       <div class="titled-nav_link-content arrange arrange--middle arrange--6">
                         <div class="arrange_unit">
@@ -154,7 +166,12 @@ class LeftPannel extends Component {
                   </li>
 
                   <li class="titled-nav_item">
-                    <Link to="/Order" class="titled-nav_link" href="/user_details_purchases">
+                    <Link
+                      to="/OrdersList"
+                      class={`titled-nav_link ${ordersTabIsActive && 'is - active'}`}
+                      class="titled-nav_link"
+                      href="#"
+                    >
                       <div class="titled-nav_link-content arrange arrange--middle arrange--6">
                         <div class="arrange_unit">
                           <span

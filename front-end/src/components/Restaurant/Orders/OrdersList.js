@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import Order from './Order';
 import OrderDetails from './OrderDetails';
 import './Orders.css';
-import Pagination from 'react-js-pagination';
 import axios from 'axios';
 import serverUrl from '../../../config';
 
@@ -13,7 +12,6 @@ class ordersList extends Component {
     this.state = {
       orderSortBy: localStorage.getItem('orderSortBy'),
       popSeen: false,
-      activePage: 1,
       ORDERS: [],
       orderDetails: [],
     };
@@ -33,7 +31,7 @@ class ordersList extends Component {
             ID: order.ID,
             CustomerId: order.CustomerID,
             CustomerName: order.CustomerName,
-            OrderedTime: order.Date,
+            OrderedTime: order.OrderedTime,
             OrderType: order.Order_Type,
             DeliverStatusID: order.DeliverStatusID,
             DeliverStatusValue: order.DeliverStatusValue,
@@ -171,7 +169,11 @@ class ordersList extends Component {
           </div>
         </nav>
         {this.state.popSeen ? (
-          <OrderDetails orderDetails={this.state.orderDetails} toggle={this.openOrderDetails} />
+          <OrderDetails
+            modeTop={'10%'}
+            orderDetails={this.state.orderDetails}
+            toggle={this.openOrderDetails}
+          />
         ) : null}
         <div>
           <ul className="lemon--ul__373c0__1_cxs undefined list__373c0__2G8oH">

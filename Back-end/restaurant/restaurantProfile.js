@@ -851,4 +851,5 @@ module.exports = {
   uploadRestaurantProfilePic,
   uploadPicToDB,
   uploadFoodImage,
+  getOrderList,
 };

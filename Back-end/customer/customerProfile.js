@@ -16,6 +16,8 @@ const s3Storage = new AWS.S3({
 });
 require('dotenv').config();
 
+const { getOrderList } = require('../restaurant/restaurantProfile');
+
 const checkEmailExists = async (email) => {
   const verifyEmailExist = 'CALL getEmail(?,?)';
   // 1 is for enum value customer
@@ -611,6 +613,71 @@ const getRegisteredEventIds = async (request, response) => {
   return response;
 };
 
+// fetch events fased on filter
+const getAllOrders = async (request, response) => {
+  try {
+    const userID = getUserIdFromToken(request.cookies.cookie, request.cookies.userrole);
+    if (userID) {
+      const getAllOrdersPlacedByCustomerQuery = 'CALL getAllOrdersPlacedByCustomer(?)';
+
+      const connection = await mysqlConnection();
+      // eslint-disable-next-line no-unused-vars
+      const [results, fields] = await connection.query(getAllOrdersPlacedByCustomerQuery, userID);
+      connection.end();
+      response.writeHead(200, {
+        'Content-Type': 'text/plain',
+      });
+      response.end(JSON.stringify(results));
+    } else {
+      response.writeHead(401, {
+        'Content-Type': 'text/plain',
+      });
+      response.end('Invalid User');
+    }
+  } catch (error) {
+    response.writeHead(500, {
+      'Content-Type': 'text/plain',
+    });
+    response.end('Network error');
+  }
+  return response;
+};
+
+// Fetch details of particular order
+const orderDetailsFetch = async (request, response) => {
+  const { orderID, restroId } = url.parse(request.url, true).query;
+  const userID = getUserIdFromToken(request.cookies.cookie, request.cookies.userrole);
+  if (userID) {
+    const orderFetchQuery = 'CALL orderFetch(?,?)';
+
+    const connection = await mysqlConnection();
+    // eslint-disable-next-line no-unused-vars
+    const [results, fields] = await connection.query(orderFetchQuery, [restroId, orderID]);
+    let order = results[0][0].Ordered_Dishes;
+    order = order.split(';');
+    const appetizers = results[1];
+    const beverages = results[2];
+    const salads = results[3];
+    const desserts = results[4];
+    const mainCourse = results[5];
+    const orders = await getOrderList(order, appetizers, desserts, beverages, salads, mainCourse);
+
+    console.log(orders);
+
+    connection.end();
+    response.writeHead(200, {
+      'Content-Type': 'text/plain',
+    });
+    response.end(JSON.stringify(orders));
+  } else {
+    response.writeHead(401, {
+      'Content-Type': 'text/plain',
+    });
+    response.end('Invalid User');
+  }
+  return response;
+};
+
 module.exports = {
   signup,
   getBasicInfo,
@@ -625,4 +692,6 @@ module.exports = {
   getEventList,
   registerForEvent,
   getRegisteredEventIds,
+  getAllOrders,
+  orderDetailsFetch,
 };

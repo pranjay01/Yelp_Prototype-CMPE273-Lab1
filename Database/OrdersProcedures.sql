@@ -11,16 +11,19 @@ declare exit handler for sqlexception
 rollback;
 start transaction;
 if OrderType='All' Then
-	select ORDERS.ID as ID, CUSTOMER.Customer_ID as CustomerID, CUSTOMER.ImageURL as ImageUrl,
-	concat(CUSTOMER.First_Name, ' ', CUSTOMER.Last_Name) as CustomerName, Date, Order_Type, 
-	Delivery_Status as DeliverStatusID,DELIVERY_STATUS.Status as DeliverStatusValue , Bill
+	select ORDERS.ID as ID, CUSTOMER.Customer_ID as CustomerID, CUSTOMER.ImageURL 
+    as ImageUrl, concat(CUSTOMER.First_Name, ' ', CUSTOMER.Last_Name) as CustomerName,
+    date_format(Date, '%D %M, %Y %I:%i %p')  as OrderedTime, Order_Type, 	
+    Delivery_Status as DeliverStatusID,DELIVERY_STATUS.Status as DeliverStatusValue , 
+    Bill
 	FROM ORDERS LEFT JOIN CUSTOMER ON CUSTOMER.Customer_ID=ORDERS.Customer_ID 
 	LEFT JOIN DELIVERY_STATUS ON (DELIVERY_STATUS.ID=Delivery_Status)
 	WHERE Restaurant_ID=RestroId;
 end if;
 if OrderType='New' Then
 	select ORDERS.ID as ID, CUSTOMER.Customer_ID as CustomerID, CUSTOMER.ImageURL as ImageUrl,
-	concat(CUSTOMER.First_Name, ' ', CUSTOMER.Last_Name) as CustomerName, Date, Order_Type, 
+	concat(CUSTOMER.First_Name, ' ', CUSTOMER.Last_Name) as CustomerName, 
+    date_format(Date, '%D %M, %Y %I:%i %p')  as OrderedTime, Order_Type, 
 	Delivery_Status as DeliverStatusID,DELIVERY_STATUS.Status as DeliverStatusValue , Bill
 	FROM ORDERS LEFT JOIN CUSTOMER ON CUSTOMER.Customer_ID=ORDERS.Customer_ID 
 	LEFT JOIN DELIVERY_STATUS ON (DELIVERY_STATUS.ID=Delivery_Status)
@@ -28,7 +31,8 @@ if OrderType='New' Then
 end if;
 if OrderType='Delivered' Then
 	select ORDERS.ID as ID, CUSTOMER.Customer_ID as CustomerID, CUSTOMER.ImageURL as ImageUrl,
-	concat(CUSTOMER.First_Name, ' ', CUSTOMER.Last_Name) as CustomerName, Date, Order_Type, 
+	concat(CUSTOMER.First_Name, ' ', CUSTOMER.Last_Name) as CustomerName, 
+    date_format(Date, '%D %M, %Y %I:%i %p')  as OrderedTime, Order_Type, 
 	Delivery_Status as DeliverStatusID,DELIVERY_STATUS.Status as DeliverStatusValue , Bill
 	FROM ORDERS LEFT JOIN CUSTOMER ON CUSTOMER.Customer_ID=ORDERS.Customer_ID 
 	LEFT JOIN DELIVERY_STATUS ON (DELIVERY_STATUS.ID=Delivery_Status)
@@ -36,7 +40,8 @@ if OrderType='Delivered' Then
 end if;
 if OrderType='Canceled' Then
 	select ORDERS.ID as ID, CUSTOMER.Customer_ID as CustomerID, 
-	concat(CUSTOMER.First_Name, ' ', CUSTOMER.Last_Name) as CustomerName, Date, Order_Type, 
+	concat(CUSTOMER.First_Name, ' ', CUSTOMER.Last_Name) as CustomerName, 
+    date_format(Date, '%D %M, %Y %I:%i %p')  as OrderedTime, Order_Type, 
 	Delivery_Status as DeliverStatusID,DELIVERY_STATUS.Status as DeliverStatusValue , Bill
 	FROM ORDERS LEFT JOIN CUSTOMER ON CUSTOMER.Customer_ID=ORDERS.Customer_ID 
 	LEFT JOIN DELIVERY_STATUS ON (DELIVERY_STATUS.ID=Delivery_Status)
@@ -124,3 +129,24 @@ END  $$
 
 
 
+-- Procedure to get order details of the customer
+
+drop procedure  if exists getAllOrdersPlacedByCustomer;
+
+DELIMITER  $$
+CREATE PROCEDURE `getAllOrdersPlacedByCustomer`
+(IN cusId INT)
+BEGIN
+    
+declare exit handler for sqlexception
+rollback;
+start transaction;
+
+select ORDERS.ID as ID, date_format(Date, '%D %M, %Y %I:%i %p')  as OrderedTime, Order_Type as OrderType,
+DELIVERY_STATUS.Status as DeliverStatusValue , Bill, Restaurant_ID as restroId
+FROM ORDERS 
+LEFT JOIN DELIVERY_STATUS ON (DELIVERY_STATUS.ID=Delivery_Status)
+WHERE Customer_ID=cusId;
+
+commit;
+END  $$
