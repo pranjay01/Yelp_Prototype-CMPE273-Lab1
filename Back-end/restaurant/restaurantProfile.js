@@ -258,11 +258,12 @@ const updateRestaurantProfile = async (restaurant, response) => {
       CurbsidePickup,
       DineIn,
       YelpDelivery,
+      ImageUrl,
     } = restaurant;
     const restroID = getUserIdFromToken(restaurant.token, restaurant.userrole);
     if (restroID) {
       const updateRestaurantProfileQuery =
-        'CALL updateRestaurantProfileQuery(?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
+        'CALL updateRestaurantProfileQuery(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
 
       const connection = await mysqlConnection();
       // eslint-disable-next-line no-unused-vars
@@ -287,6 +288,7 @@ const updateRestaurantProfile = async (restaurant, response) => {
         CurbsidePickup,
         DineIn,
         YelpDelivery,
+        ImageUrl,
       ]);
       connection.end();
       console.log(results);

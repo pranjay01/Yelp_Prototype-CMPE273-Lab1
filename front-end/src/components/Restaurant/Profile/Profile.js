@@ -29,6 +29,7 @@ class Profile extends Component {
       CurbsidePickup: false,
       DineIn: false,
       YelpDelivery: false,
+      ImageUrl: '',
       tmpEditProfile: {
         Name: '',
         Email: '',
@@ -44,6 +45,7 @@ class Profile extends Component {
         CurbsidePickup: false,
         DineIn: false,
         YelpDelivery: false,
+        ImageUrl: '',
       },
     };
   }
@@ -79,6 +81,7 @@ class Profile extends Component {
             Country_Code: response.data[0][0].Country_Code,
             Opening_Time: response.data[0][0].Opening_Time,
             Closing_Time: response.data[0][0].Closing_Time,
+            ImageUrl: response.data[0][0].ImageURL,
             CurbsidePickup,
             DineIn,
             YelpDelivery,
@@ -130,6 +133,7 @@ class Profile extends Component {
         CurbsidePickup: this.state.CurbsidePickup,
         DineIn: this.state.DineIn,
         YelpDelivery: this.state.YelpDelivery,
+        ImageUrl: this.state.ImageUrl,
       };
       this.setState({
         isFormDisable: !this.state.isFormDisable,
@@ -153,6 +157,7 @@ class Profile extends Component {
         CurbsidePickup: false,
         DineIn: false,
         YelpDelivery: false,
+        ImageUrl: '',
       };
       this.setState({
         Name: orignalData.Name,
@@ -171,6 +176,7 @@ class Profile extends Component {
         YelpDelivery: orignalData.YelpDelivery,
         tmpEditProfile,
         isFormDisable: !this.state.isFormDisable,
+        ImageUrl: orignalData.ImageUrl,
 
         submitError: false,
       });
@@ -405,6 +411,7 @@ class Profile extends Component {
         Opening_Time: this.state.Opening_Time,
         Closing_Time: this.state.Closing_Time,
         CurbsidePickup: this.state.CurbsidePickup,
+        ImageUrl: this.state.ImageUrl,
         DineIn: this.state.DineIn,
         YelpDelivery: this.state.YelpDelivery,
         token: cookie.load('cookie'),
@@ -439,7 +446,49 @@ class Profile extends Component {
     }
   };
 
+  onChangeFileHandler = (event) => {
+    if (event.target.files.length === 1) {
+      axios.defaults.withCredentials = true;
+      event.preventDefault();
+      let formData = new FormData();
+      formData.append('file', event.target.files[0], event.target.files[0].name);
+      axios({
+        method: 'post',
+        url: serverUrl + 'biz/uploadRestaurantProfilePic',
+        data: formData,
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+        .then((response) => {
+          console.log('Status Code : ', response.status);
+          if (parseInt(response.status) === 200) {
+            console.log('Product Saved');
+            this.setState({
+              ImageUrl: response.data,
+
+              //authFlag: true,
+              //savedId: response.data.message,
+            });
+            //Router.push('/vendor/' + localStorage.getItem('user_id'));
+          } else if (parseInt(response.status) === 400) {
+            console.log(response.data);
+          }
+        })
+        .catch((error) => {
+          this.setState({
+            errorMsg: error.message,
+            authFlag: false,
+          });
+        });
+      // this.setState({
+      //   uploadedPic: event.target.files,
+      // });
+    }
+  };
+
   render(/**<fieldset disabled> */) {
+    const defaultImage =
+      'https://s3-media0.fl.yelpcdn.com/assets/srv0/yelp_styleguide/bf5ff8a79310/assets/img/default_avatars/user_medium_square.png';
+
     let errorClass = 'alert alert-error ';
     if (!this.state.submitError) {
       errorClass += 'hidden';
@@ -456,6 +505,43 @@ class Profile extends Component {
           class="yform signup-form  city-hidden"
           id="signup-form"
         >
+          <h4>
+            Your Profile Photo
+            <strong>
+              <a href="/#">
+                <input
+                  disabled={this.state.isFormDisable && 'disabled'}
+                  type="file"
+                  accept="image/*"
+                  onChange={this.onChangeFileHandler}
+                  name="fileName"
+                  id="filename"
+                  multiple
+                />
+              </a>
+            </strong>
+          </h4>
+
+          <div class="photo-box pb-m">
+            <a
+              class="js-analytics-click"
+              data-analytics-label="user-photo"
+              href="/user_photos?return_url=%2Fprofile%3Freturn_url%3D%252Fuser_details%253Fuserid%253DSbr_JFt86Dss0N-hb9StQg"
+            >
+              <img
+                style={{ width: '150px', height: '120px' }}
+                alt=""
+                class="photo-box-img"
+                src={
+                  this.state.ImageUrl !== null && this.state.ImageUrl.length > 0
+                    ? this.state.ImageUrl
+                    : defaultImage
+                }
+                // src="https://s3-media0.fl.yelpcdn.com/assets/srv0/yelp_styleguide/bf5ff8a79310/assets/img/default_avatars/user_medium_square.png"
+              />
+            </a>
+          </div>
+          <br />
           <fieldset disabled={this.state.isFormDisable && 'disabled'}>
             <div class="js-password-meter-container">
               <ul>

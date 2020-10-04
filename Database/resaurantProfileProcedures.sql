@@ -81,7 +81,7 @@ begin
 declare exit handler for sqlexception rollback;
 start transaction;
 	SELECT Name,Country_ID,State_ID,City,Zip,Street,Phone_no,Country_Code,Opening_Time,Closing_Time
-    ,Email FROM RESTAURANT 
+    ,Email,ImageURL FROM RESTAURANT 
     JOIN SIGNUP ON (Restaurant_ID=SIGNUP.ID) 
     WHERE Restaurant_ID=userID;
     commit;
@@ -102,7 +102,7 @@ create procedure `updateRestaurantProfileQuery`
 in _City varchar(25),in _Zip INT,in _Street VARCHAR(50),
 _Phone_no BIGINT,in _Country_Code INT,in _Opening_Time VARCHAR(10),
 in _Closing_Time VARCHAR(10),in _Restaurant_ID INT, in CurbsidePickup BOOLEAN,
-in DineIn BOOLEAN,in YelpDelivery BOOLEAN)
+in DineIn BOOLEAN,in YelpDelivery BOOLEAN,IN _ImageUrl VARCHAR(500))
 begin
 
 declare exit handler for sqlexception rollback;
@@ -118,7 +118,8 @@ start transaction;
     Phone_no=_Phone_no,
     Country_Code=_Country_Code,
     Opening_Time=_Opening_Time,
-    Closing_Time=_Closing_Time
+    Closing_Time=_Closing_Time,
+    ImageURL=_ImageUrl
     where Restaurant_ID=_Restaurant_ID;
     
     DELETE FROM DELIVERY_TYPE_RESTAURANT_MAPPINGS where Restaurant_ID=_Restaurant_ID;
@@ -172,5 +173,6 @@ BEGIN
 declare exit handler for sqlexception rollback;
 start transaction;
 UPDATE RESTAURANT SET ImageURL=_ImagrUrl where Restaurant_ID=RestroID;
+commit;
 END$$
 DELIMITER ;

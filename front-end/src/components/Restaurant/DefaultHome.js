@@ -12,7 +12,7 @@ class DefaultHome extends Component {
   }
 
   uploadPicToDB = (event, ImageUrl) => {
-    event.preventDefault();
+    //event.preventDefault();
     const data = {
       ImageUrl,
     };
@@ -31,6 +31,7 @@ class DefaultHome extends Component {
   };
 
   onChangeFileHandler = (event) => {
+    axios.defaults.withCredentials = true;
     if (event.target.files.length === 1) {
       event.preventDefault();
       let formData = new FormData();
