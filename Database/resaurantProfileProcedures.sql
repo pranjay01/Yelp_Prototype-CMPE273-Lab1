@@ -9,7 +9,7 @@ CREATE PROCEDURE `resturantSignup`
 (100),IN _name varchar
 (50), IN _country INT, IN _state INT,IN _city varchar
 (25),IN _zip INT, IN _street varchar
-(50),IN _c_code INT,IN _phone bigint)
+(50),IN _c_code INT,IN _phone bigint,IN _latitude varchar(50),IN _longitude varchar(50))
 BEGIN
     declare _resturantId int;
 declare exit handler for sqlexception
@@ -24,8 +24,8 @@ set _resturantId
 FROM SIGNUP
 WHERE Email=_email and Role=2);
 INSERT INTO RESTAURANT
-    (Restaurant_ID,Name,Country_ID,State_ID,City,Zip,Street,Country_Code,Phone_no)
-VALUES(_resturantId, _name, _country, _state, _city, _zip, _street, _c_code, _phone);
+    (Restaurant_ID,Name,Country_ID,State_ID,City,Zip,Street,Country_Code,Phone_no,Latitude,Longitude)
+VALUES(_resturantId, _name, _country, _state, _city, _zip, _street, _c_code, _phone,_latitude,_longitude);
 commit;
 END  $$
 
@@ -143,7 +143,7 @@ start transaction;
 end $$
 
 delimiter ;
-
+getOrderDetailsNew
 
 -- Procedure to fetch review for the Restaurant
 drop procedure  if exists fetchReviews;

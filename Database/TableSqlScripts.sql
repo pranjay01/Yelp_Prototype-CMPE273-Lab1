@@ -72,7 +72,9 @@ Phone_no BIGINT NOT NULL UNIQUE CHECK (Phone_no BETWEEN 1000000000 and 999999999
 Country_Code INT NOT NULL,
 Opening_Time VARCHAR(10),
 Closing_Time VARCHAR(10),
-ImageURL VARCHAR(500)
+ImageURL VARCHAR(500),
+Latitude varchar(50),
+Longitude varchar(50)
 );
 
 

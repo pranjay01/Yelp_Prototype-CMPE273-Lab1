@@ -50,7 +50,8 @@ as DineIn, IFNULL((SELECT true FROM DELIVERY_TYPE_RESTAURANT_MAPPINGS WHERE
 DELIVERY_TYPE_RESTAURANT_MAPPINGS.Restaurant_ID=RESTAURANT.Restaurant_ID and Delivery_ID=3),false) 
 as YelpDelivery,RESTAURANT.ImageURL as ImageUrl,TIME_FORMAT(RESTAURANT.Opening_Time, "%h:%i %p") 
  as OpeningTime,TIME_FORMAT(RESTAURANT.Closing_Time, "%h:%i %p")  as ClosingTime, 
-count(REVIEWS.ID) as ReviewCounts, round(IFNULL(avg(REVIEWS.Rating),0)) as AvgRating
+count(REVIEWS.ID) as ReviewCounts, round(IFNULL(avg(REVIEWS.Rating),0)) as AvgRating,
+RESTAURANT.Latitude as lat, RESTAURANT.Longitude as lng
 FROM  RESTAURANT LEFT JOIN REVIEWS ON REVIEWS.Restaurant_ID=RESTAURANT.Restaurant_ID
 WHERE RESTAURANT.Restaurant_ID IN (
 SELECT Restaurant_ID FROM RESTAURANT where Name like  CONCAT('%', _searchedString , '%')
@@ -69,7 +70,8 @@ DELIVERY_TYPE_RESTAURANT_MAPPINGS.Restaurant_ID=RESTAURANT.Restaurant_ID and Del
 as YelpDelivery,RESTAURANT.ImageURL as ImageUrl,
 TIME_FORMAT(RESTAURANT.Opening_Time, "%h:%i %p") 
  as OpeningTime,TIME_FORMAT(RESTAURANT.Closing_Time, "%h:%i %p")  as ClosingTime, 
-count(REVIEWS.ID) as ReviewCounts, round(IFNULL(avg(REVIEWS.Rating),0)) as AvgRating
+count(REVIEWS.ID) as ReviewCounts, round(IFNULL(avg(REVIEWS.Rating),0)) as AvgRating,
+RESTAURANT.Latitude as lat, RESTAURANT.Longitude as lng
 FROM  RESTAURANT LEFT JOIN REVIEWS ON REVIEWS.Restaurant_ID=RESTAURANT.Restaurant_ID
 WHERE RESTAURANT.Restaurant_ID IN (
 SELECT Restaurant_ID FROM APPETIZER where Name like  CONCAT('%', _searchedString , '%') UNION
@@ -93,7 +95,8 @@ DELIVERY_TYPE_RESTAURANT_MAPPINGS.Restaurant_ID=RESTAURANT.Restaurant_ID and Del
 as YelpDelivery,RESTAURANT.ImageURL as ImageUrl,
 TIME_FORMAT(RESTAURANT.Opening_Time, "%h:%i %p") 
  as OpeningTime,TIME_FORMAT(RESTAURANT.Closing_Time, "%h:%i %p")  as ClosingTime,  
-count(REVIEWS.ID) as ReviewCounts, round(IFNULL(avg(REVIEWS.Rating),0)) as AvgRating
+count(REVIEWS.ID) as ReviewCounts, round(IFNULL(avg(REVIEWS.Rating),0)) as AvgRating,
+RESTAURANT.Latitude as lat, RESTAURANT.Longitude as lng
 FROM  RESTAURANT LEFT JOIN REVIEWS ON REVIEWS.Restaurant_ID=RESTAURANT.Restaurant_ID
 WHERE RESTAURANT.Restaurant_ID IN (
 SELECT Restaurant_ID FROM APPETIZER JOIN CUISINES ON CUISINES.ID=APPETIZER.Cuisine_ID 
@@ -122,7 +125,8 @@ DELIVERY_TYPE_RESTAURANT_MAPPINGS.Restaurant_ID=RESTAURANT.Restaurant_ID and Del
 as YelpDelivery,RESTAURANT.ImageURL as ImageUrl,
 TIME_FORMAT(RESTAURANT.Opening_Time, "%h:%i %p") 
  as OpeningTime,TIME_FORMAT(RESTAURANT.Closing_Time, "%h:%i %p")  as ClosingTime,  
-count(REVIEWS.ID) as ReviewCounts, round(IFNULL(avg(REVIEWS.Rating),0)) as AvgRating
+count(REVIEWS.ID) as ReviewCounts, round(IFNULL(avg(REVIEWS.Rating),0)) as AvgRating,
+RESTAURANT.Latitude as lat, RESTAURANT.Longitude as lng
 FROM  RESTAURANT LEFT JOIN REVIEWS ON REVIEWS.Restaurant_ID=RESTAURANT.Restaurant_ID
 WHERE RESTAURANT.Restaurant_ID IN (
 SELECT Restaurant_ID FROM RESTAURANT JOIN STATE ON STATE.ID=State_ID where concat(STATE.NAME,City,Zip,Street) 

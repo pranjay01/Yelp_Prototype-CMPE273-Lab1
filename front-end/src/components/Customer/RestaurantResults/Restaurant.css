@@ -250,3 +250,37 @@ a:visited .photo-box-img__09f24__3F3c5 {
   border-bottom-left-radius: 16px;
   margin-left: 4px;
 }
+
+/* @media only screen and (max-width: 1321px) and (min-width: 1074px)  */
+.rightRailContainer__09f24__3VshM {
+  flex: 0.55242 0 295px;
+}
+
+.rightRailInnerContainer__09f24__1eXhz {
+  height: 100%;
+}
+
+.stickyContainer__09f24__1IR-t {
+  position: -webkit-sticky;
+  position: sticky;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  transition: top 0.4s ease, margin-top 0.4s ease, height 0.4s ease;
+}
+
+.container__09f24__11Ola {
+  flex: 1 1 auto;
+  display: flex;
+}
+
+element.style {
+  background-color: rgb(229, 227, 223);
+  position: relative;
+  overflow: hidden;
+}
+.engine__09f24__3vSXb {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}

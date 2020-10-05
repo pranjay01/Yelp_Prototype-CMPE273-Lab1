@@ -6,10 +6,15 @@ const AWS = require('aws-sdk');
 const multer = require('multer');
 const multerS3 = require('multer-s3');
 const url = require('url');
+const geocoder = require('google-geocoder');
 // const { request } = require('http');
 const { getUserIdFromToken } = require('../common/loginLogout');
 
 const mysqlConnection = require('../mysqlConnection');
+
+const geo = geocoder({
+  key: 'AIzaSyBpI0r49yQH5FrrK6tsDHrbkYoBp8bWSXE',
+});
 
 const { BUCKET_NAME } = process.env;
 const s3Storage = new AWS.S3({
@@ -140,44 +145,58 @@ const signup = async (restaurant, response) => {
   } = restaurant;
   if (await checkEmailExists(Email)) {
     try {
-      const hashedPassword = await bcrypt.hash(Password, 10);
-      console.log(hashedPassword);
-      const signupQuery = 'CALL resturantSignup(?,?,?,?,?,?,?,?,?,?)';
+      let Location = Street.concat(', ');
+      Location = Location.concat(Zip);
+      geo.find(Location, async function (err, res) {
+        console.log(res[0].location.lat);
+        console.log(res[0].location.lng);
+        const latitude = res[0].location.lat;
+        const longitude = res[0].location.lng;
 
-      const connection = await mysqlConnection();
-      const [results] = await connection.query(signupQuery, [
-        Email,
-        hashedPassword,
-        Name,
-        Number(Country_ID),
-        Number(State_ID),
-        City,
-        Number(Zip),
-        Street,
-        Number(Country_Code),
-        Number(Phone_no),
-      ]);
-      connection.end();
-      console.log(results);
-      response.writeHead(201, {
-        'Content-Type': 'text/plain',
+        //   }
+        // );
+        const hashedPassword = await bcrypt.hash(Password, 10);
+        console.log(hashedPassword);
+        const signupQuery = 'CALL resturantSignup(?,?,?,?,?,?,?,?,?,?,?,?)';
+
+        const connection = await mysqlConnection();
+        const [results] = await connection.query(signupQuery, [
+          Email,
+          hashedPassword,
+          Name,
+          Number(Country_ID),
+          Number(State_ID),
+          City,
+          Number(Zip),
+          Street,
+          Number(Country_Code),
+          Number(Phone_no),
+          latitude,
+          longitude,
+        ]);
+        connection.end();
+        console.log(results);
+        response.writeHead(201, {
+          'Content-Type': 'text/plain',
+        });
+        response.end('User Created');
+        // return response;
       });
-      response.end('User Created');
-      return response;
     } catch (error) {
       response.writeHead(500, {
         'Content-Type': 'text/plain',
       });
       response.end('Network error');
-      return response;
+      // return response;
     }
   } else {
     response.writeHead(409, {
       'Content-Type': 'text/plain',
     });
     response.end('Email Already Exists');
-    return response;
+    // return response;
   }
+  return response;
 };
 
 const getBasicInfo = async (request, response) => {

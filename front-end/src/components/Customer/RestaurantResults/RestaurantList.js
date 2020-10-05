@@ -6,13 +6,16 @@ import axios from 'axios';
 import serverUrl from '../../../config';
 import { updateRestaurantArray } from '../../../constants/action-types';
 import { history } from '../../../App';
-
+// import { Map, GoogleApiWrapper } from 'google-maps-react';
 import { connect } from 'react-redux';
+import MapContainer from './MapContainer';
 
 class RestaurantList extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      markers: [],
+      //locations=[['Mac Donalds','37.323250','-121.913260'],['Applebee Grill + Bar','37.302750','-121.863210'],['Bibos Ny Pizza','37.306690','-121.890690'],],
       BackupRestaurantsList: [],
       filterMode: 'Both',
     };
@@ -31,7 +34,15 @@ class RestaurantList extends Component {
       })
       .then((response) => {
         console.log(response.data);
+        let markers = response.data[0].map((restaurant) => {
+          //markers.concat({ lat: restaurant.lat, lng: restaurant.lng });
+          return {
+            title: restaurant.Name,
+            position: { lat: restaurant.lat, lng: restaurant.lng },
+          };
+        });
         let allRestaurants = response.data[0].map((restaurant) => {
+          //markers.concat({ lat: restaurant.lat, lng: restaurant.lng });
           return {
             ID: restaurant.ID,
             Name: restaurant.Name,
@@ -47,10 +58,38 @@ class RestaurantList extends Component {
         });
 
         this.setState({
+          markers,
           BackupRestaurantsList: allRestaurants,
         });
         const payload = { restaurantSearchResults: allRestaurants };
         this.props.updateRestaurantArray(payload);
+
+        // let locations = [
+        //   ['Los Angeles', 34.052235, -118.243683],
+        //   ['Santa Monica', 34.024212, -118.496475],
+        //   ['Redondo Beach', 33.849182, -118.388405],
+        //   ['Newport Beach', 33.628342, -117.927933],
+        //   ['Long Beach', 33.77005, -118.193739],
+        // ];
+        // let infowindow = new google.maps.InfoWindow({});
+        // let marker, count;
+        // for (count = 0; count < locations.length; count++) {
+        //   marker = new google.maps.Marker({
+        //     position: new google.maps.LatLng(locations[count][1], locations[count][2]),
+        //     map: map,
+        //     title: locations[count][0],
+        //   });
+        //   google.maps.event.addListener(
+        //     marker,
+        //     'click',
+        //     (function (marker, count) {
+        //       return function () {
+        //         infowindow.setContent(locations[count][0]);
+        //         infowindow.open(map, marker);
+        //       };
+        //     })(marker, count)
+        //   );
+        // }
       });
 
     this.setState({
@@ -201,7 +240,20 @@ class RestaurantList extends Component {
             </div>
 
             {/**Google Maps */}
-            <div className="lemon--div__09f24__1mboc rightRailContainer__09f24__3VshM border-color--default__09f24__R1nRO"></div>
+            <div className="lemon--div__09f24__1mboc rightRailContainer__09f24__3VshM border-color--default__09f24__R1nRO">
+              <div className="lemon--div__09f24__1mboc rightRailInnerContainer__09f24__1eXhz border-color--default__09f24__R1nRO">
+                <div
+                  style={{ top: '133px', height: 'calc(100vh - 133px)', marginTop: '36px' }}
+                  className="lemon--div__09f24__1mboc stickyContainer__09f24__1IR-t border-color--default__09f24__R1nRO"
+                >
+                  <div className="lemon--div__09f24__1mboc container__09f24__11Ola border-color--default__09f24__R1nRO">
+                    <div className="lemon--div__09f24__1mboc outer__09f24__2nI2R border-color--default__09f24__R1nRO">
+                      <MapContainer markers={this.state.markers}></MapContainer>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
