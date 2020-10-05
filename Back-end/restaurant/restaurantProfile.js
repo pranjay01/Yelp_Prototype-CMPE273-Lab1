@@ -42,6 +42,7 @@ const getOrderList = async (_order, _appetizers, _desserts, _beverages, _salads,
     console.log('item: ', item);
     const itemInformation = item.split(':');
     if (itemInformation[1] === '1') {
+      console.log('_appetizers:', _appetizers);
       const index = _appetizers.findIndex((x) => x.ID === Number(itemInformation[0]));
       console.log('Index: ', index, '_appetizers[index] ', _appetizers[index]);
       const tmpObj = {
@@ -52,6 +53,7 @@ const getOrderList = async (_order, _appetizers, _desserts, _beverages, _salads,
       };
       results.push(tmpObj);
     } else if (itemInformation[1] === '2') {
+      console.log('_salads:', _salads);
       const index = _salads.findIndex((x) => x.ID === Number(itemInformation[0]));
       console.log('Index: ', index, '_salads[index] ', _salads[index]);
       const tmpObj = {
@@ -62,6 +64,7 @@ const getOrderList = async (_order, _appetizers, _desserts, _beverages, _salads,
       };
       results.push(tmpObj);
     } else if (itemInformation[1] === '3') {
+      console.log('_desserts:', _desserts);
       const index = _desserts.findIndex((x) => x.ID === Number(itemInformation[0]));
       console.log('Index: ', index, '_desserts[index] ', _desserts[index]);
       const tmpObj = {
@@ -72,6 +75,7 @@ const getOrderList = async (_order, _appetizers, _desserts, _beverages, _salads,
       };
       results.push(tmpObj);
     } else if (itemInformation[1] === '4') {
+      console.log('_beverages:', _beverages);
       const index = _beverages.findIndex((x) => x.ID === Number(itemInformation[0]));
       console.log('Index: ', index, '_beverages[index] ', _beverages[index]);
       const tmpObj = {
@@ -82,6 +86,7 @@ const getOrderList = async (_order, _appetizers, _desserts, _beverages, _salads,
       };
       results.push(tmpObj);
     } else if (itemInformation[1] === '5') {
+      console.log('_mainCourse:', _mainCourse);
       const index = _mainCourse.findIndex((x) => x.ID === Number(itemInformation[0]));
       console.log('Index: ', index, '_mainCourse[index] ', _mainCourse[index]);
       const tmpObj = {
