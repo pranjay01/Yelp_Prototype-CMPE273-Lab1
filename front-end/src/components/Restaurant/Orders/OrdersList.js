@@ -16,6 +16,7 @@ class ordersList extends Component {
       popSeen: false,
       ORDERS: [],
       orderDetails: [],
+      OrdersOrignalCopy: [],
       customerProfile: {
         Name: '',
         NickName: '',
@@ -32,7 +33,61 @@ class ordersList extends Component {
     };
   }
 
-  fetchOrders(sortValue) {
+  fetchOrders(event, sortValue) {
+    let newOrdersList = [];
+    event.preventDefault();
+    if (sortValue === 'New') {
+      newOrdersList = this.state.OrdersOrignalCopy.filter(
+        (order) => Number(order.DeliverStatusID) < 5
+      );
+    } else if (sortValue === 'Delivered') {
+      newOrdersList = this.state.OrdersOrignalCopy.filter(
+        (order) => Number(order.DeliverStatusID) === 5 || Number(order.DeliverStatusID) === 6
+      );
+    } else if (sortValue === 'Canceled') {
+      newOrdersList = this.state.OrdersOrignalCopy.filter(
+        (order) => Number(order.DeliverStatusID) === 7
+      );
+    } else {
+      newOrdersList = this.state.OrdersOrignalCopy;
+    }
+    this.setState({
+      ORDERS: newOrdersList,
+    });
+    localStorage.setItem('orderSortBy', sortValue);
+    // axios
+    //   .get(
+    //     serverUrl + 'biz/getOrderDetailsNew',
+
+    //     { params: { sortValue }, withCredentials: true }
+    //   )
+    //   .then((response) => {
+    //     console.log(response.data);
+    //     let allOrders = response.data[0].map((order) => {
+    //       return {
+    //         ID: order.ID,
+    //         CustomerId: order.CustomerID,
+    //         CustomerName: order.CustomerName,
+    //         OrderedTime: order.OrderedTime,
+    //         OrderType: order.Order_Type,
+    //         DeliverStatusID: order.DeliverStatusID,
+    //         DeliverStatusValue: order.DeliverStatusValue,
+    //         Bill: order.Bill,
+    //         tmpStatus: order.DeliverStatusID,
+    //         ImageUrl: order.ImageUrl,
+    //       };
+    //     });
+
+    //     this.setState({
+    //       ORDERS: this.state.ORDERS.concat(allOrders),
+    //       orderSortBy: sortValue,
+    //     });
+    //   });
+  }
+
+  componentDidMount() {
+    //this.fetchOrders(localStorage.getItem('orderSortBy'));
+    const sortValue = 'All';
     axios
       .get(
         serverUrl + 'biz/getOrderDetailsNew',
@@ -57,15 +112,12 @@ class ordersList extends Component {
         });
 
         this.setState({
-          ORDERS: this.state.ORDERS.concat(allOrders),
+          OrdersOrignalCopy: allOrders,
+          ORDERS: allOrders,
           orderSortBy: sortValue,
         });
       });
     localStorage.setItem('orderSortBy', sortValue);
-  }
-
-  componentDidMount() {
-    this.fetchOrders(localStorage.getItem('orderSortBy'));
   }
 
   onStatusChangeHandler = (value, orderID) => {
@@ -194,22 +246,22 @@ class ordersList extends Component {
             </div>
             <ul class="nav navbar-nav">
               <li className={localStorage.getItem('orderSortBy') === 'All' && 'active'}>
-                <Link to="/#" onClick={() => this.fetchOrders('All')}>
+                <Link to="/#" onClick={(event) => this.fetchOrders(event, 'All')}>
                   All Orders
                 </Link>
               </li>
               <li className={localStorage.getItem('orderSortBy') === 'New' && 'active'}>
-                <Link to="/#" onClick={() => this.fetchOrders('New')}>
+                <Link to="/#" onClick={(event) => this.fetchOrders(event, 'New')}>
                   New Orders
                 </Link>
               </li>
               <li className={localStorage.getItem('orderSortBy') === 'Delivered' && 'active'}>
-                <Link to="/#" onClick={() => this.fetchOrders('Delivered')}>
+                <Link to="/#" onClick={(event) => this.fetchOrders(event, 'Delivered')}>
                   Delevered Orders
                 </Link>
               </li>
               <li className={localStorage.getItem('orderSortBy') === 'Canceled' && 'active'}>
-                <Link to="/#" onClick={() => this.fetchOrders('Canceled')}>
+                <Link to="/#" onClick={(event) => this.fetchOrders(event, 'Canceled')}>
                   Canceled Orders
                 </Link>
               </li>

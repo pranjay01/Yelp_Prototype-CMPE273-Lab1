@@ -72,12 +72,11 @@ SELECT * FROM APPETIZER WHERE Restaurant_ID=RestroId;
 
 SELECT * FROM BEVERAGES WHERE Restaurant_ID=RestroId;
 
+SELECT * FROM SALADS WHERE Restaurant_ID=RestroId;
+
 SELECT * FROM DESSERTS WHERE Restaurant_ID=RestroId;
 
 SELECT * FROM MAIN_COURSE WHERE Restaurant_ID=RestroId;
-
-SELECT * FROM SALADS WHERE Restaurant_ID=RestroId;
-
 
 
 commit;
