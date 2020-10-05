@@ -14,6 +14,7 @@ class RestaurantList extends Component {
     super(props);
     this.state = {
       BackupRestaurantsList: [],
+      filterMode: 'Both',
     };
   }
   // localStorage.setItem('SearchedString', '');
@@ -74,6 +75,7 @@ class RestaurantList extends Component {
       const payload = { restaurantSearchResults: filterResult };
       this.props.updateRestaurantArray(payload);
     }
+    this.setState({ filterMode });
     return this.props.searchTabInfo.SearchStrings.filter((string) =>
       string.toLowerCase().includes(this.props.searchTabInfo.serchedString.toLowerCase())
     );
@@ -112,11 +114,16 @@ class RestaurantList extends Component {
                             aria-disabled="false"
                             aria-pressed="false"
                             type="button"
-                            style={{ cursor: 'pointer' }}
+                            style={{
+                              cursor: 'pointer',
+                              background: `${
+                                this.state.filterMode === 'Both' ? '#00000040' : 'white'
+                              }`,
+                            }}
                           >
                             <span class="lemon--span__09f24__3997G text-wrapper__09f24__3oqzN display--inline__09f24__3iACj border-color--default__09f24__R1nRO">
                               <span class="lemon--span__09f24__3997G text__09f24__2tZKC text-color--normal__09f24__3oebo text-align--left__09f24__3Drs0 text-weight--semibold__09f24__MTlNc text-size--small__09f24__1Z_UI">
-                                Both
+                                All
                               </span>
                             </span>
                           </button>
@@ -125,7 +132,12 @@ class RestaurantList extends Component {
                               onClick={() => {
                                 this.filterDeliverMode('CurbsidePickup');
                               }}
-                              style={{ cursor: 'pointer' }}
+                              style={{
+                                cursor: 'pointer',
+                                background: `${
+                                  this.state.filterMode === 'CurbsidePickup' ? '#00000040' : 'white'
+                                }`,
+                              }}
                               class="filterToggle__09f24__40Unn leftRounded__09f24__2FatH rightRounded__09f24__2jT2w"
                               aria-disabled="false"
                               aria-pressed="false"
@@ -143,6 +155,12 @@ class RestaurantList extends Component {
                             class="lemon--div__09f24__1mboc tooltipContainer__09f24__1eDCf display--inline-block__09f24__FsgS4 border-color--default__09f24__R1nRO"
                           >
                             <button
+                              style={{
+                                cursor: 'pointer',
+                                background: `${
+                                  this.state.filterMode === 'yelpDelivery' ? '#00000040' : 'white'
+                                }`,
+                              }}
                               onClick={() => {
                                 this.filterDeliverMode('yelpDelivery');
                               }}

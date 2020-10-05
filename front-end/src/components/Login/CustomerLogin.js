@@ -9,7 +9,6 @@ import './Login.css';
 import { updateLoginSuccess } from '../../constants/action-types';
 import { connect } from 'react-redux';
 import { updateSnackbarData } from '..//../constants/action-types';
-import SnackBar from '../CommonComponents/SnackBar';
 
 //Define a Login Component
 class CustomerLogin extends Component {

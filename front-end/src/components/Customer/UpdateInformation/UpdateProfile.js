@@ -8,7 +8,6 @@ import axios from 'axios';
 import serverUrl from '../../../config';
 import { updateSnackbarData } from '../../../constants/action-types';
 import { connect } from 'react-redux';
-import SnackBar from '../../CommonComponents/SnackBar';
 import Moment from 'moment';
 
 class UpdateProfile extends Component {

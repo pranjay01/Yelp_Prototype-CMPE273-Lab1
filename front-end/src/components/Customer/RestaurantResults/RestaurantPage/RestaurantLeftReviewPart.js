@@ -99,7 +99,7 @@ class RestaurantLeftReviewPart extends Component {
         if (response.status === 200) {
           console.log(response.data);
           this.setState({
-            showFoodMenu: !this.state.showFoodMenu,
+            showReview: false,
             //RegisteredCustomerList: [],
           });
           let payload = {
@@ -234,17 +234,8 @@ class RestaurantLeftReviewPart extends Component {
               >
                 <div class="lemon--div__373c0__1mboc button-content__373c0__1QNtB border-color--default__373c0__3-ifU">
                   <span class="lemon--span__373c0__3997G text__373c0__2Kxyz button-content-text__373c0__Z-7FO text-color--inherit__373c0__1lczC text-align--center__373c0__3VrfZ text-weight--semibold__373c0__2l0fe text-size--large__373c0__3t60B text--truncated__373c0__3sLaf">
-                    <span aria-hidden="true" class="icon--18-star css-15osoi8">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="18"
-                        height="18"
-                        class="icon_svg"
-                      >
-                        <path d="M8.941 1l2.372 5.387 5.187.758-3.75 3.669.928 5.078-4.737-2.907L4.365 16l.885-5.186L1.5 7.145l5.186-.758L8.941 1z"></path>
-                      </svg>
-                    </span>{' '}
-                    Write a Review
+                    <span aria-hidden="true" class="icon--18-star css-15osoi8"></span> Write a
+                    Review
                   </span>
                 </div>
               </a>
