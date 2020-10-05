@@ -43,7 +43,7 @@ const getOrderList = async (_order, _appetizers, _desserts, _beverages, _salads,
     const itemInformation = item.split(':');
     if (itemInformation[1] === '1') {
       const index = _appetizers.findIndex((x) => x.ID === Number(itemInformation[0]));
-      console.log('_appetizers[index] ', _appetizers[index]);
+      console.log('Index: ', index, '_appetizers[index] ', _appetizers[index]);
       const tmpObj = {
         Name: _appetizers[index].Name,
         Count: Number(itemInformation[2]),
@@ -53,7 +53,7 @@ const getOrderList = async (_order, _appetizers, _desserts, _beverages, _salads,
       results.push(tmpObj);
     } else if (itemInformation[1] === '2') {
       const index = _salads.findIndex((x) => x.ID === Number(itemInformation[0]));
-      console.log('_salads[index] ', _salads[index]);
+      console.log('Index: ', index, '_salads[index] ', _salads[index]);
       const tmpObj = {
         Name: _salads[index].Name,
         Count: Number(itemInformation[2]),
@@ -63,7 +63,7 @@ const getOrderList = async (_order, _appetizers, _desserts, _beverages, _salads,
       results.push(tmpObj);
     } else if (itemInformation[1] === '3') {
       const index = _desserts.findIndex((x) => x.ID === Number(itemInformation[0]));
-      console.log('_desserts[index] ', _desserts[index]);
+      console.log('Index: ', index, '_desserts[index] ', _desserts[index]);
       const tmpObj = {
         Name: _desserts[index].Name,
         Count: Number(itemInformation[2]),
@@ -73,7 +73,7 @@ const getOrderList = async (_order, _appetizers, _desserts, _beverages, _salads,
       results.push(tmpObj);
     } else if (itemInformation[1] === '4') {
       const index = _beverages.findIndex((x) => x.ID === Number(itemInformation[0]));
-      console.log('_beverages[index] ', _beverages[index]);
+      console.log('Index: ', index, '_beverages[index] ', _beverages[index]);
       const tmpObj = {
         Name: _beverages[index].Name,
         Count: Number(itemInformation[2]),
@@ -83,7 +83,7 @@ const getOrderList = async (_order, _appetizers, _desserts, _beverages, _salads,
       results.push(tmpObj);
     } else if (itemInformation[1] === '5') {
       const index = _mainCourse.findIndex((x) => x.ID === Number(itemInformation[0]));
-      console.log('_mainCourse[index] ', _mainCourse[index]);
+      console.log('Index: ', index, '_mainCourse[index] ', _mainCourse[index]);
       const tmpObj = {
         Name: _mainCourse[index].Name,
         Count: Number(itemInformation[2]),
