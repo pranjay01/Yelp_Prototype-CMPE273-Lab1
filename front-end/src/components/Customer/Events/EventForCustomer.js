@@ -9,7 +9,7 @@ class EventForCustomer extends Component {
   }
   // Call On render
   componentDidMount() {
-    console.log('inside Signup');
+    // console.log('inside Signup');
     axios.get(serverUrl + 'static/getDeliverStatus').then((response) => {
       console.log(response.data);
       let allStatuses = response.data[0].map((status) => {
@@ -46,7 +46,7 @@ class EventForCustomer extends Component {
                   <span class="lemon--span__373c0__3997G text__373c0__2Kxyz text-color--mid__373c0__jCeOG text-align--left__373c0__2XGa-">
                     <span style={{ marginRight: '20px' }}>{this.props.event.Name}</span>
                     <span>
-                      <b>{this.props.event.hashtags}</b>
+                      <b id="Hashtags">{this.props.event.hashtags}</b>
                     </span>
 
                     {/* 8/22/2020*/}
@@ -73,7 +73,11 @@ class EventForCustomer extends Component {
                 style={{ marginLeft: '10px', marginRight: '100px' }}
                 class="lemon--p__373c0__3Qnnj text__373c0__2Kxyz comment__373c0__3EKjH text-color--normal__373c0__3xep9 text-align--left__373c0__2XGa-"
               >
-                <span class="lemon--span__373c0__3997G raw__373c0__3rKqk" lang="en">
+                <span
+                  id="Description"
+                  class="lemon--span__373c0__3997G raw__373c0__3rKqk"
+                  lang="en"
+                >
                   {this.props.event.Description}
                 </span>
               </p>
@@ -99,7 +103,7 @@ class EventForCustomer extends Component {
                     )}
                   </span>
                   <span class="lemon--span__373c0__3997G text__373c0__2Kxyz text-color--mid__373c0__jCeOG text-align--left__373c0__2XGa-">
-                    <b>{this.props.event.Address}</b>
+                    <b id="Address">{this.props.event.Address}</b>
                   </span>
                 </div>
               </div>
