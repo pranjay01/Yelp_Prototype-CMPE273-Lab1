@@ -172,8 +172,8 @@ class CustomerLogin extends Component {
         if (response.status === 200) {
           localStorage.setItem('token', cookie.load('cookie'));
           localStorage.setItem('userrole', cookie.load('userrole'));
-          // console.log('cookie: ', cookie.load('cookie'));
-          // console.log('role: ', cookie.load('userrole'));
+          console.log('cookie: ', cookie.load('cookie'));
+          console.log('role: ', cookie.load('userrole'));
           let payload = {
             userEmail: this.state.username,
             role: cookie.load('userrole'),
