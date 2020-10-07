@@ -165,6 +165,7 @@ class ordersList extends Component {
 
   updateStatus = (orderID) => {
     const index = this.state.ORDERS.findIndex((x) => x.ID === orderID);
+    const index2 = this.state.OrdersOrignalCopy.findIndex((x) => x.ID === orderID);
     let foodItem = { ...this.state.ORDERS[index] };
     const newStatus = foodItem.tmpStatus;
     let data = {
@@ -181,12 +182,16 @@ class ordersList extends Component {
           foodItem = { ...foodItem, DeliverStatusID: foodItem.tmpStatus };
           let ORDERS = [...this.state.ORDERS];
           ORDERS.splice(index, 1);
+          let OrdersOrignalCopy = [...this.state.OrdersOrignalCopy];
+          OrdersOrignalCopy.splice(index2, 1);
           // ORDERS.push(foodItem);
+          OrdersOrignalCopy.splice(index2, 0, foodItem);
           if (Number(foodItem.tmpStatus) < 5) {
             ORDERS.splice(index, 0, foodItem);
           }
           this.setState({
             ORDERS,
+            OrdersOrignalCopy,
           });
           // newFoodId = { ...newFoodId, ...this.state.newFood };
         }
