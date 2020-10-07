@@ -18,34 +18,35 @@ const port = process.env.MYSQL_PORT;
 // const db = process.env.MYSQL_DB_RDS;
 // const port = process.env.MYSQL_PORT_RDS;
 
-// var mysqlConnection = async () => {
+// const mysqlConnection = async () => {
 //   return mysql.createConnection({
-//     host: "localhost",
-//     user: "root",
-//     password: "Pranjay@01",
-//     database: "Yelp_Prototype",
+//     host,
+//     user,
+//     password,
+//     database: db,
 //     multipleStatements: true,
-//     port: 3307,
+//     port,
 //   });
 // };
 
+const pool = mysql.createPool({
+  connectionLimit: 50,
+  host,
+  user,
+  password,
+  database: db,
+  multipleStatements: true,
+  port,
+});
+
 const mysqlConnection = async () => {
-  return mysql.createConnection({
-    host,
-    user,
-    password,
-    database: db,
-    multipleStatements: true,
-    port,
-  });
+  return pool.getConnection();
 };
 
-// mysqlConnection.connect((err) => {
-//   if (!err) {
-//     console.log("Connected", err);
-//   } else {
-//     console.log("Connection Failed", err);
-//   }
-// });
+// const mysqlConnection = function (callback) {
+//   pool.getConnection(function (err, connection) {
+//     callback(err, connection);
+//   });
+// };
 
 module.exports = mysqlConnection;
