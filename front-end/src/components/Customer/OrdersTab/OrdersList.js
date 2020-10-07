@@ -226,7 +226,7 @@ class OrdersList extends Component {
   render() {
     let redirectVar = null;
     if (!cookie.load('cookie')) {
-      console.log('cookie not found');
+      // console.log('cookie not found');
       redirectVar = <Redirect to="/customerLogin" />;
     } else {
       if (cookie.load('userrole') === 'Customer') {
@@ -292,92 +292,9 @@ class OrdersList extends Component {
                             Pickup Type
                           </Link>
                         </li>
-                        {/*(this.state.filter1 === 'Pickup' || this.state.filter1 === 'Delivery') && (
-                          <li className={this.state.filter1 === 'Delivered' && 'active'}>
-                            <Link to="/#" onClick={() => this.fetchOrders('Delivered')}>
-                              Recieved
-                            </Link>
-                          </li>
-                        )*/}
-                        {/*(this.state.filter1 === 'Pickup' || this.state.filter1 === 'Delivery') && (
-                          <li
-                            className={
-                              localStorage.getItem('orderSortBy') === 'Delivered' && 'active'
-                            }
-                          >
-                            <Link to="/#" onClick={() => this.fetchOrders('Delivered')}>
-                              Preparing
-                            </Link>
-                          </li>
-                        )}
-                        {this.state.filter1 === 'Delivery' && (
-                          <li
-                            className={
-                              localStorage.getItem('orderSortBy') === 'Delivered' && 'active'
-                            }
-                          >
-                            <Link to="/#" onClick={() => this.fetchOrders('Delivered')}>
-                              On The Way
-                            </Link>
-                          </li>
-                        )}
-                        {this.state.filter1 === 'Delivery' && (
-                          <li
-                            className={
-                              localStorage.getItem('orderSortBy') === 'Delivered' && 'active'
-                            }
-                          >
-                            <Link to="/#" onClick={() => this.fetchOrders('Delivered')}>
-                              Delivered
-                            </Link>
-                          </li>
-                        )}
-                        {this.state.filter1 === 'Pickup' && (
-                          <li
-                            className={
-                              localStorage.getItem('orderSortBy') === 'Delivered' && 'active'
-                            }
-                          >
-                            <Link to="/#" onClick={() => this.fetchOrders('Delivered')}>
-                              Pickup Ready
-                            </Link>
-                          </li>
-                        )}
-                        {this.state.filter1 === 'Pickup' && (
-                          <li
-                            className={
-                              localStorage.getItem('orderSortBy') === 'Delivered' && 'active'
-                            }
-                          >
-                            <Link to="/#" onClick={() => this.fetchOrders('Delivered')}>
-                              Pickedup
-                            </Link>
-                          </li>
-                        )*/}
                       </ul>
 
                       <ul class="nav navbar-nav">
-                        {/*<li className={this.state.filter1 === 'All' && 'active'}>
-                          <Link to="/#" onClick={(event) => this.fetchOrdersFilter1(event, 'All')}>
-                            All Orders
-                          </Link>
-                        </li>
-                        <li className={this.state.filter1 === 'Delivery' && 'active'}>
-                          <Link
-                            to="/#"
-                            onClick={(event) => this.fetchOrdersFilter1(event, 'Delivery')}
-                          >
-                            Delivery Type
-                          </Link>
-                        </li>
-                        <li className={this.state.filter1 === 'Pickup' && 'active'}>
-                          <Link
-                            to="/#"
-                            onClick={(event) => this.fetchOrdersFilter1(event, 'Pickup')}
-                          >
-                            Pickup Type
-                          </Link>
-                    </li>*/}
                         {(this.state.filter1 === 'Pickup' || this.state.filter1 === 'Delivery') && (
                           <li className={this.state.filter2 === 'Recieved' && 'active'}>
                             <Link
