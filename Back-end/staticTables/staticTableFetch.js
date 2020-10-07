@@ -106,7 +106,7 @@ const fetchRestaurantResults = async (req, res) => {
       filter,
       searchString,
     ]);
-    connection.release();
+    connection.end();
     // console.log(results);
 
     res.writeHead(200, {

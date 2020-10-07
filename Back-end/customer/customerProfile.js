@@ -210,7 +210,7 @@ const updateProfile = async (request, response) => {
         Website,
         ImageUrl,
       ]);
-      connection.release();
+      connection.end();
       console.log(results);
       response.writeHead(204, {
         'Content-Type': 'text/plain',
