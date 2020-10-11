@@ -40,11 +40,7 @@ it('Cout of ul components in Order List', () => {
     OrderedTime: '',
     OrderType: 'DElivery',
   };
-  const wrapper = shallow(
-    //<Provider store={store}>
-    <OrdersList ORDERS={ORDERS} />
-    //</Provider>
-  );
+  const wrapper = shallow(<OrdersList ORDERS={ORDERS} />);
   expect(wrapper.find('ul')).to.have.lengthOf(3);
 });
 

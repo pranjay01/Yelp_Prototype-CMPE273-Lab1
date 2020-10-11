@@ -17,8 +17,8 @@ app.use(
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
-    duration: 60 * 60,
-    activeDuration: 5 * 60,
+    duration: 60 * 60 * 1000,
+    activeDuration: 5 * 60 * 1000,
   })
 );
 

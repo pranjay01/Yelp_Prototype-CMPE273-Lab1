@@ -937,7 +937,7 @@ class FoodMenu extends Component {
             CuisineID: response.data[0][0].Cuisine_ID,
             Description: response.data[0][0].Description,
             Price: response.data[0][0].Price,
-            ImageUrl: response.data[0][0].ImageUrl,
+            ImageUrl: response.data[0][0].ImageURL,
           };
 
           // newFoodId = { ...newFoodId, ...this.state.newFood };

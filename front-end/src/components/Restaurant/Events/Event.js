@@ -45,7 +45,7 @@ class Event extends Component {
                     <span>
                       {' '}
                       {/*this.props.event.EventDate.toLocaleDateString()*/}
-                      {new Intl.DateTimeFormat('en-GB', {
+                      {new Intl.DateTimeFormat('en-US', {
                         year: 'numeric',
                         month: 'long',
                         day: '2-digit',

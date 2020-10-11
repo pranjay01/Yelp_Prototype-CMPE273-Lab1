@@ -83,6 +83,7 @@ class RestaurantLeftReviewPart extends Component {
     });
   };
   submitReview = (event, review, rating) => {
+    event.preventDefault();
     const data = {
       RestroId: localStorage.getItem('restaurantPageID'),
       review,

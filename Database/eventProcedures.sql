@@ -34,7 +34,7 @@ declare exit handler for sqlexception
 rollback;
 start transaction;
  IF _filter='upcoming' THEN
-	select EVENTS.ID as ID, EVENTS.Name as Name, Description, Date as EventDate, 
+	select EVENTS.ID as ID, EVENTS.Name as Name, Description, date_add(Date,interval 1 day) as EventDate, 
 	StartTime as EventStartTime, EndTime as EventEndTime, Hashtags as hashtags,
 	concat(STATE.Name,' ', City, ', ',Street, ' - ',Zip ) as Address
 	FROM EVENTS
@@ -92,7 +92,7 @@ declare exit handler for sqlexception
 rollback;
 start transaction;
  IF _filter='upcoming' THEN
-	select EVENTS.ID as ID, EVENTS.Name as Name, Description, Date as EventDate, 
+	select EVENTS.ID as ID, EVENTS.Name as Name, Description, date_add(Date,interval 1 day) as EventDate, 
 	TIME_FORMAT(StartTime, "%h:%i %p") as EventStartTime, TIME_FORMAT(EndTime, "%h:%i %p") as EventEndTime, Hashtags as hashtags,
 	concat(STATE.Name,' ', City, ', ',Street, ' - ',Zip ) as Address
 	FROM EVENTS
@@ -101,7 +101,7 @@ start transaction;
 	ORDER BY Date;
 
 ELSEIF _filter='registered' THEN
-	select EVENTS.ID as ID, EVENTS.Name as Name, Description, Date as EventDate, 
+	select EVENTS.ID as ID, EVENTS.Name as Name, Description, date_add(Date,interval 1 day) as EventDate, 
 	StartTime as EventStartTime, EndTime as EventEndTime, Hashtags as hashtags,
 	concat(STATE.Name,' ', City, ', ',Street, ' - ',Zip ) as Address
 	FROM EVENTS 
@@ -111,7 +111,7 @@ ELSEIF _filter='registered' THEN
 	ORDER BY Date;
 
 ELSE 
-	select EVENTS.ID as ID, EVENTS.Name as Name, Description, Date as EventDate, 
+	select EVENTS.ID as ID, EVENTS.Name as Name, Description, date_add(Date,interval 1 day) as EventDate, 
 	StartTime as EventStartTime, EndTime as EventEndTime, Hashtags as hashtags,
 	concat(STATE.Name,' ', City, ', ',Street, ' - ',Zip ) as Address
 	FROM EVENTS 

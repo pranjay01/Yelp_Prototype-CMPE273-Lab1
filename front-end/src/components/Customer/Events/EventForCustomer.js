@@ -55,11 +55,15 @@ class EventForCustomer extends Component {
                     <span>
                       {' '}
                       {/*this.props.event.EventDate.toLocaleDateString()*/}
-                      {new Intl.DateTimeFormat('en-GB', {
+                      {
+                        new Intl.DateTimeFormat('en-US', {
                         year: 'numeric',
                         month: 'long',
                         day: '2-digit',
-                      }).format(this.props.event.EventDate)}
+                      }).format(this.props.event.EventDate)/* this.props.event.EventDate.split(
+                          'T'
+                        )[0]
+                      */}
                     </span>
                     <span style={{ marginLeft: '20px' }}>
                       {this.props.event.EventStartTime}-{this.props.event.EventEndTime}
