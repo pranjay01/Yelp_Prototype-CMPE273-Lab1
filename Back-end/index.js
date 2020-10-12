@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 
 const bodyParser = require('body-parser');
 // const mysqlConnection = require("./mysqlConnection");
+const mongoose = require('mongoose');
 const bizProfile = require('./routes/bizProfileRoutes');
 const custProfile = require('./routes/customerProfileRoutes');
 const staticTabbles = require('./routes/staticTableRoutes');
@@ -34,6 +35,23 @@ app.use(function (req, res, next) {
   );
   res.setHeader('Cache-Control', 'no-cache');
   next();
+});
+
+const options = {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  poolSize: 500,
+  bufferMaxEntries: 0,
+};
+
+const { mongoDB } = require('./Models/config');
+
+mongoose.connect(mongoDB, options, (err, res) => {
+  if (err) {
+    console.log('MongoDB connection Failesd', err);
+  } else {
+    console.log('MongoDB Connected Succesfully', res);
+  }
 });
 
 app.use('/biz', bizProfile);
