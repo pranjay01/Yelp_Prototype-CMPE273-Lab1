@@ -4,7 +4,21 @@ const defaultState = {
   restaurantHome: {
     restaurantName: '',
     restaurantAddress: '',
-    ImageUrl: '',
+    CountryName: '',
+    StateName: '',
+    City: '',
+    Zip: '',
+    Street: '',
+    PhoneNo: '',
+    CountryCode: '',
+    OpeningTime: '',
+    ClosingTime: '',
+    ImageURL: '',
+    CurbsidePickup: '',
+    DineIn: '',
+    YelpDelivery: '',
+    Reviews: '',
+    Following: '',
   },
 };
 

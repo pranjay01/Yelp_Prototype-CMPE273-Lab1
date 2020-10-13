@@ -3,7 +3,7 @@ const express = require('express');
 
 const {
   signup,
-  getBasicInfo,
+  getRestaurantInfo,
   getRestaurantCompleteInfo,
   updateRestaurantProfile,
   fetchMenu,
@@ -18,10 +18,11 @@ const {
   getEventList,
   getCustomerList,
   uploadRestaurantProfilePic,
-  uploadPicToDB,
   uploadFoodImage,
   getCustomerCompleteProfileForRestaurant,
 } = require('../restaurant/restaurantProfile');
+
+const { validateUser } = require('../Utils/passport');
 
 const { login } = require('../common/loginLogout');
 
@@ -55,10 +56,10 @@ Router.post('/logout', async (req, res) => {
 });
 
 // Restaurant get Profile Info for Home page
-Router.get('/homeProfile', async (req, res) => {
+Router.get('/homeProfile', validateUser, async (req, res) => {
   console.log('Get basic Restaurant Profile');
   let results = null;
-  results = await getBasicInfo(req, res);
+  results = await getRestaurantInfo(req, res);
   return results;
 });
 
@@ -173,12 +174,12 @@ Router.post('/uploadRestaurantProfilePic', async (req, res) => {
   return results;
 });
 
-Router.post('/uploadPicToDB', async (req, res) => {
-  console.log('uploadPicToDB');
-  let results = null;
-  results = await uploadPicToDB(req, res);
-  return results;
-});
+// Router.post('/uploadPicToDB', async (req, res) => {
+//   console.log('uploadPicToDB');
+//   let results = null;
+//   results = await uploadPicToDB(req, res);
+//   return results;
+// });
 
 Router.post('/uploadFoodImage', async (req, res) => {
   console.log('uploadFoodImage');

@@ -14,9 +14,10 @@ function auth() {
     new JwtStrategy(opts, (jwtPayload, callback) => {
       // eslint-disable-next-line no-underscore-dangle
       const userId = jwtPayload._id;
-      const role = jwtPayload.Role;
+      const role = jwtPayload.userrole;
+      const { email } = jwtPayload;
       // eslint-disable-next-line consistent-return
-      UserSignup.findOne({ _id: userId, Role: role }, (err, results) => {
+      UserSignup.findOne({ _id: userId, Role: role, Email: email }, (err, results) => {
         if (err) {
           return callback(err, false);
         }
@@ -31,4 +32,4 @@ function auth() {
 }
 
 exports.auth = auth;
-exports.checkAuth = passport.authenticate('jwt', { session: false });
+exports.validateUser = passport.authenticate('jwt', { session: false });

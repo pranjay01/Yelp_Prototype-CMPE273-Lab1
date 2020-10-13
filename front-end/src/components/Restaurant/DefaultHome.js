@@ -11,30 +11,31 @@ class DefaultHome extends Component {
     this.state = {};
   }
 
-  uploadPicToDB = (event, ImageUrl) => {
-    //event.preventDefault();
-    const data = {
-      ImageUrl,
-    };
-    event.preventDefault();
-    axios.post(serverUrl + 'biz/uploadPicToDB', data).then(
-      (response) => {
-        if (response.status === 200) {
-          console.log('successfully save image');
-        }
-      },
-      (error) => {
-        console.log(error.response);
-        //window.location.reload(false);
-      }
-    );
-  };
+  // uploadPicToDB = (event, ImageURL) => {
+  //   //event.preventDefault();
+  //   const data = {
+  //     ImageURL,
+  //   };
+  //   event.preventDefault();
+  //   axios.post(serverUrl + 'biz/uploadPicToDB', data).then(
+  //     (response) => {
+  //       if (response.status === 200) {
+  //         console.log('successfully save image');
+  //       }
+  //     },
+  //     (error) => {
+  //       console.log(error.response);
+  //       //window.location.reload(false);
+  //     }
+  //   );
+  // };
 
   onChangeFileHandler = (event) => {
     axios.defaults.withCredentials = true;
     if (event.target.files.length === 1) {
       event.preventDefault();
       let formData = new FormData();
+      formData.append('_id', localStorage.getItem('userId'));
       formData.append('file', event.target.files[0], event.target.files[0].name);
       axios({
         method: 'post',
@@ -47,10 +48,10 @@ class DefaultHome extends Component {
           if (parseInt(response.status) === 200) {
             console.log('Product Saved');
             let payload = {
-              ImageUrl: response.data,
+              ImageURL: response.data,
             };
             this.props.updateHomeProfile(payload);
-            this.uploadPicToDB(event, response.data);
+            // this.uploadPicToDB(event, response.data);
           } else if (parseInt(response.status) === 400) {
             console.log(response.data);
           }
@@ -84,9 +85,9 @@ class DefaultHome extends Component {
               style={{ height: '450px' }}
               class="lemon--img__06b83__3GQUb"
               src={
-                this.props.restaurantProfile.ImageUrl !== null &&
-                this.props.restaurantProfile.ImageUrl.length > 0
-                  ? this.props.restaurantProfile.ImageUrl
+                this.props.restaurantProfile.ImageURL !== null &&
+                this.props.restaurantProfile.ImageURL.length > 0
+                  ? this.props.restaurantProfile.ImageURL
                   : defaultImage
               }
               //src="https://s3-media0.fl.yelpcdn.com/assets/public/defaultBusinessHeaderImage.yji-a94634351a246719545b17b9bddc388f.png"
@@ -103,7 +104,7 @@ class DefaultHome extends Component {
                         <div class="lemon--div__06b83__1mboc business-name__06b83__2Y1ql display--inline-block__06b83__1ZKqC border-color--default__06b83__3-ifU">
                           <div class="lemon--div__06b83__1mboc border-color--default__06b83__3-ifU">
                             <h2 class="lemon--h2__06b83__hjA2W heading--h2__06b83__1g9VN">
-                              {this.props.profileInfo.restroName}
+                              {this.props.restaurantProfile.restaurantName}
                             </h2>
                           </div>
                         </div>
@@ -112,7 +113,7 @@ class DefaultHome extends Component {
                         <div class="lemon--div__06b83__1mboc business-info__06b83__1dQLw display--inline-block__06b83__1ZKqC border-color--default__06b83__3-ifU">
                           <div class="lemon--div__06b83__1mboc border-color--default__06b83__3-ifU">
                             <p class="lemon--p__06b83__3Qnnj text__06b83__2Kxyz text-color--white__06b83__22aE8 text-align--left__06b83__2XGa- text-weight--semibold__06b83__2l0fe">
-                              {this.props.profileInfo.address}
+                              {this.props.restaurantProfile.restaurantAddress}
                             </p>
                           </div>
                         </div>
@@ -122,7 +123,7 @@ class DefaultHome extends Component {
                       <div class="lemon--div__06b83__1mboc business-info__06b83__1dQLw display--inline-block__06b83__1ZKqC padding-t1__06b83__2aTOb border-color--default__06b83__3-ifU">
                         <div class="lemon--div__06b83__1mboc border-color--default__06b83__3-ifU">
                           <span class="lemon--span__06b83__3997G text__06b83__2Kxyz text-color--normal__06b83__3xep9 text-align--left__06b83__2XGa-">
-                            {this.props.profileInfo.reviewCOunt} reviews
+                            {this.props.restaurantProfile.Reviews.length} reviews
                           </span>
                         </div>
                       </div>
