@@ -110,7 +110,7 @@ const getOrderList = async (_order, _appetizers, _desserts, _beverages, _salads,
   return results;
 };
 
-// Function to create new restaurant
+// Function to create new restaurant // mongoDbAdded
 const signup = async (restaurant, response) => {
   try {
     UserSignup.findOne({ Email: restaurant.Email, Role: 'Restaurant' }, async (error, user) => {
@@ -193,6 +193,7 @@ const signup = async (restaurant, response) => {
   return response;
 };
 
+// Get Complete Restaurant, // mongoDbAdded
 const getRestaurantInfo = async (request, response) => {
   try {
     const { _id } = url.parse(request.url, true).query;
@@ -219,28 +220,27 @@ const getRestaurantInfo = async (request, response) => {
   return response;
 };
 
-const getRestaurantCompleteInfo = async (request, response) => {
+// Update Restaurant Profile // mongoDbAdded
+const updateRestaurantProfile = async (restaurant, response) => {
   try {
-    const userID = getUserIdFromToken(request.cookies.cookie, request.cookies.userrole);
-    if (userID) {
-      const getRestaurantCompleteInfoQuery = 'CALL getRestaurantCompleteInfoQuery(?)';
-
-      const connection = await mysqlConnection();
-      // eslint-disable-next-line no-unused-vars
-      const [results, fields] = await connection.query(getRestaurantCompleteInfoQuery, userID);
-      connection.end();
-      console.log(results);
-
-      response.writeHead(200, {
-        'Content-Type': 'text/plain',
-      });
-      response.end(JSON.stringify(results));
-    } else {
-      response.writeHead(401, {
-        'Content-Type': 'text/plain',
-      });
-      response.end('Invalid User');
-    }
+    Restaurant.updateOne(
+      { RestaurantID: restaurant.RestaurantID },
+      { ...restaurant },
+      async (error, data) => {
+        if (error) {
+          response.writeHead(500, {
+            'Content-Type': 'text/plain',
+          });
+          response.end('Network Error');
+        } else {
+          console.log(data);
+          response.writeHead(200, {
+            'Content-Type': 'text/plain',
+          });
+          response.end('Profile Updated Successfully');
+        }
+      }
+    );
   } catch (error) {
     response.writeHead(401, {
       'Content-Type': 'text/plain',
@@ -250,80 +250,71 @@ const getRestaurantCompleteInfo = async (request, response) => {
   return response;
 };
 
-// Update Restaurant Profile
-const updateRestaurantProfile = async (restaurant, response) => {
+// upload restaurant profile to s3 bucket // mongoDbAdded
+const uploadRestaurantProfilePic = async (req, res) => {
   try {
-    const {
-      Name,
-      // eslint-disable-next-line camelcase
-      Country_ID,
-      // eslint-disable-next-line camelcase
-      State_ID,
-      City,
-      Zip,
-      Street,
-      // eslint-disable-next-line camelcase
-      Phone_no,
-      // eslint-disable-next-line camelcase
-      Country_Code,
-      // eslint-disable-next-line camelcase
-      Opening_Time,
-      // eslint-disable-next-line camelcase
-      Closing_Time,
-      CurbsidePickup,
-      DineIn,
-      YelpDelivery,
-      ImageUrl,
-    } = restaurant;
-    const restroID = getUserIdFromToken(restaurant.token, restaurant.userrole);
-    if (restroID) {
-      const updateRestaurantProfileQuery =
-        'CALL updateRestaurantProfileQuery(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
-
-      const connection = await mysqlConnection();
-      // eslint-disable-next-line no-unused-vars
-      const [results, fields] = await connection.query(updateRestaurantProfileQuery, [
-        Name,
-        // eslint-disable-next-line camelcase
-        Number(Country_ID),
-        // eslint-disable-next-line camelcase
-        Number(State_ID),
-        City,
-        Number(Zip),
-        Street,
-        // eslint-disable-next-line camelcase
-        Number(Phone_no),
-        // eslint-disable-next-line camelcase
-        Number(Country_Code),
-        // eslint-disable-next-line camelcase
-        Opening_Time,
-        // eslint-disable-next-line camelcase
-        Closing_Time,
-        restroID,
-        CurbsidePickup,
-        DineIn,
-        YelpDelivery,
-        ImageUrl,
-      ]);
-      connection.end();
-      console.log(results);
-      response.writeHead(200, {
-        'Content-Type': 'text/plain',
-      });
-      response.end(JSON.stringify(results));
-    } else {
-      response.writeHead(401, {
-        'Content-Type': 'text/plain',
-      });
-      response.end('Invalid User');
-    }
+    console.log(req.body);
+    multipleUpload(req, res, function (err) {
+      if (err instanceof multer.MulterError) {
+        res.json({ status: 400, error: err.message });
+      } else if (err) {
+        res.json({ status: 400, error: err.message });
+      } else {
+        // console.log(req.file.location);
+        Restaurant.updateOne(
+          { RestaurantID: req.body },
+          { ImageURL: req.file.location },
+          async (error) => {
+            if (error) {
+              res.writeHead(500, {
+                'Content-Type': 'text/plain',
+              });
+              res.end('Network Error');
+            } else {
+              res.writeHead(200, {
+                'Content-Type': 'text/plain',
+              });
+              // console.log('data:', data);
+              res.end(req.file.location);
+            }
+          }
+        );
+      }
+    });
   } catch (error) {
-    response.writeHead(401, {
+    res.writeHead(401, {
       'Content-Type': 'text/plain',
     });
-    response.end('Network Error');
+    res.end('Network Error');
   }
-  return response;
+  return res;
+};
+
+// upload restaurant profile to only s3 bucket // mongoDbAdded
+const uploadPicToMulter = async (req, res) => {
+  try {
+    console.log(req.body);
+    multipleUpload(req, res, function (err) {
+      if (err instanceof multer.MulterError) {
+        res.json({ status: 400, error: err.message });
+      } else if (err) {
+        res.json({ status: 400, error: err.message });
+      } else {
+        // console.log(req.file.location);
+        res.writeHead(200, {
+          'Content-Type': 'text/plain',
+        });
+        // console.log('data:', data);
+        res.end(req.file.location);
+      }
+    });
+  } catch (error) {
+    res.writeHead(401, {
+      'Content-Type': 'text/plain',
+    });
+    res.end('Network Error');
+  }
+  return res;
 };
 
 const fetchMenu = async (request, response) => {
@@ -736,84 +727,6 @@ const getCustomerList = async (request, response) => {
   return response;
 };
 
-// upload restaurant profile to s3 bucket
-const uploadRestaurantProfilePic = async (req, res) => {
-  try {
-    console.log(req.body);
-    multipleUpload(req, res, function (err) {
-      if (err instanceof multer.MulterError) {
-        res.json({ status: 400, error: err.message });
-      } else if (err) {
-        res.json({ status: 400, error: err.message });
-      } else {
-        // console.log(req.file.location);
-        Restaurant.updateOne(
-          { RestaurantID: req.body },
-          { ImageURL: req.file.location },
-          async (error) => {
-            if (error) {
-              res.writeHead(500, {
-                'Content-Type': 'text/plain',
-              });
-              res.end('Network Error');
-            } else {
-              res.writeHead(200, {
-                'Content-Type': 'text/plain',
-              });
-              // console.log('data:', data);
-              res.end(req.file.location);
-            }
-          }
-        );
-      }
-    });
-  } catch (error) {
-    res.writeHead(401, {
-      'Content-Type': 'text/plain',
-    });
-    res.end('Network Error');
-  }
-  return res;
-};
-
-/*
-// upload restaurant image to db
-const uploadPicToDB = async (req, response) => {
-  try {
-    const image = req.body;
-    const { ImageUrl } = image;
-    const restroID = getUserIdFromToken(req.cookies.cookie, req.cookies.userrole);
-
-    if (restroID) {
-      const uploadRestaurantProfilePicQuery = 'CALL uploadPicToDB(?,?)';
-
-      const connection = await mysqlConnection();
-      // eslint-disable-next-line no-unused-vars
-      const [results, fields] = await connection.query(uploadRestaurantProfilePicQuery, [
-        restroID,
-        ImageUrl,
-      ]);
-      connection.end();
-      console.log(results);
-      response.writeHead(200, {
-        'Content-Type': 'text/plain',
-      });
-      response.end('Image saved successfully');
-    } else {
-      response.writeHead(401, {
-        'Content-Type': 'text/plain',
-      });
-      response.end('Invalid User');
-    }
-  } catch (error) {
-    response.writeHead(401, {
-      'Content-Type': 'text/plain',
-    });
-    response.end('Network Error');
-  }
-  return response;
-};
-*/
 const uploadFoodImage = async (req, res) => {
   try {
     const restroId = getUserIdFromToken(req.cookies.cookie, req.cookies.userrole);
@@ -883,7 +796,6 @@ const getCustomerCompleteProfileForRestaurant = async (request, response) => {
 module.exports = {
   signup,
   getRestaurantInfo,
-  getRestaurantCompleteInfo,
   updateRestaurantProfile,
   fetchMenu,
   insertFood,
@@ -897,6 +809,7 @@ module.exports = {
   getEventList,
   getCustomerList,
   uploadRestaurantProfilePic,
+  uploadPicToMulter,
   uploadFoodImage,
   getOrderList,
   getCustomerCompleteProfileForRestaurant,

@@ -17,9 +17,9 @@ const restaurantSchema = new Schema(
     OpeningTime: { type: String },
     ClosingTime: { type: String },
     ImageURL: { type: String },
-    CurbsidePickup: { type: Boolean },
-    DineIn: { type: Boolean },
-    YelpDelivery: { type: Boolean },
+    CurbsidePickup: { type: Boolean, default: false },
+    DineIn: { type: Boolean, default: false },
+    YelpDelivery: { type: Boolean, default: false },
     Latitude: { type: String },
     Longitude: { type: String },
     Reviews: [

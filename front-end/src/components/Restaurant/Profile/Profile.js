@@ -4,136 +4,27 @@ import serverUrl from '../../../config';
 import cookie from 'react-cookies';
 import { updateHomeProfile } from '../../../constants/action-types';
 import { connect } from 'react-redux';
+import { updateSnackbarData } from '../../../constants/action-types';
 
 class Profile extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      Name: '',
-      Email: '',
-      Country_ID: '',
-      State_ID: '',
-      City: '',
-      Zip: '',
-      Street: '',
-      Phone_no: '',
-      Country_Code: '',
-      Opening_Time: '',
-      Closing_Time: '',
-      Countries: [],
-      States: [],
-      CountryCodes: [],
       isFormDisable: true,
       submitError: false,
       submitErrorBlock: '',
-      CurbsidePickup: false,
-      DineIn: false,
-      YelpDelivery: false,
+
       ImageUrl: '',
-      tmpEditProfile: {
-        Name: '',
-        Email: '',
-        Country_ID: '',
-        State_ID: '',
-        City: '',
-        Zip: '',
-        Street: '',
-        Phone_no: '',
-        Country_Code: '',
-        Opening_Time: '',
-        Closing_Time: '',
-        CurbsidePickup: false,
-        DineIn: false,
-        YelpDelivery: false,
-        ImageUrl: '',
-      },
+      tmpEditProfile: null,
     };
   }
 
-  componentDidMount() {
-    axios.get(serverUrl + 'biz/restaurantCompleteProfile', { withCredentials: true }).then(
-      (response) => {
-        if (response.status === 200) {
-          let CurbsidePickup = false;
-          let DineIn = false;
-          let YelpDelivery = false;
-          let DeliveryOptions = response.data[1];
-          DeliveryOptions.forEach(function (option) {
-            if (option.ID === 1) {
-              CurbsidePickup = true;
-            }
-            if (option.ID === 2) {
-              DineIn = true;
-            }
-            if (option.ID === 3) {
-              YelpDelivery = true;
-            }
-          });
-          this.setState({
-            Name: response.data[0][0].Name,
-            Email: response.data[0][0].Email,
-            Country_ID: response.data[0][0].Country_ID,
-            State_ID: response.data[0][0].State_ID,
-            City: response.data[0][0].City,
-            Street: response.data[0][0].Street,
-            Zip: response.data[0][0].Zip,
-            Phone_no: response.data[0][0].Phone_no,
-            Country_Code: response.data[0][0].Country_Code,
-            Opening_Time: response.data[0][0].Opening_Time,
-            Closing_Time: response.data[0][0].Closing_Time,
-            ImageUrl: response.data[0][0].ImageURL,
-            CurbsidePickup,
-            DineIn,
-            YelpDelivery,
-            isFormDisable: true,
-          });
-          console.log(this.state);
-          console.log(response.data);
-        }
-      },
-
-      (error) => {
-        console.log(error.response.data);
-      }
-    );
-
-    axios.get(serverUrl + 'static/signupMasterData').then((response) => {
-      console.log(response.data);
-      let allCountries = response.data[0].map((country) => {
-        return { key: country.ID, value: country.Name };
-      });
-      let allStates = response.data[1].map((state) => {
-        return { key: state.ID, value: state.Name };
-      });
-      let allCountrieCodes = response.data[0].map((countryCode) => {
-        return { key: countryCode.ID, value: countryCode.Country_Code };
-      });
-      this.setState({
-        Countries: this.state.Countries.concat(allCountries),
-        States: this.state.States.concat(allStates),
-        CountryCodes: this.state.CountryCodes.concat(allCountrieCodes),
-      });
-    });
-  }
+  componentDidMount() {}
 
   editProfile = () => {
     if (this.state.isFormDisable) {
       let tmpEditProfile = {
-        Name: this.state.Name,
-        Email: this.state.Email,
-        Country_ID: this.state.Country_ID,
-        State_ID: Number(this.state.State_ID),
-        City: this.state.City,
-        Zip: this.state.Zip,
-        Street: this.state.Street,
-        Phone_no: this.state.Phone_no,
-        Country_Code: this.state.Country_Code,
-        Opening_Time: this.state.Opening_Time,
-        Closing_Time: this.state.Closing_Time,
-        CurbsidePickup: this.state.CurbsidePickup,
-        DineIn: this.state.DineIn,
-        YelpDelivery: this.state.YelpDelivery,
-        ImageUrl: this.state.ImageUrl,
+        ...this.props.restaurantProfile,
       };
       this.setState({
         isFormDisable: !this.state.isFormDisable,
@@ -142,246 +33,232 @@ class Profile extends Component {
       });
     } else {
       let orignalData = this.state.tmpEditProfile;
-      let tmpEditProfile = {
-        Name: '',
-        Email: '',
-        Country_ID: '',
-        State_ID: '',
-        City: '',
-        Zip: '',
-        Street: '',
-        Phone_no: '',
-        Country_Code: '',
-        Opening_Time: '',
-        Closing_Time: '',
-        CurbsidePickup: false,
-        DineIn: false,
-        YelpDelivery: false,
-        ImageUrl: '',
+
+      let payload = {
+        ...orignalData,
       };
+      this.props.updateHomeProfile(payload);
+
       this.setState({
-        Name: orignalData.Name,
-        Email: orignalData.Email,
-        Country_ID: orignalData.Country_ID,
-        State_ID: orignalData.State_ID,
-        City: orignalData.City,
-        Zip: orignalData.Zip,
-        Street: orignalData.Street,
-        Phone_no: orignalData.Phone_no,
-        Country_Code: orignalData.Country_Code,
-        Opening_Time: orignalData.Opening_Time,
-        Closing_Time: orignalData.Closing_Time,
-        CurbsidePickup: orignalData.CurbsidePickup,
-        DineIn: orignalData.DineIn,
-        YelpDelivery: orignalData.YelpDelivery,
-        tmpEditProfile,
+        tmpEditProfile: null,
         isFormDisable: !this.state.isFormDisable,
-        ImageUrl: orignalData.ImageUrl,
 
         submitError: false,
       });
-      let index = this.state.States.findIndex((x) => x.key === orignalData.State_ID);
-      let payload = {
-        restaurantAddress:
-          orignalData.Street +
-          ' ' +
-          orignalData.City +
-          ' ' +
-          this.state.States[index].value +
-          ' ' +
-          orignalData.Zip,
-        restaurantName: orignalData.Name,
-      };
-      this.props.updateHomeProfile(payload);
     }
   };
 
   onChangeHandlerName = (e) => {
     let payload = {
-      restaurantName: e.target.value,
+      Name: e.target.value,
     };
     this.props.updateHomeProfile(payload);
     this.setState({
-      Name: e.target.value,
       submitError: false,
     });
   };
 
   onChangeHandlerEmail = (e) => {
-    this.setState({
+    let payload = {
       Email: e.target.value,
+    };
+    this.props.updateHomeProfile(payload);
+    this.setState({
       submitError: false,
     });
   };
 
   onChangeHandlerCountryCode = (e) => {
+    let payload = {
+      CountryCode: e.target.value,
+    };
+    this.props.updateHomeProfile(payload);
     this.setState({
-      Country_Code: e.target.value,
       submitError: false,
     });
   };
 
   onChangeHandlerPhoneNo = (e) => {
+    let payload = {
+      PhoneNo: e.target.value,
+    };
+    this.props.updateHomeProfile(payload);
     this.setState({
-      Phone_no: e.target.value,
       submitError: false,
     });
   };
 
   onChangeHandlerCountry = (e) => {
+    let payload = {
+      CountryName: e.target.value,
+    };
+    this.props.updateHomeProfile(payload);
     this.setState({
-      Country_ID: e.target.value,
       submitError: false,
     });
   };
 
   onChangeHandlerState = (e) => {
-    let index = this.state.States.findIndex((x) => x.key === Number(e.target.value));
+    // let index = this.state.States.findIndex((x) => x.key === Number(e.target.value));
     let payload = {
       restaurantAddress:
-        this.state.Street +
+        this.props.restaurantProfile.Street +
         ' ' +
-        this.state.City +
+        this.props.restaurantProfile.City +
         ' ' +
-        this.state.States[index].value +
+        e.target.value +
         ' ' +
-        this.state.Zip,
+        this.props.restaurantProfile.Zip,
+      StateName: e.target.value,
     };
     this.props.updateHomeProfile(payload);
     this.setState({
-      State_ID: e.target.value,
       submitError: false,
     });
   };
 
   onChangeHandlerZipCode = (e) => {
-    let index = this.state.States.findIndex((x) => x.key === Number(this.state.State_ID));
     let payload = {
       restaurantAddress:
-        this.state.Street +
+        this.props.restaurantProfile.Street +
         ' ' +
-        this.state.City +
+        this.props.restaurantProfile.City +
         ' ' +
-        this.state.States[index].value +
+        this.props.restaurantProfile.StateName +
         ' ' +
         e.target.value,
+      Zip: e.target.value,
     };
     this.props.updateHomeProfile(payload);
     this.setState({
-      Zip: e.target.value,
       submitError: false,
     });
   };
 
   onChangeHandlerCity = (e) => {
-    let index = this.state.States.findIndex((x) => x.key === Number(this.state.State_ID));
     let payload = {
       restaurantAddress:
-        this.state.Street +
+        this.props.restaurantProfile.Street +
         ' ' +
         e.target.value +
         ' ' +
-        this.state.States[index].value +
+        this.props.restaurantProfile.StateName +
         ' ' +
-        this.state.Zip,
+        this.props.restaurantProfile.Zip,
+      City: e.target.value,
     };
     this.props.updateHomeProfile(payload);
     this.setState({
-      City: e.target.value,
       submitError: false,
     });
   };
 
   onChangeHandlerStreet = (e) => {
-    let index = this.state.States.findIndex((x) => x.key === Number(this.state.State_ID));
     let payload = {
       restaurantAddress:
         e.target.value +
         ' ' +
-        this.state.City +
+        this.props.restaurantProfile.City +
         ' ' +
-        this.state.States[index].value +
+        this.props.restaurantProfile.StateName +
         ' ' +
-        this.state.Zip,
+        this.props.restaurantProfile.Zip,
+      Street: e.target.value,
     };
     this.props.updateHomeProfile(payload);
     this.setState({
-      Street: e.target.value,
       submitError: false,
     });
   };
 
   onChangeHandlerOpeningTime = (e) => {
+    let payload = {
+      OpeningTime: e.target.value,
+    };
+    this.props.updateHomeProfile(payload);
     this.setState({
-      Opening_Time: e.target.value,
       submitError: false,
     });
   };
 
   onChangeHandlerClosingTime = (e) => {
+    let payload = {
+      ClosingTime: e.target.value,
+    };
+    this.props.updateHomeProfile(payload);
     this.setState({
-      Closing_Time: e.target.value,
       submitError: false,
     });
   };
 
   onChangeHandlerYelpDelivery = () => {
+    let payload = {
+      YelpDelivery: !this.props.restaurantProfile.YelpDelivery,
+    };
+    this.props.updateHomeProfile(payload);
     this.setState({
-      YelpDelivery: !this.state.YelpDelivery,
       submitError: false,
     });
   };
   onChangeHandlerCurbsidePickup = () => {
+    let payload = {
+      CurbsidePickup: !this.props.restaurantProfile.CurbsidePickup,
+    };
+    this.props.updateHomeProfile(payload);
     this.setState({
-      CurbsidePickup: !this.state.CurbsidePickup,
+      submitError: false,
     });
   };
   onChangeHandlerDineIn = () => {
+    let payload = {
+      DineIn: !this.props.restaurantProfile.DineIn,
+    };
+    this.props.updateHomeProfile(payload);
     this.setState({
-      DineIn: !this.state.DineIn,
+      submitError: false,
     });
   };
 
   ValidityUpdateProfile = () => {
     let ErrorStr = '';
-    if (this.state.Name.length == 0) {
+    if (this.props.restaurantProfile.Name.length == 0) {
       ErrorStr = ErrorStr + 'Name cannot be Empty';
     }
-    if (this.state.Country_Code === '') {
+    if (this.props.restaurantProfile.CountryCode === '') {
       if (ErrorStr) {
         ErrorStr += ', ';
       }
       ErrorStr = ErrorStr + 'Select correct Phone Extention';
     }
 
-    if (this.state.State_ID === '') {
+    if (this.props.restaurantProfile.StateName === '') {
       if (ErrorStr) {
         ErrorStr += ', ';
       }
       ErrorStr = ErrorStr + 'Select correct State';
     }
-    if (this.state.City.length === 0) {
+    if (this.props.restaurantProfile.City.length === 0) {
       if (ErrorStr) {
         ErrorStr += ', ';
       }
       ErrorStr = ErrorStr + 'City cannot be empty';
     }
 
-    if (this.state.Country_ID === '') {
+    if (this.props.restaurantProfile.CountryName === '') {
       if (ErrorStr) {
         ErrorStr += ', ';
       }
       ErrorStr = ErrorStr + 'Select Country';
     }
 
-    if (!/^\d+$/.test(this.state.Zip)) {
+    if (!/^\d+$/.test(this.props.restaurantProfile.Zip)) {
       if (ErrorStr) {
         ErrorStr += ', ';
       }
       ErrorStr = ErrorStr + 'Validate Zip Code';
     }
 
-    if (!/^\d+$/.test(this.state.Phone_no)) {
+    if (!/^\d+$/.test(this.props.restaurantProfile.PhoneNo)) {
       if (ErrorStr) {
         ErrorStr += ', ';
       }
@@ -400,22 +277,8 @@ class Profile extends Component {
       //prevent page from refresh
       e.preventDefault();
       const data = {
-        Name: this.state.Name,
-        Country_ID: this.state.Country_ID,
-        State_ID: this.state.State_ID,
-        City: this.state.City,
-        Zip: this.state.Zip,
-        Street: this.state.Street,
-        Country_Code: this.state.Country_Code,
-        Phone_no: this.state.Phone_no,
-        Opening_Time: this.state.Opening_Time,
-        Closing_Time: this.state.Closing_Time,
-        CurbsidePickup: this.state.CurbsidePickup,
-        ImageUrl: this.state.ImageUrl,
-        DineIn: this.state.DineIn,
-        YelpDelivery: this.state.YelpDelivery,
-        token: cookie.load('cookie'),
-        userrole: cookie.load('userrole'),
+        ...this.props.restaurantProfile,
+        RestaurantID: localStorage.getItem('userId'),
       };
       //set the with credentials to true
       axios.defaults.withCredentials = true;
@@ -425,9 +288,15 @@ class Profile extends Component {
           console.log('Status Code : ', response.status);
           if (response.status === 200) {
             console.log('Profile Updated');
+            const payload = {
+              success: true,
+              message: response.data,
+            };
+            this.props.updateSnackbarData(payload);
             this.setState({
               isFormDisable: true,
               submitError: false,
+              tmpEditProfile: null,
             });
           }
         },
@@ -451,10 +320,11 @@ class Profile extends Component {
       axios.defaults.withCredentials = true;
       event.preventDefault();
       let formData = new FormData();
+      formData.append('_id', localStorage.getItem('userId'));
       formData.append('file', event.target.files[0], event.target.files[0].name);
       axios({
         method: 'post',
-        url: serverUrl + 'biz/uploadRestaurantProfilePic',
+        url: serverUrl + 'biz/uploadPicToMulter',
         data: formData,
         headers: { 'Content-Type': 'multipart/form-data' },
       })
@@ -462,13 +332,10 @@ class Profile extends Component {
           console.log('Status Code : ', response.status);
           if (parseInt(response.status) === 200) {
             console.log('Product Saved');
-            this.setState({
-              ImageUrl: response.data,
-
-              //authFlag: true,
-              //savedId: response.data.message,
-            });
-            //Router.push('/vendor/' + localStorage.getItem('user_id'));
+            const payload = {
+              ImageURL: response.data,
+            };
+            this.props.updateHomeProfile(payload);
           } else if (parseInt(response.status) === 400) {
             console.log(response.data);
           }
@@ -533,8 +400,9 @@ class Profile extends Component {
                 alt=""
                 class="photo-box-img"
                 src={
-                  this.state.ImageUrl !== null && this.state.ImageUrl.length > 0
-                    ? this.state.ImageUrl
+                  this.props.restaurantProfile.ImageURL !== null &&
+                  this.props.restaurantProfile.ImageURL.length > 0
+                    ? this.props.restaurantProfile.ImageURL
                     : defaultImage
                 }
                 // src="https://s3-media0.fl.yelpcdn.com/assets/srv0/yelp_styleguide/bf5ff8a79310/assets/img/default_avatars/user_medium_square.png"
@@ -554,7 +422,7 @@ class Profile extends Component {
                     required="required"
                     type="text"
                     onChange={this.onChangeHandlerName}
-                    value={this.state.Name}
+                    value={this.props.restaurantProfile.Name}
                   />
                 </li>
               </ul>
@@ -571,7 +439,7 @@ class Profile extends Component {
                     required="required"
                     type="email"
                     // onChange={this.onChangeHandlerEmail}
-                    value={this.state.Email}
+                    value={this.props.restaurantProfile.Email}
                     disabled="disabled"
                   />
                 </li>
@@ -582,15 +450,15 @@ class Profile extends Component {
                     placeholder="countryCode"
                     className="form-control"
                     onChange={this.onChangeHandlerCountryCode}
-                    value={this.state.Country_Code}
+                    value={this.props.restaurantProfile.CountryCode}
                     required
                   >
                     <option className="Dropdown-menu" key="" value=""></option>
-                    {this.state.CountryCodes.map((countryCode) => (
+                    {this.props.masterData.CountryCodes.map((countryCode) => (
                       <option
                         className="Dropdown-menu"
                         key={countryCode.key}
-                        value={countryCode.key}
+                        value={countryCode.value}
                       >
                         {countryCode.value}
                       </option>
@@ -606,7 +474,7 @@ class Profile extends Component {
                     required="required"
                     type="text"
                     onChange={this.onChangeHandlerPhoneNo}
-                    value={this.state.Phone_no}
+                    value={this.props.restaurantProfile.PhoneNo}
                     minlength="10"
                     maxlength="10"
                   />
@@ -624,14 +492,14 @@ class Profile extends Component {
                     placeholder="Gender"
                     className="form-control"
                     onChange={this.onChangeHandlerCountry}
-                    value={this.state.Country_ID}
+                    value={this.props.restaurantProfile.CountryName}
                     required
                   >
                     <option className="Dropdown-menu" key="" value="">
                       Country
                     </option>
-                    {this.state.Countries.map((country) => (
-                      <option className="Dropdown-menu" key={country.key} value={country.key}>
+                    {this.props.masterData.Countries.map((country) => (
+                      <option className="Dropdown-menu" key={country.key} value={country.value}>
                         {country.value}
                       </option>
                     ))}
@@ -644,14 +512,14 @@ class Profile extends Component {
                     placeholder="State"
                     className="form-control"
                     onChange={this.onChangeHandlerState}
-                    value={this.state.State_ID}
+                    value={this.props.restaurantProfile.StateName}
                     required
                   >
                     <option className="Dropdown-menu" key="" value="">
                       State
                     </option>
-                    {this.state.States.map((state) => (
-                      <option className="Dropdown-menu" key={state.key} value={state.key}>
+                    {this.props.masterData.States.map((state) => (
+                      <option className="Dropdown-menu" key={state.key} value={state.value}>
                         {state.value}
                       </option>
                     ))}
@@ -669,7 +537,7 @@ class Profile extends Component {
                     required="required"
                     type="text"
                     onChange={this.onChangeHandlerZipCode}
-                    value={this.state.Zip}
+                    value={this.props.restaurantProfile.Zip}
                   />
                 </li>
                 <li style={{ width: '30%' }}>
@@ -681,7 +549,7 @@ class Profile extends Component {
                     required="required"
                     type="text"
                     onChange={this.onChangeHandlerCity}
-                    value={this.state.City}
+                    value={this.props.restaurantProfile.City}
                   />
                 </li>
                 <li style={{ width: '70%' }}>
@@ -693,7 +561,7 @@ class Profile extends Component {
                     required="required"
                     type="text"
                     onChange={this.onChangeHandlerStreet}
-                    value={this.state.Street}
+                    value={this.props.restaurantProfile.Street}
                   />
                 </li>
               </ul>
@@ -707,7 +575,7 @@ class Profile extends Component {
                     style={{ width: '20px', height: '20px' }}
                     name="isGoing"
                     type="checkbox"
-                    checked={this.state.CurbsidePickup}
+                    checked={this.props.restaurantProfile.CurbsidePickup}
                     onChange={this.onChangeHandlerCurbsidePickup}
                   />
                 </li>
@@ -717,7 +585,7 @@ class Profile extends Component {
                     style={{ width: '20px', height: '20px' }}
                     name="isGoing"
                     type="checkbox"
-                    checked={this.state.DineIn}
+                    checked={this.props.restaurantProfile.DineIn}
                     onChange={this.onChangeHandlerDineIn}
                   />
                 </li>
@@ -727,7 +595,7 @@ class Profile extends Component {
                     style={{ width: '20px', height: '20px' }}
                     name="isGoing"
                     type="checkbox"
-                    checked={this.state.YelpDelivery}
+                    checked={this.props.restaurantProfile.YelpDelivery}
                     onChange={this.onChangeHandlerYelpDelivery}
                   />
                 </li>
@@ -738,11 +606,11 @@ class Profile extends Component {
                   <input
                     type="time"
                     step="1"
-                    value={this.state.time}
+                    //value={this.state.time}
                     className="form-control"
                     placeholder="Time"
                     onChange={this.onChangeHandlerOpeningTime}
-                    value={this.state.Opening_Time}
+                    value={this.props.restaurantProfile.OpeningTime}
                   />
                 </li>
                 <li style={{ width: '40%' }}>
@@ -750,11 +618,11 @@ class Profile extends Component {
                   <input
                     type="time"
                     step="1"
-                    value={this.state.time}
+                    // value={this.state.time}
                     className="form-control"
                     placeholder="Time"
                     onChange={this.onChangeHandlerClosingTime}
-                    value={this.state.Closing_Time}
+                    value={this.props.restaurantProfile.ClosingTime}
                   />
                 </li>
               </ul>
@@ -804,6 +672,15 @@ class Profile extends Component {
   }
 }
 
+const mapStateToProps = (state) => {
+  const { restaurantHome } = state.restaurantHomePageReducer;
+  const { masterData } = state.masterDataReducer;
+  return {
+    restaurantProfile: restaurantHome,
+    masterData,
+  };
+};
+
 const mapDispatchToProps = (dispatch) => {
   return {
     updateHomeProfile: (payload) => {
@@ -812,9 +689,15 @@ const mapDispatchToProps = (dispatch) => {
         payload,
       });
     },
+    updateSnackbarData: (payload) => {
+      dispatch({
+        type: updateSnackbarData,
+        payload,
+      });
+    },
   };
 };
 
-export default connect(null, mapDispatchToProps)(Profile);
+export default connect(mapStateToProps, mapDispatchToProps)(Profile);
 
 // export default Profile;

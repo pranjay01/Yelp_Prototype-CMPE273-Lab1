@@ -28,42 +28,42 @@ class RestaurantHome extends Component {
     };
   }
   onTabChangeHandler = (tabName) => {
-    axios.get(serverUrl + 'biz/homeProfile', { withCredentials: true }).then(
-      (response) => {
-        if (response.status === 200) {
-          this.setState({
-            restroName: response.data.Name,
-            address:
-              response.data.Street +
-              ' ' +
-              response.data.City +
-              ' ' +
-              response.data.State +
-              ' ' +
-              response.data.Zip,
-            reviewCOunt: response.data[1].ReviewCount,
-          });
-          let payload = {
-            restaurantName: response.data.Name,
-            ImageURL: response.data.ImageURL,
-            restaurantAddress:
-              response.data.Street +
-              ' ' +
-              response.data.City +
-              ' ' +
-              response.data.State +
-              ' ' +
-              response.data.Zip,
-          };
-          this.props.updateHomeProfile(payload);
-          console.log(this.state);
-          console.log(response.data);
-        }
-      },
-      (error) => {
-        console.log(error.response.data);
-      }
-    );
+    // axios.get(serverUrl + 'biz/homeProfile', { withCredentials: true }).then(
+    //   (response) => {
+    //     if (response.status === 200) {
+    //       this.setState({
+    //         restroName: response.data.Name,
+    //         address:
+    //           response.data.Street +
+    //           ' ' +
+    //           response.data.City +
+    //           ' ' +
+    //           response.data.State +
+    //           ' ' +
+    //           response.data.Zip,
+    //         reviewCOunt: response.data[1].ReviewCount,
+    //       });
+    //       let payload = {
+    //         restaurantName: response.data.Name,
+    //         ImageURL: response.data.ImageURL,
+    //         restaurantAddress:
+    //           response.data.Street +
+    //           ' ' +
+    //           response.data.City +
+    //           ' ' +
+    //           response.data.State +
+    //           ' ' +
+    //           response.data.Zip,
+    //       };
+    //       this.props.updateHomeProfile(payload);
+    //       console.log(this.state);
+    //       console.log(response.data);
+    //     }
+    //   },
+    //   (error) => {
+    //     console.log(error.response.data);
+    //   }
+    // );
     this.setState({
       tabName,
     });
@@ -71,6 +71,7 @@ class RestaurantHome extends Component {
     localStorage.setItem('showFoodCategory', '');
   };
   componentDidMount() {
+    console.log('Inside restaurant home component did mount');
     axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
     axios
       .get(serverUrl + 'biz/homeProfile', {
@@ -93,7 +94,6 @@ class RestaurantHome extends Component {
             //   reviewCOunt: response.data[1].ReviewCount,
             // });
             let payload = {
-              restaurantName: response.data.Name,
               restaurantAddress:
                 response.data.Street +
                 ' ' +
@@ -261,7 +261,7 @@ class RestaurantHome extends Component {
     }
 
     let tabName = this.state.tabName;
-    let basicProfile = this.state;
+    // let basicProfile = this.state;
     const defaultImage =
       'https://s3-media0.fl.yelpcdn.com/assets/public/default_user_avatar_40x40_v2.yji-925e5d7fcbd2b314d1a618150d57d7f6.png';
     const defaultImageSrcSet =
@@ -366,7 +366,8 @@ class RestaurantHome extends Component {
                   //switch (tabName) {
                   switch (tabName) {
                     case 'Home':
-                      return <DefaultHome profileInfo={basicProfile} />;
+                      // return <DefaultHome profileInfo={basicProfile} />;
+                      return <DefaultHome />;
                     case 'Profile':
                       return <Profile />;
                     case 'FoodMenu':

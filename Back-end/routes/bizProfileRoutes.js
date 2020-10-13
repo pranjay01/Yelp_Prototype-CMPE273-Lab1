@@ -4,7 +4,6 @@ const express = require('express');
 const {
   signup,
   getRestaurantInfo,
-  getRestaurantCompleteInfo,
   updateRestaurantProfile,
   fetchMenu,
   insertFood,
@@ -18,6 +17,7 @@ const {
   getEventList,
   getCustomerList,
   uploadRestaurantProfilePic,
+  uploadPicToMulter,
   uploadFoodImage,
   getCustomerCompleteProfileForRestaurant,
 } = require('../restaurant/restaurantProfile');
@@ -63,19 +63,25 @@ Router.get('/homeProfile', validateUser, async (req, res) => {
   return results;
 });
 
-// Restaurant get Profile Info for Profile page
-Router.get('/restaurantCompleteProfile', async (req, res) => {
-  console.log('Get basic Restaurant Profile');
-  let results = null;
-  results = await getRestaurantCompleteInfo(req, res);
-  return results;
-});
-
 // Restaurant Update Profile
-Router.post('/updateRestaurantProfile', async (req, res) => {
+Router.post('/updateRestaurantProfile', validateUser, async (req, res) => {
   console.log('Update Restaurant Profile');
   let results = null;
   results = await updateRestaurantProfile(req.body, res);
+  return results;
+});
+
+Router.post('/uploadRestaurantProfilePic', validateUser, async (req, res) => {
+  console.log('uploadRestaurantProfilePic');
+  let results = null;
+  results = await uploadRestaurantProfilePic(req, res);
+  return results;
+});
+
+Router.post('/uploadPicToMulter', validateUser, async (req, res) => {
+  console.log('uploadPicToMulter');
+  let results = null;
+  results = await uploadPicToMulter(req, res);
   return results;
 });
 
@@ -166,20 +172,6 @@ Router.get('/getCustomerList', async (req, res) => {
   results = await getCustomerList(req, res);
   return results;
 });
-
-Router.post('/uploadRestaurantProfilePic', async (req, res) => {
-  console.log('uploadRestaurantProfilePic');
-  let results = null;
-  results = await uploadRestaurantProfilePic(req, res);
-  return results;
-});
-
-// Router.post('/uploadPicToDB', async (req, res) => {
-//   console.log('uploadPicToDB');
-//   let results = null;
-//   results = await uploadPicToDB(req, res);
-//   return results;
-// });
 
 Router.post('/uploadFoodImage', async (req, res) => {
   console.log('uploadFoodImage');

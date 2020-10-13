@@ -34,7 +34,7 @@ class LeftPannel extends Component {
                     <div class="lemon--div__06b83__1mboc arrange-unit__06b83__o3tjT arrange-unit-fill__06b83__3Sfw1 border-color--default__06b83__3-ifU">
                       <div class="lemon--div__06b83__1mboc fs-block border-color--default__06b83__3-ifU">
                         <h4 class="lemon--h4__06b83__1yd__ heading--h4__06b83__27bDo">
-                          {this.props.restaurantProfile.restaurantName}
+                          {this.props.restaurantProfile.Name}
                         </h4>
                         <div class="lemon--div__06b83__1mboc padding-t1__06b83__2aTOb border-color--default__06b83__3-ifU">
                           <p class="lemon--p__06b83__3Qnnj text__06b83__2Kxyz text-color--subtle__06b83__3DZpi text-align--left__06b83__2XGa- text-size--small__06b83__3NVWO">

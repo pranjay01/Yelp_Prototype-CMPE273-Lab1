@@ -104,7 +104,7 @@ class DefaultHome extends Component {
                         <div class="lemon--div__06b83__1mboc business-name__06b83__2Y1ql display--inline-block__06b83__1ZKqC border-color--default__06b83__3-ifU">
                           <div class="lemon--div__06b83__1mboc border-color--default__06b83__3-ifU">
                             <h2 class="lemon--h2__06b83__hjA2W heading--h2__06b83__1g9VN">
-                              {this.props.restaurantProfile.restaurantName}
+                              {this.props.restaurantProfile.Name}
                             </h2>
                           </div>
                         </div>

@@ -8,7 +8,7 @@ import './Login.css';
 // import { history } from '../../App';
 import { updateLoginSuccess, updateSignupStatus } from '../../constants/action-types';
 import { connect } from 'react-redux';
-import { updateSnackbarData } from '..//../constants/action-types';
+import { updateSnackbarData } from '../../constants/action-types';
 import jwt_decode from 'jwt-decode';
 
 //Define a Login Component
