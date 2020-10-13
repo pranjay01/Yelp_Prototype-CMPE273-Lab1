@@ -4,7 +4,7 @@ const { Schema } = mongoose;
 
 const restaurantSchema = new Schema(
   {
-    RestaurantID: { type: Number, required: true },
+    RestaurantID: { type: String, required: true },
     Name: { type: String, required: true },
     Email: { type: String, required: true },
     CountryName: { type: String, required: true },

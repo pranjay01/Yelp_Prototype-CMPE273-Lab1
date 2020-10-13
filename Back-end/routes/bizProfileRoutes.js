@@ -23,7 +23,7 @@ const {
   getCustomerCompleteProfileForRestaurant,
 } = require('../restaurant/restaurantProfile');
 
-const { login, logout } = require('../common/loginLogout');
+const { login } = require('../common/loginLogout');
 
 const Router = express.Router();
 
@@ -39,16 +39,19 @@ Router.post('/signup', async (req, res) => {
 Router.post('/login', async (req, res) => {
   console.log('Login if correct credential');
   let results = null;
-  results = await login(req, res, 2);
+  results = await login(req, res, 'Restaurant');
   return results;
 });
 
 // Restaurant Logout
 Router.post('/logout', async (req, res) => {
   console.log('Logout');
-  let results = null;
-  results = await logout(req.body, res);
-  return results;
+  req.logout();
+  res.writeHead(200, {
+    'Content-Type': 'text/plain',
+  });
+  res.end('User Logout Successful');
+  return res;
 });
 
 // Restaurant get Profile Info for Home page

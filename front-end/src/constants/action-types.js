@@ -10,3 +10,4 @@ export const updateSelectedFilter = 'update-selected-filter';
 export const updateSearchedString = 'updat-searched-string';
 export const updateSearchStrings = 'update-search-strings';
 export const updateRestaurantArray = 'update-restaurant-array';
+export const updateMasterData = 'update-master-data';

@@ -4,7 +4,7 @@ const { Schema } = mongoose;
 
 const foodItemSchema = new Schema(
   {
-    RestaurantId: { type: Number, required: true },
+    RestaurantId: { type: String, required: true },
     FoodName: { type: String, required: true },
     MenuCategoryName: {
       type: String,

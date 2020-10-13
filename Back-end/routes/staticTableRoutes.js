@@ -2,6 +2,9 @@
 const express = require('express');
 
 const {
+  uploadCountryData,
+  uploadStateData,
+  uploadGenderData,
   getSignupMasterData,
   getSignupMasterDataCustomer,
   getCusinesForMenu,
@@ -14,6 +17,28 @@ const {
 } = require('../staticTables/staticTableFetch');
 
 const Router = express.Router();
+
+// Insert STatic Master Data
+Router.post('/country', async (req, res) => {
+  console.log('Upload Country Data');
+  let results = null;
+  results = await uploadCountryData(req, res);
+  return results;
+});
+
+Router.post('/state', async (req, res) => {
+  console.log('Upload State Data');
+  let results = null;
+  results = await uploadStateData(req, res);
+  return results;
+});
+
+Router.post('/gender', async (req, res) => {
+  console.log('Upload Gender Data');
+  let results = null;
+  results = await uploadGenderData(req, res);
+  return results;
+});
 
 // Restaurant signup
 Router.get('/signupMasterData', async (req, res) => {

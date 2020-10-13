@@ -16,6 +16,7 @@
     "google-maps-react": "^2.0.6",
     "history": "^5.0.0",
     "jest": "^26.5.2",
+    "jwt-decode": "^3.0.0",
     "mdbreact": "^4.27.0",
     "react": "^16.13.1",
     "react-bootstrap-validation": "^0.1.11",

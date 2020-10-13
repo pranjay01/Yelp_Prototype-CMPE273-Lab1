@@ -7,16 +7,10 @@ class loginBlock extends Component {
     this.state = {};
   }
   render() {
-    console.log('inside login block');
     return (
       <div className="arrange_unit nowrap">
         <ul className="header-nav hero-header_nav main-header_account">
-          <li
-            // onClick={() => {
-            //   history.push('/login');
-            // }}
-            className="header-nav_item u-space-r2 "
-          >
+          <li className="header-nav_item u-space-r2 ">
             <Link
               className="header-nav_link header-nav_link--log-in js-analytics-click restaurant-search-result-page"
               to="/customerLogin"

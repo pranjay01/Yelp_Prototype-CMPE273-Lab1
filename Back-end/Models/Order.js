@@ -4,10 +4,10 @@ const { Schema } = mongoose;
 
 const orderSchema = new Schema(
   {
-    CustomerId: { type: Number, required: true },
+    CustomerId: { type: String, required: true },
     CustomerName: { type: String, required: true },
     CustomerImageUrl: { type: String, required: true },
-    RestaurantId: { type: Number, required: true },
+    RestaurantId: { type: String, required: true },
     RestaurantName: { type: String, required: true },
     OrderedDate: { type: Date, required: true },
     OrderType: { type: String, enum: ['Delivery', 'Pick_up'], required: true },

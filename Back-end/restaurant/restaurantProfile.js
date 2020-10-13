@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable no-console */
 
 const bcrypt = require('bcrypt');
@@ -11,6 +12,9 @@ const geocoder = require('google-geocoder');
 const { getUserIdFromToken } = require('../common/loginLogout');
 
 const mysqlConnection = require('../mysqlConnection');
+const UserSignup = require('../Models/UserSignup');
+
+const Restaurant = require('../Models/Restaurant');
 
 const geo = geocoder({
   key: 'AIzaSyBpI0r49yQH5FrrK6tsDHrbkYoBp8bWSXE',
@@ -106,95 +110,85 @@ const getOrderList = async (_order, _appetizers, _desserts, _beverages, _salads,
   return results;
 };
 
-// Function to check if email already exists
-// 2 is for enum value restauarnt
-const checkEmailExists = async (email) => {
-  const verifyEmailExist = 'CALL getEmail(?,?)';
-
-  const connection = await mysqlConnection();
-  // eslint-disable-next-line no-unused-vars
-  const [results, fields] = await connection.query(verifyEmailExist, [email, 2]);
-
-  connection.end();
-  console.log(results);
-  if (results[0].length === 0) {
-    return true;
-    // eslint-disable-next-line no-else-return
-  } else {
-    return false;
-  }
-};
-
-// Function to create ine restaurant
+// Function to create new restaurant
 const signup = async (restaurant, response) => {
-  const {
-    Email,
-    Password,
-    Name,
-    // eslint-disable-next-line camelcase
-    Country_ID,
-    // eslint-disable-next-line camelcase
-    State_ID,
-    City,
-    Zip,
-    Street,
-    // eslint-disable-next-line camelcase
-    Country_Code,
-    // eslint-disable-next-line camelcase
-    Phone_no,
-  } = restaurant;
-  if (await checkEmailExists(Email)) {
-    try {
-      let Location = Street.concat(', ');
-      Location = Location.concat(Zip);
-      geo.find(Location, async function (err, res) {
-        console.log(res[0].location.lat);
-        console.log(res[0].location.lng);
-        const latitude = res[0].location.lat;
-        const longitude = res[0].location.lng;
-
-        //   }
-        // );
-        const hashedPassword = await bcrypt.hash(Password, 10);
-        console.log(hashedPassword);
-        const signupQuery = 'CALL resturantSignup(?,?,?,?,?,?,?,?,?,?,?,?)';
-
-        const connection = await mysqlConnection();
-        const [results] = await connection.query(signupQuery, [
-          Email,
-          hashedPassword,
-          Name,
-          Number(Country_ID),
-          Number(State_ID),
-          City,
-          Number(Zip),
-          Street,
-          Number(Country_Code),
-          Number(Phone_no),
-          latitude,
-          longitude,
-        ]);
-        connection.end();
-        console.log(results);
-        response.writeHead(201, {
+  try {
+    UserSignup.findOne({ Email: restaurant.Email, Role: 'Restaurant' }, async (error, user) => {
+      if (error) {
+        response.writeHead(500, {
           'Content-Type': 'text/plain',
         });
-        response.end('User Created');
-        // return response;
-      });
-    } catch (error) {
-      response.writeHead(500, {
-        'Content-Type': 'text/plain',
-      });
-      response.end('Network error');
-      // return response;
-    }
-  } else {
-    response.writeHead(409, {
+        response.end('Network Error');
+      } else if (user) {
+        response.writeHead(400, {
+          'Content-Type': 'text/plain',
+        });
+        response.end('Email Already Exists');
+      } else {
+        let Location = restaurant.Street.concat(', ');
+        Location = Location.concat(restaurant.Zip);
+        geo.find(Location, async function (err1, res) {
+          if (res.length === 0) {
+            response.writeHead(500, {
+              'Content-Type': 'text/plain',
+            });
+            response.end('Incorrect Location');
+          } else {
+            console.log(res[0].location.lat);
+            console.log(res[0].location.lng);
+            const latitude = res[0].location.lat;
+            const longitude = res[0].location.lng;
+            const hashedPassword = await bcrypt.hash(restaurant.Password, 10);
+            const newUser = new UserSignup({
+              ...restaurant,
+              Role: 'Restaurant',
+              Password: hashedPassword,
+            });
+            //  newUser = { ...newUser, Password: hashedPassword };
+            newUser.save((err, data) => {
+              if (err) {
+                response.writeHead(500, {
+                  'Content-Type': 'text/plain',
+                });
+                response.end('Network Error');
+              } else {
+                const newRestaurant = new Restaurant({
+                  ...restaurant,
+                  RestaurantID: data._id,
+                  Latitude: latitude,
+                  Longitude: longitude,
+                });
+                newRestaurant.save((err2, result) => {
+                  if (err2) {
+                    response.writeHead(500, {
+                      'Content-Type': 'text/plain',
+                    });
+                    response.end('Network Error');
+                  } else {
+                    response.writeHead(201, {
+                      'Content-Type': 'text/plain',
+                    });
+                    response.end('User Created');
+                    console.log(result);
+                  }
+                });
+              }
+            });
+            if (err1) {
+              response.writeHead(500, {
+                'Content-Type': 'text/plain',
+              });
+              response.end('Incorrect Location');
+            }
+          }
+        });
+      }
+    });
+  } catch (e) {
+    response.writeHead(500, {
       'Content-Type': 'text/plain',
     });
-    response.end('Email Already Exists');
-    // return response;
+    response.end('Network error');
   }
   return response;
 };

@@ -26,6 +26,8 @@
     "multer-s3": "^2.9.0",
     "mysql": "^2.18.1",
     "mysql2": "^2.1.0",
+    "passport": "^0.4.1",
+    "passport-jwt": "^4.0.0",
     "randomstring": "^1.1.5"
   },
   "devDependencies": {

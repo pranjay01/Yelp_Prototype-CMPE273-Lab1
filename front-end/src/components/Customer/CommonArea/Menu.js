@@ -5,25 +5,21 @@ import serverUrl from '../../../config';
 import { updateLogoutSuccess, getCustomerBasicInfo } from '../../../constants/action-types';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { Redirect } from 'react-router';
 
 class Menu extends Component {
   constructor(props) {
     super(props);
-    this.state = { Name: '', Address: '', ReviewCount: 0 };
+    this.state = { Name: '', Address: '', ReviewCount: 0, logout: false };
   }
 
   componentDidMount() {}
   logout = (e) => {
-    // e.preventDefault();
+    e.preventDefault();
     console.log('logouting customer');
-    var data = {
-      token: cookie.load('cookie'),
-      role: cookie.load('userrole'),
-    };
-    cookie.remove('cookie', { path: '/' });
-    cookie.remove('userrole', { path: '/' });
+
     localStorage.clear();
-    axios.post(serverUrl + 'customer/logout', data).then((response) => {
+    axios.post(serverUrl + 'customer/logout').then((response) => {
       if (response.status === 200) {
         let payload = {
           userEmail: '',
@@ -31,11 +27,21 @@ class Menu extends Component {
           loginStatus: false,
         };
         this.props.updateLogoutSuccess(payload);
+        this.setState({
+          Name: '',
+          Address: '',
+          ReviewCount: 0,
+          logout: true,
+        });
         window.location.reload(false);
       }
     });
   };
   render() {
+    let redirectVar = null;
+    if (this.state.logout) {
+      redirectVar = <Redirect to="/customerLogin" />;
+    }
     const defaultImage =
       'https://s3-media0.fl.yelpcdn.com/assets/public/user_60_square.yji-514f6997a3184af475d5adc800b6d0b1.png';
     return (
@@ -44,6 +50,7 @@ class Menu extends Component {
         class="drop-menu drop-menu-has-arrow"
         style={{ display: 'block' }}
       >
+        {redirectVar}
         <div class="drop-menu-arrow responsive-hidden-small"></div>
         <div class="drop-menu-group responsive-visible-large-block">
           <div class="ypassport ypassport-notext media-block">

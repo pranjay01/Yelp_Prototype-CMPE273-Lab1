@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable camelcase */
 /* eslint-disable no-console */
 const bcrypt = require('bcrypt');
@@ -18,6 +19,10 @@ require('dotenv').config();
 
 const { getOrderList } = require('../restaurant/restaurantProfile');
 
+const UserSignup = require('../Models/UserSignup');
+
+const Customer = require('../Models/Customer');
+/*
 const checkEmailExists = async (email) => {
   const verifyEmailExist = 'CALL getEmail(?,?)';
   // 1 is for enum value customer
@@ -32,7 +37,7 @@ const checkEmailExists = async (email) => {
   }
   return false;
 };
-
+*/
 const multipleUpload = multer({
   storage: multerS3({
     s3: s3Storage,
@@ -51,6 +56,64 @@ const multipleUpload = multer({
 }).single('file');
 
 const signup = async (customer, response) => {
+  try {
+    UserSignup.findOne({ Email: customer.Email, Role: 'Customer' }, async (error, user) => {
+      if (error) {
+        response.writeHead(500, {
+          'Content-Type': 'text/plain',
+        });
+        response.end('Network Error');
+      } else if (user) {
+        response.writeHead(400, {
+          'Content-Type': 'text/plain',
+        });
+        response.end('Email Already Exists');
+      } else {
+        const hashedPassword = await bcrypt.hash(customer.Password, 10);
+        const newUser = new UserSignup({
+          ...customer,
+          Role: 'Customer',
+          Password: hashedPassword,
+        });
+        newUser.save((err, data) => {
+          if (err) {
+            response.writeHead(500, {
+              'Content-Type': 'text/plain',
+            });
+            response.end('Network Error');
+          } else {
+            const newCustomer = new Customer({
+              ...customer,
+              CustomerID: data._id,
+            });
+            newCustomer.save((err1, result) => {
+              if (err1) {
+                response.writeHead(500, {
+                  'Content-Type': 'text/plain',
+                });
+                response.end('Network Error');
+              } else {
+                response.writeHead(201, {
+                  'Content-Type': 'text/plain',
+                });
+                response.end('User Created');
+                console.log(result);
+              }
+            });
+          }
+        });
+      }
+    });
+  } catch (error) {
+    response.writeHead(500, {
+      'Content-Type': 'text/plain',
+    });
+    response.end('Network Error');
+  }
+  return response;
+};
+/*
+const signupOld = async (customer, response) => {
   // eslint-disable-next-line camelcase
   const { Email, Password, First_Name, Last_Name, Gender } = customer;
   if (await checkEmailExists(Email)) {
@@ -92,6 +155,7 @@ const signup = async (customer, response) => {
   }
 };
 
+*/
 // getCustomer Basic Info
 const getBasicInfo = async (request, response) => {
   console.log(request.headers.cookie);

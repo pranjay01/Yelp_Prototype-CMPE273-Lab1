@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import cookie from 'react-cookies';
 import { Redirect } from 'react-router';
 import axios from 'axios';
 import serverUrl from '../../config';
@@ -71,44 +70,44 @@ class RestaurantHome extends Component {
     localStorage.setItem('tabName', tabName);
     localStorage.setItem('showFoodCategory', '');
   };
-  componentDidMount() {
-    axios.get(serverUrl + 'biz/homeProfile', { withCredentials: true }).then(
-      (response) => {
-        if (response.status === 200) {
-          this.setState({
-            restroName: response.data[0][0].Name,
-            address:
-              response.data[0][0].Street +
-              ' ' +
-              response.data[0][0].City +
-              ' ' +
-              response.data[0][0].State +
-              ' ' +
-              response.data[0][0].Zip,
-            reviewCOunt: response.data[1][0].ReviewCount,
-          });
-          let payload = {
-            restaurantName: response.data[0][0].Name,
-            ImageUrl: response.data[0][0].ImageURL,
-            restaurantAddress:
-              response.data[0][0].Street +
-              ' ' +
-              response.data[0][0].City +
-              ' ' +
-              response.data[0][0].State +
-              ' ' +
-              response.data[0][0].Zip,
-          };
-          this.props.updateHomeProfile(payload);
-          console.log(this.state);
-          console.log(response.data);
-        }
-      },
-      (error) => {
-        console.log(error.response.data);
-      }
-    );
-  }
+  // componentDidMount() {
+  //   axios.get(serverUrl + 'biz/homeProfile', { withCredentials: true }).then(
+  //     (response) => {
+  //       if (response.status === 200) {
+  //         this.setState({
+  //           restroName: response.data[0][0].Name,
+  //           address:
+  //             response.data[0][0].Street +
+  //             ' ' +
+  //             response.data[0][0].City +
+  //             ' ' +
+  //             response.data[0][0].State +
+  //             ' ' +
+  //             response.data[0][0].Zip,
+  //           reviewCOunt: response.data[1][0].ReviewCount,
+  //         });
+  //         let payload = {
+  //           restaurantName: response.data[0][0].Name,
+  //           ImageUrl: response.data[0][0].ImageURL,
+  //           restaurantAddress:
+  //             response.data[0][0].Street +
+  //             ' ' +
+  //             response.data[0][0].City +
+  //             ' ' +
+  //             response.data[0][0].State +
+  //             ' ' +
+  //             response.data[0][0].Zip,
+  //         };
+  //         this.props.updateHomeProfile(payload);
+  //         console.log(this.state);
+  //         console.log(response.data);
+  //       }
+  //     },
+  //     (error) => {
+  //       console.log(error.response.data);
+  //     }
+  //   );
+  // }
 
   showMenu = () => {
     this.setState({
@@ -116,12 +115,9 @@ class RestaurantHome extends Component {
     });
   };
   logout = (e) => {
-    var data = {
-      token: cookie.load('cookie'),
-      role: cookie.load('userrole'),
-    };
+    localStorage.clear();
     e.preventDefault();
-    axios.post(serverUrl + 'biz/logout', data).then(
+    axios.post(serverUrl + 'biz/logout').then(
       (response) => {
         if (response.status === 200) {
           localStorage.clear();
@@ -139,30 +135,22 @@ class RestaurantHome extends Component {
           this.setState({
             loggedIn: false,
           });
-          // window.location.reload(false);
         }
       },
       (error) => {
         console.log(error.response.data);
-        window.location.reload(false);
+        // window.location.reload(false);
       }
     );
-    cookie.remove('cookie', { path: '/' });
-    cookie.remove('userrole', { path: '/' });
   };
   render() {
-    console.log('inside restaurant home');
     let redirectVar = null;
-    if (!cookie.load('cookie')) {
+    if (!localStorage.getItem('token')) {
       redirectVar = <Redirect to="/restaurantLogin" />;
     } else {
-      console.log('cookie found');
-      console.log('inside RestaurantHome', cookie.load('userrole'));
-      if (cookie.load('userrole') === 'Customer') {
-        console.log('inside if block');
+      if (localStorage.getItem('userrole') === 'Customer') {
         redirectVar = <Redirect to="/home" />;
-      } else if (cookie.load('userrole') === 'Restaurant') {
-        console.log('redirect to restaurant home page');
+      } else if (localStorage.getItem('userrole') === 'Restaurant') {
         redirectVar = null;
       } else {
         redirectVar = <Redirect to="/restaurantLogin" />;

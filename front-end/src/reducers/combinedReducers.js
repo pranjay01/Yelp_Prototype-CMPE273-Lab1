@@ -5,6 +5,7 @@ import snackBarReducer from './snackBarReducer';
 import customerBasicInfoReducer from './customerBasicInfoReducer';
 import searchTabReducer from './searchTabReducer';
 import restaurantSearchResultReducer from './restaurantSearchResultReducer';
+import masterDataReducer from './masterDataReducer';
 
 import { combineReducers } from 'redux';
 
@@ -16,6 +17,7 @@ const finalReducers = combineReducers({
   customerBasicInfoReducer: customerBasicInfoReducer,
   searchTabReducer: searchTabReducer,
   restaurantSearchResultReducer: restaurantSearchResultReducer,
+  masterDataReducer: masterDataReducer,
 });
 
 export default finalReducers;

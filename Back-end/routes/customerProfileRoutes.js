@@ -19,7 +19,7 @@ const {
   getAllOrders,
   orderDetailsFetch,
 } = require('../customer/customerProfile');
-const { login, logout } = require('../common/loginLogout');
+const { login } = require('../common/loginLogout');
 
 // Customer signup
 Router.post('/signup', async (req, res) => {
@@ -33,16 +33,19 @@ Router.post('/signup', async (req, res) => {
 Router.post('/login', async (req, res) => {
   console.log('Login if correct credential');
   let results = null;
-  results = await login(req, res, 1);
+  results = await login(req, res, 'Customer');
   return results;
 });
 
 // Customer Logout
 Router.post('/logout', async (req, res) => {
   console.log('Logout');
-  let results = null;
-  results = await logout(req.body, res);
-  return results;
+  req.logout();
+  res.writeHead(200, {
+    'Content-Type': 'text/plain',
+  });
+  res.end('User Logout Successful');
+  return res;
 });
 
 Router.get('/getBasicInfo', async (req, res) => {

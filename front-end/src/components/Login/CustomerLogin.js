@@ -1,14 +1,13 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import cookie from 'react-cookies';
 import { Redirect } from 'react-router';
 import axios from 'axios';
 import serverUrl from '../../config';
 import './Login.css';
-// import { history } from '../../App';
 import { updateLoginSuccess } from '../../constants/action-types';
 import { connect } from 'react-redux';
 import { updateSnackbarData } from '..//../constants/action-types';
+import jwt_decode from 'jwt-decode';
 
 //Define a Login Component
 class CustomerLogin extends Component {
@@ -32,28 +31,6 @@ class CustomerLogin extends Component {
       genders: [],
       gender: null,
     };
-    //Bind the handlers to this className
-    // this.usernameChangeHandler = this.usernameChangeHandler.bind(this);
-    // this.passwordChangeHandler = this.passwordChangeHandler.bind(this);
-    // this.submitLogin = this.submitLogin.bind(this);
-  }
-  componentWillMount() {
-    if (this.props.location.pathname === '/customerSignup') {
-      console.log('inside Signup');
-      axios.get(serverUrl + 'static/signupMasterDataCustomer').then((response) => {
-        console.log(response.data);
-        let allGenders = response.data[0].map((gender) => {
-          return { key: gender.ID, value: gender.Gender };
-        });
-
-        this.setState({
-          genders: this.state.genders.concat(allGenders),
-        });
-      });
-    }
-    this.setState({
-      authFlag: false,
-    });
   }
 
   /**Signup Block */
@@ -92,8 +69,8 @@ class CustomerLogin extends Component {
     const data = {
       Email: this.state.email,
       Password: this.state.signupPassword,
-      First_Name: this.state.fName,
-      Last_Name: this.state.lName,
+      FirstName: this.state.fName,
+      LastName: this.state.lName,
       Gender: this.state.gender,
     };
     //set the with credentials to true
@@ -102,7 +79,7 @@ class CustomerLogin extends Component {
     axios.post(serverUrl + 'customer/signup', data).then(
       (response) => {
         console.log('Status Code : ', response.status);
-        if (response.status === 200) {
+        if (response.status === 201) {
           console.log(response.data);
           let payload = {
             success: true,
@@ -170,13 +147,15 @@ class CustomerLogin extends Component {
       (response) => {
         console.log('Status Code : ', response.status);
         if (response.status === 200) {
-          localStorage.setItem('token', cookie.load('cookie'));
-          localStorage.setItem('userrole', cookie.load('userrole'));
-          console.log('cookie: ', cookie.load('cookie'));
-          console.log('role: ', cookie.load('userrole'));
+          const decoded = jwt_decode(response.data.split(' ')[1]);
+          localStorage.setItem('token', response.data);
+          localStorage.setItem('userId', decoded._id);
+          localStorage.setItem('userrole', decoded.userrole);
+          localStorage.setItem('useremail', decoded.email);
+
           let payload = {
-            userEmail: this.state.username,
-            role: cookie.load('userrole'),
+            userEmail: decoded.email,
+            role: decoded.Role,
             loginStatus: true,
           };
           this.props.updateLoginSuccess(payload);
@@ -190,8 +169,6 @@ class CustomerLogin extends Component {
         }
       },
       (error) => {
-        // console.log('Status Code : ', error.status);
-        // console.log('Status Code : ', error.response);
         this.setState({
           errorBlock: error.response.data,
           inputBlockHighlight: 'errorBlock',
@@ -209,14 +186,17 @@ class CustomerLogin extends Component {
   };
   render() {
     let redirectVar = null;
-    if (cookie.load('cookie')) {
-      if (cookie.load('userrole') === 'Restaurant') {
+    // console.log('token: ', localStorage.getItem('token'));
+    if (localStorage.getItem('token')) {
+      if (localStorage.getItem('userrole') === 'Restaurant') {
         console.log('redirect to restaurant home page');
         redirectVar = <Redirect to="/restaurantHome" />;
-      } else if (cookie.load('userrole') === 'Customer') {
+      } else if (localStorage.getItem('userrole') === 'Customer') {
         console.log('redirect to custome home page');
         redirectVar = <Redirect to="/home" />;
       }
+    } else if (this.state.authFlag === true) {
+      redirectVar = <Redirect to="/customerLogin" />;
     }
 
     let signupOrLogin = null;
@@ -224,54 +204,55 @@ class CustomerLogin extends Component {
     if (this.props.location.pathname === '/customerSignup') {
       // if (history.location.pathname === '/customerSignup') {
       signupOrLogin = (
-        <div class="flow-start">
-          <div class="signup-form-container">
-            <div class="header">
+        <div className="flow-start">
+          <div className="signup-form-container">
+            <div className="header">
               <h2>Sign Up for Yelp</h2>
-              <p class="subheading">Connect with great local businesses</p>
-              <p class="legal-copy">
+              <p className="subheading">Connect with great local businesses</p>
+              <p className="legal-copy">
                 By continuing, you agree to Yelp’s{' '}
-                <Link class="legal-link" href="#">
+                <Link className="legal-link" href="#">
                   Terms of Service
                 </Link>{' '}
                 and acknowledge Yelp’s{' '}
-                <Link class="legal-link" href="#">
+                <Link className="legal-link" href="#">
                   Privacy Policy
                 </Link>
                 .
               </p>
             </div>
             <div>
-              <p class="fb-start">
+              <p className="fb-start">
                 <button
                   type="submit"
                   value="submit"
-                  class="ybtn ybtn--social ybtn--facebook ybtn-full"
+                  className="ybtn ybtn--social ybtn--facebook ybtn-full"
                 >
                   <span>
-                    <div class="u-text-centered">
+                    <div className="u-text-centered">
                       <span
                         aria-hidden="true"
                         style={{ width: '24px', height: '24px' }}
-                        class="icon icon--24-facebook icon--size-24 icon--currentColor"
+                        className="icon icon--24-facebook icon--size-24 icon--currentColor"
                       >
-                        <svg role="img" class="icon_svg"></svg>
+                        <svg role="img" className="icon_svg"></svg>
                       </span>{' '}
                       Continue with Facebook
                     </div>
                   </span>
                 </button>
               </p>
-              <p class="google-start">
+              <p className="google-start">
                 <button
                   type="submit"
                   value="submit"
-                  class="ybtn ybtn--social ybtn--google ybtn-full"
+                  className="ybtn ybtn--social ybtn--google ybtn-full"
                 >
                   <span>
-                    <div class="u-text-centered">
-                      <span class="icon--png">
+                    <div className="u-text-centered">
+                      <span className="icon--png">
                         <img
+                          alt="Yelp"
                           height="24"
                           width="24"
                           src="https://s3-media0.fl.yelpcdn.com/assets/srv0/yelp_styleguide/cae242fd3929/assets/img/structural/24x24_google_rainbow.png"
@@ -283,20 +264,20 @@ class CustomerLogin extends Component {
                   </span>
                 </button>
               </p>
-              <p class="legal-copy">Don't worry, we never post without your permission.</p>
-              <fieldset class="hr-line">
+              <p className="legal-copy">Don't worry, we never post without your permission.</p>
+              <fieldset className="hr-line">
                 <legend align="center">OR</legend>
               </fieldset>
             </div>
             <form
               onSubmit={this.onSubmitSignUp}
-              class="yform signup-form  city-hidden"
+              className="yform signup-form  city-hidden"
               id="signup-form"
             >
-              <div class="js-password-meter-container">
-                <ul class="inline-layout clearfix">
+              <div className="js-password-meter-container">
+                <ul className="inline-layout clearfix">
                   <li>
-                    <label class="placeholder-sub">First Name</label>
+                    <label className="placeholder-sub">First Name</label>
                     <input
                       id="first_name"
                       name="first_name"
@@ -308,7 +289,7 @@ class CustomerLogin extends Component {
                   </li>
 
                   <li>
-                    <label class="placeholder-sub">Last Name</label>
+                    <label className="placeholder-sub">Last Name</label>
                     <input
                       id="last_name"
                       name="last_name"
@@ -321,7 +302,7 @@ class CustomerLogin extends Component {
                 </ul>
 
                 <div>
-                  <label class="placeholder-sub">Email</label>
+                  <label className="placeholder-sub">Email</label>
                   <input
                     id="email"
                     name="email"
@@ -331,7 +312,7 @@ class CustomerLogin extends Component {
                     onChange={this.onChangeHandlerEmail}
                   />
 
-                  <label class="placeholder-sub">Password</label>
+                  <label className="placeholder-sub">Password</label>
                   <input
                     id="password"
                     name="password"
@@ -341,24 +322,24 @@ class CustomerLogin extends Component {
                     onChange={this.onChangeHandlerPasswordSignup}
                   />
 
-                  <div class="js-password-meter-wrapper password-meter-wrapper u-hidden">
-                    <div class="progress-bar-container--minimal">
-                      <h4 class="progress-bar-text"></h4>
-                      <div class="progress-bar new js-progress-bar">
+                  <div className="js-password-meter-wrapper password-meter-wrapper u-hidden">
+                    <div className="progress-bar-container--minimal">
+                      <h4 className="progress-bar-text"></h4>
+                      <div className="progress-bar new js-progress-bar">
                         <div
-                          class="progress-bar_fill js-progress-bar_fill new"
+                          className="progress-bar_fill js-progress-bar_fill new"
                           role="presentation"
                           style={{ width: '0%' }}
                         ></div>
                       </div>
                     </div>
 
-                    <div class="js-password-meter-help-block help-block u-space-b2">
+                    <div className="js-password-meter-help-block help-block u-space-b2">
                       Password must be at least 6 characters in length
                     </div>
                     <input
                       type="hidden"
-                      class="js-password-meter-strength-result"
+                      className="js-password-meter-strength-result"
                       name="result_password_strength_meter"
                     />
                   </div>
@@ -366,8 +347,8 @@ class CustomerLogin extends Component {
                   <input id="signup_source" name="signup_source" type="hidden" value="default" />
                 </div>
               </div>
-              <div class="js-more-fields more-fields">
-                <label class="placeholder-sub">Gender</label>
+              <div className="js-more-fields more-fields">
+                <label className="placeholder-sub">Gender</label>
                 <select
                   placeholder="Gender"
                   className="form-control"
@@ -376,8 +357,8 @@ class CustomerLogin extends Component {
                   <option className="Dropdown-menu" key="" value="">
                     Gender
                   </option>
-                  {this.state.genders.map((gender) => (
-                    <option className="Dropdown-menu" key={gender.key} value={gender.key}>
+                  {this.props.masterData.Genders.map((gender) => (
+                    <option className="Dropdown-menu" key={gender.key} value={gender.value}>
                       {gender.value}
                     </option>
                   ))}
@@ -387,22 +368,22 @@ class CustomerLogin extends Component {
               <button
                 id="signup-button"
                 type="submit"
-                class="ybtn ybtn--primary ybtn--big disable-on-submit submit signup-button"
+                className="ybtn ybtn--primary ybtn--big disable-on-submit submit signup-button"
               >
                 <span>Sign Up</span>
               </button>
             </form>
           </div>
-          <div class="sub-text-box">
-            <small class="subtle-text" style={{ textAlign: 'left', paddingRight: '21px' }}>
+          <div className="sub-text-box">
+            <small className="subtle-text" style={{ textAlign: 'left', paddingRight: '21px' }}>
               Restaurant Signup{' '}
-              <Link class="login-link" to="/restaurantSignup">
+              <Link className="login-link" to="/restaurantSignup">
                 Sign Up
               </Link>
             </small>
-            <small class="subtle-text">
+            <small className="subtle-text">
               Already on Yelp?{' '}
-              <Link class="login-link" to="/customerLogin">
+              <Link className="login-link" to="/customerLogin">
                 Log in
               </Link>
             </small>
@@ -412,54 +393,54 @@ class CustomerLogin extends Component {
     } else if (this.props.location.pathname === '/customerLogin') {
       // } else if (history.location.pathname === '/customerLogin') {
       signupOrLogin = (
-        <div class="login">
-          <div class="signup-form-container">
-            <div class="header">
+        <div className="login">
+          <div className="signup-form-container">
+            <div className="header">
               <h2>Sign in to Yelp</h2>
-              <p class="subheading">
+              <p className="subheading">
                 New to Yelp?{' '}
-                <Link class="signup-link " to="/customerSignup">
+                <Link className="signup-link " to="/customerSignup">
                   Sign up
                 </Link>
               </p>
-              <p class="legal-copy">
+              <p className="legal-copy">
                 By logging in, you agree to Yelp’s{' '}
-                <Link class="legal-link" to="#">
+                <Link className="legal-link" to="#">
                   Terms of Service
                 </Link>{' '}
                 and{' '}
-                <Link class="legal-link" to="#">
+                <Link className="legal-link" to="#">
                   Privacy Policy
                 </Link>
                 .
               </p>
             </div>
-            <ul class="ylist">
-              <li class="js-apple-login">
+            <ul className="ylist">
+              <li className="js-apple-login">
                 <div
                   id="appleid-signin"
                   role="button"
-                  class="apple-login-button u-cursor-pointer"
+                  className="apple-login-button u-cursor-pointer"
                   data-color="black"
                   data-type="sign in"
                   data-border-radius="8%"
                 ></div>
               </li>
 
-              <li class="js-fb-login">
+              <li className="js-fb-login">
                 <button
                   type="submit"
                   value="submit"
-                  class="ybtn ybtn--social ybtn--facebook ybtn-full"
+                  className="ybtn ybtn--social ybtn--facebook ybtn-full"
                 >
                   <span>
-                    <div class="u-text-centered">
+                    <div className="u-text-centered">
                       <span
                         aria-hidden="true"
                         style={{ width: '24px', height: '24px' }}
-                        class="icon icon--24-facebook icon--size-24 icon--currentColor"
+                        className="icon icon--24-facebook icon--size-24 icon--currentColor"
                       >
-                        <svg role="img" class="icon_svg"></svg>
+                        <svg role="img" className="icon_svg"></svg>
                       </span>{' '}
                       Sign in with Facebook
                     </div>
@@ -467,16 +448,17 @@ class CustomerLogin extends Component {
                 </button>
               </li>
 
-              <li class="js-google-login" data-component-bound="true">
+              <li className="js-google-login" data-component-bound="true">
                 <button
                   type="submit"
                   value="submit"
-                  class="ybtn ybtn--social ybtn--google ybtn-full"
+                  className="ybtn ybtn--social ybtn--google ybtn-full"
                 >
                   <span>
-                    <div class="u-text-centered">
-                      <span class="icon--png">
+                    <div className="u-text-centered">
+                      <span className="icon--png">
                         <img
+                          alt="Yelp"
                           height="24"
                           width="24"
                           src="https://s3-media0.fl.yelpcdn.com/assets/srv0/yelp_styleguide/cae242fd3929/assets/img/structural/24x24_google_rainbow.png"
@@ -489,11 +471,11 @@ class CustomerLogin extends Component {
                 </button>
               </li>
             </ul>
-            <fieldset class="login-separator hr-line">
+            <fieldset className="login-separator hr-line">
               <legend align="center">OR</legend>
             </fieldset>
-            <form class="yform" onSubmit={this.submitLogin}>
-              <label class="placeholder-sub">Email</label>
+            <form className="yform" onSubmit={this.submitLogin}>
+              <label className="placeholder-sub">Email</label>
               <input
                 id="email"
                 name="email"
@@ -501,9 +483,9 @@ class CustomerLogin extends Component {
                 required="required"
                 type="email"
                 onChange={this.onChangeHandlerUsername}
-                class={this.state.inputBlockHighlight}
+                className={this.state.inputBlockHighlight}
               />
-              <label class="placeholder-sub">Password</label>
+              <label className="placeholder-sub">Password</label>
               <input
                 onChange={this.onChangeHandlerPassword}
                 id="password"
@@ -511,27 +493,27 @@ class CustomerLogin extends Component {
                 placeholder="Password"
                 required="required"
                 type="password"
-                class={this.state.inputBlockHighlight}
+                className={this.state.inputBlockHighlight}
               />
-              <button type="submit" class="ybtn ybtn--primary ybtn--big submit ybtn-full">
+              <button type="submit" className="ybtn ybtn--primary ybtn--big submit ybtn-full">
                 <span>Sign in</span>
               </button>
             </form>
           </div>
-          <div class="sub-text-box">
-            <small class="subtle-text">
+          <div className="sub-text-box">
+            <small className="subtle-text">
               Restaurant Login{' '}
               <Link
-                class="signup-link"
+                className="signup-link"
                 to="/restaurantLogin"
                 style={{ textAlign: 'left', paddingRight: '55px' }}
               >
                 Log In
               </Link>
             </small>
-            <small class="subtle-text">
+            <small className="subtle-text">
               New to Yelp?{' '}
-              <Link class="signup-link" to="/customerSignup">
+              <Link className="signup-link" to="/customerSignup">
                 Sign up
               </Link>
             </small>
@@ -560,20 +542,20 @@ class CustomerLogin extends Component {
         {/*this.props.snackbarData != null && <SnackBar />*/}
         <button onClick={this.checkSnackbar}></button>
         <div>
-          <div class="lemon--div__373c0__1mboc header__373c0__AlFmH border-color--default__373c0__2oFDT">
-            <div class="lemon--div__373c0__1mboc container__373c0__13FCe transparent__373c0__3oxYH">
-              <div class="lemon--div__373c0__1mboc content__373c0__Zrlv5">
-                <div class="lemon--div__373c0__1mboc header-arrange__373c0__zC1DR arrange__373c0__UHqhV gutter-18__373c0__31Z0U vertical-align-middle__373c0__2TQsQ border-color--default__373c0__2oFDT">
-                  <div class="lemon--div__373c0__1mboc arrange-unit__373c0__1piwO arrange-unit-fill__373c0__17z0h border-color--default__373c0__2oFDT">
-                    <div class="lemon--div__373c0__1mboc border-color--default__373c0__2oFDT text-align--center__373c0__1l506">
-                      <div class="lemon--div__373c0__1mboc display--inline-block__373c0__2de_K border-color--default__373c0__2oFDT">
+          <div className="lemon--div__373c0__1mboc header__373c0__AlFmH border-color--default__373c0__2oFDT">
+            <div className="lemon--div__373c0__1mboc container__373c0__13FCe transparent__373c0__3oxYH">
+              <div className="lemon--div__373c0__1mboc content__373c0__Zrlv5">
+                <div className="lemon--div__373c0__1mboc header-arrange__373c0__zC1DR arrange__373c0__UHqhV gutter-18__373c0__31Z0U vertical-align-middle__373c0__2TQsQ border-color--default__373c0__2oFDT">
+                  <div className="lemon--div__373c0__1mboc arrange-unit__373c0__1piwO arrange-unit-fill__373c0__17z0h border-color--default__373c0__2oFDT">
+                    <div className="lemon--div__373c0__1mboc border-color--default__373c0__2oFDT text-align--center__373c0__1l506">
+                      <div className="lemon--div__373c0__1mboc display--inline-block__373c0__2de_K border-color--default__373c0__2oFDT">
                         <div
-                          class="lemon--div__373c0__1mboc logo__373c0__oXueP border-color--default__373c0__2oFDT"
+                          className="lemon--div__373c0__1mboc logo__373c0__oXueP border-color--default__373c0__2oFDT"
                           id="logo"
                           data-analytics-label="logo"
                         >
                           <Link
-                            class="lemon--a__373c0__IEZFH link__373c0__29943 logo-link__373c0__16Y0F link-color--blue-dark__373c0__1mhJo link-size--default__373c0__1skgq"
+                            className="lemon--a__373c0__IEZFH link__373c0__29943 logo-link__373c0__16Y0F link-color--blue-dark__373c0__1mhJo link-size--default__373c0__1skgq"
                             to="/"
                           >
                             Yelp
@@ -592,19 +574,27 @@ class CustomerLogin extends Component {
             <div className="main-content-wrap main-content-wrap--full">
               <div id="super-container" className="content-container">
                 <div id="alert-container">
-                  <div class={errorClass}>
-                    <a onClick={this.removeError} class="js-alert-dismiss dismiss-link" href="#">
+                  <div className={errorClass}>
+                    <a
+                      onClick={this.removeError}
+                      className="js-alert-dismiss dismiss-link"
+                      href="#"
+                    >
                       ×
                     </a>
-                    <p class="alert-message">
+                    <p className="alert-message">
                       <ul>{errorBlock}</ul>
                     </p>
                   </div>
-                  <div class={successClass}>
-                    <a onClick={this.removeError} class="js-alert-dismiss dismiss-link" href="#">
+                  <div className={successClass}>
+                    <a
+                      onClick={this.removeError}
+                      className="js-alert-dismiss dismiss-link"
+                      href="#"
+                    >
                       ×
                     </a>
-                    <p class="alert-message">
+                    <p className="alert-message">
                       <ul>{successBlock}</ul>
                     </p>
                   </div>
@@ -613,12 +603,15 @@ class CustomerLogin extends Component {
                 <div className="clearfix layout-block layout-h row--responsive">
                   <div className="column column-alpha column--responsive">
                     <div className="signup-wrapper">
-                      <div class="signup-flow on-flow-start">{signupOrLogin}</div>
+                      <div className="signup-flow on-flow-start">{signupOrLogin}</div>
                     </div>
                   </div>
-                  <div class="column column-beta responsive-visible-large-block">
-                    <div class="picture-container">
-                      <img src="https://s3-media0.fl.yelpcdn.com/assets/2/www/img/7922e77f338d/signup/signup_illustration.png" />
+                  <div className="column column-beta responsive-visible-large-block">
+                    <div className="picture-container">
+                      <img
+                        alt="Yelp"
+                        src="https://s3-media0.fl.yelpcdn.com/assets/2/www/img/7922e77f338d/signup/signup_illustration.png"
+                      />
                     </div>
                   </div>
                 </div>
@@ -633,9 +626,18 @@ class CustomerLogin extends Component {
 //export Login Component
 
 // export default CustomerLogin;
+// const mapStateToProps = (state) => {
+//   const snackbarData = state.snackBarReducer;
+//   return {
+//     snackbarData: snackbarData,
+//   };
+// };
+
 const mapStateToProps = (state) => {
+  const { masterData } = state.masterDataReducer;
   const snackbarData = state.snackBarReducer;
   return {
+    masterData: masterData,
     snackbarData: snackbarData,
   };
 };
@@ -657,4 +659,4 @@ const mapDispatchToProps = (dispatch) => {
   };
 };
 
-export default connect(null, mapDispatchToProps)(CustomerLogin);
+export default connect(mapStateToProps, mapDispatchToProps)(CustomerLogin);

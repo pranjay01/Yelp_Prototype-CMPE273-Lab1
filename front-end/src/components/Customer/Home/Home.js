@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import cookie from 'react-cookies';
 import { Redirect } from 'react-router';
 import axios from 'axios';
 import serverUrl from '../../../config';
@@ -120,13 +119,12 @@ class Home extends Component {
   render() {
     let redirectVar = null;
     // let block = null;
-    if (!cookie.load('cookie')) {
-      console.log('cookie not found');
+    if (!localStorage.getItem('token')) {
       redirectVar = null;
     } else {
-      if (cookie.load('userrole') === 'Customer') {
+      if (localStorage.getItem('userrole') === 'Customer') {
         redirectVar = null;
-      } else if (cookie.load('userrole') === 'Restaurant') {
+      } else if (localStorage.getItem('userrole') === 'Restaurant') {
         redirectVar = <Redirect to="/restaurantHome" />;
       } else {
         redirectVar = <Redirect to="/customerLogin" />;
@@ -182,7 +180,7 @@ class Home extends Component {
                   </div>
                 </div>
 
-                {cookie.load('cookie') ? <MenuBlock /> : <LoginBlock />}
+                {localStorage.getItem('token') ? <MenuBlock /> : <LoginBlock />}
               </div>
             </div>
             <div className="homepage-hero_inner">

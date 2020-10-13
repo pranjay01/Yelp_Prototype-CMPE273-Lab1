@@ -1,23 +1,114 @@
 const url = require('url');
 const mysqlConnection = require('../mysqlConnection');
-
+const Country = require('../Models/Country');
+const State = require('../Models/State');
+const Gender = require('../Models/Gender');
 require('dotenv').config();
 
-const getSignupMasterData = async (response) => {
-  const getMasterData = 'CALL getSignupMasterData()';
-  // 1 is for enum value customer
-  const connection = await mysqlConnection();
-  // eslint-disable-next-line no-unused-vars
-  const [results, fields] = await connection.query(getMasterData);
-
-  connection.end();
-  response.writeHead(200, {
-    'Content-Type': 'application/json',
+const uploadCountryData = async (request, response) => {
+  const newCountry = new Country({
+    Name: request.body.Name,
+    CountryCode: request.body.CountryCode,
   });
-  // eslint-disable-next-line no-console
-  console.log('SignupMaster for Restaurant : ', JSON.stringify(results));
-  response.end(JSON.stringify(results));
-  return response;
+  newCountry.save((error) => {
+    if (error) {
+      response.writeHead(500, {
+        'Content-Type': 'text/plain',
+      });
+      response.end();
+    } else {
+      // console.log('data: ', data);
+      response.writeHead(200, {
+        'Content-Type': 'text/plain',
+      });
+      response.end();
+    }
+  });
+};
+
+const uploadStateData = async (request, response) => {
+  const newState = new State({
+    ...request.body,
+  });
+  newState.save((error) => {
+    if (error) {
+      response.writeHead(500, {
+        'Content-Type': 'text/plain',
+      });
+      response.end();
+    } else {
+      // console.log('data: ', data);
+      response.writeHead(200, {
+        'Content-Type': 'text/plain',
+      });
+      response.end();
+    }
+  });
+};
+
+const uploadGenderData = async (request, response) => {
+  const newGender = new Gender({
+    ...request.body,
+  });
+  newGender.save((error) => {
+    if (error) {
+      response.writeHead(500, {
+        'Content-Type': 'text/plain',
+      });
+      response.end('Network Error');
+    } else {
+      // console.log('data: ', data);
+      response.writeHead(200, {
+        'Content-Type': 'text/plain',
+      });
+      response.end();
+    }
+  });
+};
+
+const getSignupMasterData = async (response) => {
+  const results = [];
+
+  try {
+    Country.find(await {}, async (error, country) => {
+      if (error) {
+        response.writeHead(500, {
+          'Content-Type': 'text/plain',
+        });
+      } else {
+        results.push(country);
+        State.find(await {}, async (error1, state) => {
+          if (error1) {
+            response.writeHead(500, {
+              'Content-Type': 'text/plain',
+            });
+          } else {
+            await results.push(state);
+            Gender.find(await {}, async (error2, gender) => {
+              if (error2) {
+                response.writeHead(500, {
+                  'Content-Type': 'text/plain',
+                });
+              } else {
+                await results.push(gender);
+                response.writeHead(200, {
+                  'Content-Type': 'application/json',
+                });
+                response.end(JSON.stringify(results));
+              }
+            });
+          }
+        });
+      }
+    });
+  } catch (error) {
+    response.writeHead(500, {
+      'Content-Type': 'text/plain',
+    });
+    response.end('Master Data Fetch Failed');
+    // return results;
+  }
+  return results;
 };
 
 const getSignupMasterDataCustomer = async (response) => {
@@ -200,6 +291,9 @@ const fetchRestaurantProfileForCustomer = async (req, res) => {
   return res;
 };
 module.exports = {
+  uploadCountryData,
+  uploadGenderData,
+  uploadStateData,
   getSignupMasterData,
   getSignupMasterDataCustomer,
   getCusinesForMenu,
@@ -210,3 +304,4 @@ module.exports = {
   menuFetch,
   fetchRestaurantProfileForCustomer,
 };
+// results = await getMasterData(res);

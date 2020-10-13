@@ -1,13 +1,19 @@
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable no-console */
 const bcrypt = require('bcrypt');
 
-const randomToken = require('randomstring');
-
-const mysqlConnection = require('../mysqlConnection');
+// const randomToken = require('randomstring');
+const jwt = require('jsonwebtoken');
+// const mysqlConnection = require('../mysqlConnection');
 require('dotenv').config();
+const UserSignup = require('../Models/UserSignup');
+
+const { auth } = require('../Utils/passport');
+
+auth();
 
 const LoggedTokens = [];
-
+/*
 const getEmailDetails = async (email, role) => {
   const getUserDetails = 'CALL getEmail(?,?)';
 
@@ -20,7 +26,33 @@ const getEmailDetails = async (email, role) => {
   return results[0];
 };
 
+*/
 const login = async (request, response, Role) => {
+  try {
+    UserSignup.findOne({ Email: request.body.Email, Role }, async (error, user) => {
+      if (error) {
+        response.status(500).end('Error Occured');
+      }
+      if (user && (await bcrypt.compare(request.body.Password, user.Password))) {
+        const payload = { _id: user._id, userrole: user.Role, email: user.Email };
+        const token = jwt.sign(payload, process.env.SESSION_SECRET, {
+          expiresIn: 1008000,
+        });
+        response.status(200).end(`JWT ${token}`);
+      } else {
+        response.status(401).end('Invalid Credentials');
+      }
+    });
+  } catch (error) {
+    response.writeHead(500, {
+      'Content-Type': 'text/plain',
+    });
+    response.end('Network error');
+  }
+};
+
+/*
+const loginOld = async (request, response, Role) => {
   const credentials = request.body;
   const { Email, Password } = credentials;
   const userDetails = await getEmailDetails(Email, Role);
@@ -69,30 +101,31 @@ const login = async (request, response, Role) => {
   return response;
 };
 
-const logout = async (body, response) => {
-  let isTokenDeleted;
-  // eslint-disable-next-line array-callback-return
-  LoggedTokens.filter(function roleCheck(user) {
-    if (user.Token === body.token && user.role === body.role) {
-      LoggedTokens.splice(LoggedTokens.indexOf(user), 1);
-      isTokenDeleted = true;
-    }
-  });
+*/
+// const logout = async (body, response) => {
+//   let isTokenDeleted;
+//   // eslint-disable-next-line array-callback-return
+//   LoggedTokens.filter(function roleCheck(user) {
+//     if (user.Token === body.token && user.role === body.role) {
+//       LoggedTokens.splice(LoggedTokens.indexOf(user), 1);
+//       isTokenDeleted = true;
+//     }
+//   });
 
-  if (isTokenDeleted) {
-    response.writeHead(200, {
-      'Content-Type': 'text/plain',
-    });
-    response.end('User Token Deleted');
-  } else {
-    response.writeHead(401, {
-      'Content-Type': 'text/plain',
-    });
-    response.end('User Token Not found');
-    // return response;
-  }
-  return response;
-};
+//   if (isTokenDeleted) {
+//     response.writeHead(200, {
+//       'Content-Type': 'text/plain',
+//     });
+//     response.end('User Token Deleted');
+//   } else {
+//     response.writeHead(401, {
+//       'Content-Type': 'text/plain',
+//     });
+//     response.end('User Token Not found');
+//     // return response;
+//   }
+//   return response;
+// };
 
 const getUserIdFromToken = (token, userRole) => {
   let User = null;
@@ -106,4 +139,4 @@ const getUserIdFromToken = (token, userRole) => {
   return userID;
 };
 
-module.exports = { login, logout, getUserIdFromToken };
+module.exports = { login, getUserIdFromToken };
