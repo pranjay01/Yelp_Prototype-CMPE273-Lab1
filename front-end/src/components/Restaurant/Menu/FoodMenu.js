@@ -415,7 +415,10 @@ class FoodMenu extends Component {
           };
           this.props.updateSnackbarData(payload);
           let pageNo = this.state.selectedPage;
-          if (this.props.foodDataFoodCount % 2 !== 0) {
+          if (
+            this.props.foodData.FoodCount % 2 !== 0 &&
+            this.state.selectedPage + 1 === this.props.foodData.PageCount
+          ) {
             pageNo -= 1;
           }
           this.fetchFoodMenu(pageNo, this.state.showFoodCategory);

@@ -22,14 +22,14 @@ const restaurantSchema = new Schema(
     YelpDelivery: { type: Boolean, default: false },
     Latitude: { type: String },
     Longitude: { type: String },
-    Reviews: [
-      {
-        Rating: { type: String, min: 1, max: 5 },
-        CustomerID: { type: Number },
-        CustomerName: { type: String },
-        Description: { type: String },
-      },
-    ],
+    // Reviews: [
+    //   {
+    //     Rating: { type: String, min: 1, max: 5 },
+    //     CustomerID: { type: Number },
+    //     CustomerName: { type: String },
+    //     Description: { type: String },
+    //   },
+    // ],
     Following: [{ ID: { type: Number }, Name: { type: String } }],
   },
   { versionKey: false }

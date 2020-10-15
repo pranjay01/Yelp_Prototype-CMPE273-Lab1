@@ -14,6 +14,7 @@ const mysqlConnection = require('../mysqlConnection');
 const UserSignup = require('../Models/UserSignup');
 
 const Restaurant = require('../Models/Restaurant');
+const Reviews = require('../Models/Review');
 
 const Appetizer = require('../Models/Appetizer');
 const Beverage = require('../Models/Beverage');
@@ -203,19 +204,31 @@ const getRestaurantInfo = async (request, response) => {
   try {
     const { _id } = url.parse(request.url, true).query;
 
-    Restaurant.findOne({ RestaurantID: _id }, async (error, restaurant) => {
-      if (error) {
-        response.writeHead(500, {
-          'Content-Type': 'text/plain',
-        });
-        response.end('Network Error');
-      } else {
-        response.writeHead(200, {
-          'Content-Type': 'text/plain',
-        });
-        response.end(JSON.stringify(restaurant));
-      }
+    const restaurant = await Restaurant.findOne({ RestaurantID: _id }).exec();
+
+    const reviewCount = await Reviews.find({ RestaurantID: _id }).countDocuments();
+    const results = {
+      restaurant,
+      reviewCount,
+    };
+
+    response.writeHead(200, {
+      'Content-Type': 'application/json',
     });
+    response.end(JSON.stringify(results));
+    // Restaurant.findOne({ RestaurantID: _id }, async (error, restaurant) => {
+    //   if (error) {
+    //     response.writeHead(500, {
+    //       'Content-Type': 'text/plain',
+    //     });
+    //     response.end('Network Error');
+    //   } else {
+    //     response.writeHead(200, {
+    //       'Content-Type': 'text/plain',
+    //     });
+    //     response.end(JSON.stringify(restaurant));
+    //   }
+    // });
   } catch (error) {
     response.writeHead(401, {
       'Content-Type': 'text/plain',
@@ -547,23 +560,27 @@ const updateFoodItem = async (request, response) => {
 
 // fetch Reviews
 const fetchReviews = async (request, response) => {
-  const restroId = getUserIdFromToken(request.cookies.cookie, request.cookies.userrole);
-  if (restroId) {
-    const fetchReviewsQuery = 'CALL fetchReviews(?)';
+  const { RestaurantID, selectedPage } = url.parse(request.url, true).query;
+  try {
+    const ReviewsList = await Reviews.find({ RestaurantID })
+      .limit(4)
+      .skip(selectedPage * 4)
+      .exec();
+    const reviewCount = await Reviews.find({ RestaurantID }).countDocuments();
+    const results = {
+      ReviewsList,
+      reviewCount,
+    };
 
-    const connection = await mysqlConnection();
-    // eslint-disable-next-line no-unused-vars
-    const [results, fields] = await connection.query(fetchReviewsQuery, restroId);
-    connection.end();
     response.writeHead(200, {
-      'Content-Type': 'text/plain',
+      'Content-Type': 'application/json',
     });
     response.end(JSON.stringify(results));
-  } else {
-    response.writeHead(401, {
+  } catch (error) {
+    response.writeHead(500, {
       'Content-Type': 'text/plain',
     });
-    response.end('Invalid User');
+    response.end('Review Fetch Failed');
   }
   return response;
 };

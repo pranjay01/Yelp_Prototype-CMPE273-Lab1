@@ -4,6 +4,9 @@ import axios from 'axios';
 import serverUrl from '../../../config';
 import './Reviews.css';
 import CustomerStaticProfile from '../CommonComponent/CustomerStaticProfile';
+import { connect } from 'react-redux';
+import { updateReviewList } from '../../../constants/action-types';
+import ReactPaginate from 'react-paginate';
 
 class ReviewList extends Component {
   constructor(props) {
@@ -29,34 +32,66 @@ class ReviewList extends Component {
   }
 
   componentDidMount() {
-    console.log('inside Reviews');
-    axios.get(serverUrl + 'biz/fetchReviews').then((response) => {
-      console.log('Review ist Fetched', response.data);
-      let allReviews = response.data[0].map((Review) => {
-        return {
-          ID: Review.ID,
-          Rating: Review.Rating,
-          Date: new Date(Review.Date),
-          Description: Review.Description,
-          CustomerId: Review.CustomerId,
-          CustomerName: Review.CustomerName,
-          CustomerAddr: Review.CustomerAddr,
-          ImageUrl: Review.ImageUrl,
-        };
-      });
+    this.fetchReviews(0);
+    // axios
+    //   .get(serverUrl + 'biz/fetchReviews', {
+    //     params: {
+    //       selectedPage: 0,
+    //       RestaurantID: localStorage.getItem('userId'),
+    //     },
+    //     withCredentials: true,
+    //   })
+    //   .then((response) => {
+    //     console.log('Review list Fetched', response.data);
+    //     let Reviews = response.data.ReviewsList.map((Review) => {
+    //       return {
+    //         ...Review,
+    //         ReviewDate: new Date(Review.ReviewDate),
+    //       };
+    //     });
 
-      this.setState({
-        REVIEWS: this.state.REVIEWS.concat(allReviews),
-      });
-    });
+    //     let payload = {
+    //       Reviews,
+    //       reviewCount: response.data.reviewCount,
+    //       PageCount: Math.ceil(response.data.reviewCount / 4),
+    //     };
+    //     this.props.updateReviewList(payload);
+    //   });
   }
-  // openStaticProfile(cusId) {
-  //   event.preventDefault();
-  //   this.setState({
-  //     currentCustomerId: cusId,
-  //     popSeen: !this.state.popSeen,
-  //   });
-  // }
+
+  fetchReviews(pageNumber) {
+    axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
+    axios
+      .get(serverUrl + 'biz/fetchReviews', {
+        params: {
+          selectedPage: pageNumber,
+          RestaurantID: localStorage.getItem('userId'),
+        },
+        withCredentials: true,
+      })
+      .then((response) => {
+        console.log('Review list Fetched', response.data);
+        let Reviews = response.data.ReviewsList.map((Review) => {
+          return {
+            ...Review,
+            ReviewDate: new Date(Review.ReviewDate),
+          };
+        });
+
+        let payload = {
+          Reviews,
+          reviewCount: response.data.reviewCount,
+          PageCount: Math.ceil(response.data.reviewCount / 4),
+        };
+        this.props.updateReviewList(payload);
+      });
+  }
+
+  // on page click
+  handlePageClick = (e) => {
+    // const selectedPage = e.selected;
+    this.fetchReviews(e.selected);
+  };
 
   openStaticProfile = (event, cusID) => {
     if (this.state.staticProfileSeen) {
@@ -108,8 +143,9 @@ class ReviewList extends Component {
           />
         ) : null}
         <ul className="lemon--ul__373c0__1_cxs undefined list__373c0__2G8oH">
-          {this.state.REVIEWS.map((review) => (
+          {this.props.reviewStore.Reviews.map((review) => (
             <Review
+              key={review._id}
               openStaticProfile={(event) => this.openStaticProfile(event, review.CustomerId)}
               review={review}
 
@@ -117,9 +153,44 @@ class ReviewList extends Component {
             />
           ))}
         </ul>
+        <div style={{ position: 'absolute', left: '50%', bottom: '3%', right: '0' }}>
+          <ReactPaginate
+            previousLabel={'prev'}
+            nextLabel={'next'}
+            breakLabel={'...'}
+            breakClassName={'break-me'}
+            pageCount={this.props.reviewStore.PageCount}
+            marginPagesDisplayed={2}
+            pageRangeDisplayed={2}
+            onPageChange={this.handlePageClick}
+            containerClassName={'pagination'}
+            subContainerClassName={'pages pagination'}
+            activeClassName={'active'}
+          />
+        </div>
       </div>
     );
   }
 }
 
-export default ReviewList;
+const mapStateToProps = (state) => {
+  const { reviewStore } = state.reviewStoreReducer;
+  return {
+    reviewStore,
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    updateReviewList: (payload) => {
+      dispatch({
+        type: updateReviewList,
+        payload,
+      });
+    },
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(ReviewList);
+
+// export default ReviewList;

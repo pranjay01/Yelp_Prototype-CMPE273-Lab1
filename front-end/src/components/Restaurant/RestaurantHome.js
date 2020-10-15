@@ -93,14 +93,15 @@ class RestaurantHome extends Component {
             // });
             let payload = {
               restaurantAddress:
-                response.data.Street +
+                response.data.restaurant.Street +
                 ' ' +
-                response.data.City +
+                response.data.restaurant.City +
                 ' ' +
-                response.data.State +
+                response.data.restaurant.State +
                 ' ' +
-                response.data.Zip,
-              ...response.data,
+                response.data.restaurant.Zip,
+              ...response.data.restaurant,
+              reviewCount: response.data.reviewCount,
             };
             this.props.updateHomeProfile(payload);
           }

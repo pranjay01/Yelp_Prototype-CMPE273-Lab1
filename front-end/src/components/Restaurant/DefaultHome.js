@@ -123,7 +123,7 @@ class DefaultHome extends Component {
                       <div className="lemon--div__06b83__1mboc business-info__06b83__1dQLw display--inline-block__06b83__1ZKqC padding-t1__06b83__2aTOb border-color--default__06b83__3-ifU">
                         <div className="lemon--div__06b83__1mboc border-color--default__06b83__3-ifU">
                           <span className="lemon--span__06b83__3997G text__06b83__2Kxyz text-color--normal__06b83__3xep9 text-align--left__06b83__2XGa-">
-                            {this.props.restaurantProfile.Reviews.length} reviews
+                            {this.props.restaurantProfile.reviewCount} reviews
                           </span>
                         </div>
                       </div>

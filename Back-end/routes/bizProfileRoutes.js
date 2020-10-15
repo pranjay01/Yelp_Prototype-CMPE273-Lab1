@@ -125,7 +125,7 @@ Router.post('/updateFoodItem', validateUser, async (req, res) => {
 });
 
 // Fetch reviews
-Router.get('/fetchReviews', async (req, res) => {
+Router.get('/fetchReviews', validateUser, async (req, res) => {
   console.log('Fetch Menu');
   let results = null;
   results = await fetchReviews(req, res);

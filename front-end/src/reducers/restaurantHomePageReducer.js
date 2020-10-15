@@ -17,7 +17,7 @@ const defaultState = {
     CurbsidePickup: '',
     DineIn: '',
     YelpDelivery: '',
-    Reviews: '',
+    reviewCount: null,
     Following: '',
   },
 };
