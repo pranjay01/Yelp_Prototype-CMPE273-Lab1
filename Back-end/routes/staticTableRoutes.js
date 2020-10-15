@@ -6,7 +6,7 @@ const {
   uploadStateData,
   uploadGenderData,
   getSignupMasterData,
-  getSignupMasterDataCustomer,
+  uploadCuisineData,
   getCusinesForMenu,
   getDeliverStatus,
   getSearchStrings,
@@ -40,19 +40,17 @@ Router.post('/gender', async (req, res) => {
   return results;
 });
 
+Router.post('/cuisine', async (req, res) => {
+  console.log('Upload Gender Data');
+  let results = null;
+  results = await uploadCuisineData(req, res);
+  return results;
+});
 // Restaurant signup
 Router.get('/signupMasterData', async (req, res) => {
   console.log('Get master data for restaurant signup');
   let results = null;
   results = await getSignupMasterData(res);
-  return results;
-});
-
-// Customer Signup
-Router.get('/signupMasterDataCustomer', async (req, res) => {
-  console.log('Get master data for customer signup');
-  let results = null;
-  results = await getSignupMasterDataCustomer(res);
   return results;
 });
 

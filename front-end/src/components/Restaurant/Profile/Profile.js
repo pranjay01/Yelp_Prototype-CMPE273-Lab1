@@ -272,10 +272,11 @@ class Profile extends Component {
   };
 
   onSubmitUpdateProfile = (e) => {
+    e.preventDefault();
     const validateCheck = this.ValidityUpdateProfile();
     if (validateCheck === 'Correct') {
       //prevent page from refresh
-      e.preventDefault();
+
       const data = {
         ...this.props.restaurantProfile,
         RestaurantID: localStorage.getItem('userId'),
@@ -362,14 +363,12 @@ class Profile extends Component {
     }
     return (
       <div style={{ marginTop: '3%' }}>
-        <div class={errorClass}>
-          <p class="alert-message">
-            <ul>{this.state.submitErrorBlock}</ul>
-          </p>
+        <div className={errorClass}>
+          <p className="alert-message">{this.state.submitErrorBlock}</p>
         </div>
         <form
           onSubmit={this.onSubmitUpdateProfile}
-          class="yform signup-form  city-hidden"
+          className="yform signup-form  city-hidden"
           id="signup-form"
         >
           <h4>
@@ -389,16 +388,16 @@ class Profile extends Component {
             </strong>
           </h4>
 
-          <div class="photo-box pb-m">
+          <div className="photo-box pb-m">
             <a
-              class="js-analytics-click"
+              className="js-analytics-click"
               data-analytics-label="user-photo"
               href="/user_photos?return_url=%2Fprofile%3Freturn_url%3D%252Fuser_details%253Fuserid%253DSbr_JFt86Dss0N-hb9StQg"
             >
               <img
                 style={{ width: '150px', height: '120px' }}
                 alt=""
-                class="photo-box-img"
+                className="photo-box-img"
                 src={
                   this.props.restaurantProfile.ImageURL !== null &&
                   this.props.restaurantProfile.ImageURL.length > 0
@@ -411,10 +410,10 @@ class Profile extends Component {
           </div>
           <br />
           <fieldset disabled={this.state.isFormDisable && 'disabled'}>
-            <div class="js-password-meter-container">
+            <div className="js-password-meter-container">
               <ul>
                 <li style={{ width: '40%' }}>
-                  <label class="placeholder-sub">Restaurant Name</label>
+                  <label className="placeholder-sub">Restaurant Name</label>
                   <input
                     id="first_name"
                     name="first_name"
@@ -426,12 +425,12 @@ class Profile extends Component {
                   />
                 </li>
               </ul>
-              <fieldset class="login-separator hr-line">
+              <fieldset className="login-separator hr-line">
                 <legend align="left">Contact Information</legend>
               </fieldset>
-              <ul class="inline-layout clearfix">
+              <ul className="inline-layout clearfix">
                 <li style={{ width: '40%' }}>
-                  <label class="placeholder-sub">Email</label>
+                  <label className="placeholder-sub">Email</label>
                   <input
                     id="email"
                     name="email"
@@ -445,7 +444,7 @@ class Profile extends Component {
                 </li>
                 <li style={{ width: '10%' }}></li>
                 <li style={{ width: '10%' }}>
-                  <label class="placeholder-sub">Country Code</label>
+                  <label className="placeholder-sub">Country Code</label>
                   <select
                     placeholder="countryCode"
                     className="form-control"
@@ -466,7 +465,7 @@ class Profile extends Component {
                   </select>
                 </li>
                 <li style={{ width: '40%' }}>
-                  <label class="placeholder-sub">Phone-No</label>
+                  <label className="placeholder-sub">Phone-No</label>
                   <input
                     id="phoneNo"
                     name="phoneNo"
@@ -475,19 +474,19 @@ class Profile extends Component {
                     type="text"
                     onChange={this.onChangeHandlerPhoneNo}
                     value={this.props.restaurantProfile.PhoneNo}
-                    minlength="10"
-                    maxlength="10"
+                    minLength="10"
+                    maxLength="10"
                   />
                 </li>
               </ul>
             </div>
-            <fieldset class="login-separator hr-line">
+            <fieldset className="login-separator hr-line">
               <legend align="left">Address</legend>
             </fieldset>
-            <div class="js-more-fields more-fields">
-              <ul class="inline-layout clearfix">
+            <div className="js-more-fields more-fields">
+              <ul className="inline-layout clearfix">
                 <li style={{ width: '30%' }}>
-                  <label class="placeholder-sub">Country</label>
+                  <label className="placeholder-sub">Country</label>
                   <select
                     placeholder="Gender"
                     className="form-control"
@@ -507,7 +506,7 @@ class Profile extends Component {
                 </li>
                 <li style={{ width: '5%' }}></li>
                 <li style={{ width: '30%' }}>
-                  <label class="placeholder-sub">State</label>
+                  <label className="placeholder-sub">State</label>
                   <select
                     placeholder="State"
                     className="form-control"
@@ -527,10 +526,10 @@ class Profile extends Component {
                 </li>
                 <li style={{ width: '5%' }}></li>
                 <li style={{ width: '30%' }}>
-                  <label class="placeholder-sub">Zip Code</label>
+                  <label className="placeholder-sub">Zip Code</label>
                   <input
-                    minlength="5"
-                    maxlength="5"
+                    minLength="5"
+                    maxLength="5"
                     id="zipCode"
                     name="zipCode"
                     placeholder="zipCode"
@@ -541,7 +540,7 @@ class Profile extends Component {
                   />
                 </li>
                 <li style={{ width: '30%' }}>
-                  <label class="placeholder-sub">City</label>
+                  <label className="placeholder-sub">City</label>
                   <input
                     id="city"
                     name="city"
@@ -553,7 +552,7 @@ class Profile extends Component {
                   />
                 </li>
                 <li style={{ width: '70%' }}>
-                  <label class="placeholder-sub">Street</label>
+                  <label className="placeholder-sub">Street</label>
                   <input
                     id="street"
                     name="street"
@@ -565,12 +564,12 @@ class Profile extends Component {
                   />
                 </li>
               </ul>
-              <fieldset class="login-separator hr-line">
+              <fieldset className="login-separator hr-line">
                 <legend align="left">Business Information</legend>
               </fieldset>
-              <ul class="inline-layout clearfix">
+              <ul className="inline-layout clearfix">
                 <li style={{ width: '30%' }}>
-                  <label class="">Curbside Pickup</label>
+                  <label className="">Curbside Pickup</label>
                   <input
                     style={{ width: '20px', height: '20px' }}
                     name="isGoing"
@@ -580,7 +579,7 @@ class Profile extends Component {
                   />
                 </li>
                 <li style={{ width: '30%' }}>
-                  <label class="">Dine In</label>
+                  <label className="">Dine In</label>
                   <input
                     style={{ width: '20px', height: '20px' }}
                     name="isGoing"
@@ -590,7 +589,7 @@ class Profile extends Component {
                   />
                 </li>
                 <li style={{ width: '30%' }}>
-                  <label class="">Yelp Delivery</label>
+                  <label className="">Yelp Delivery</label>
                   <input
                     style={{ width: '20px', height: '20px' }}
                     name="isGoing"
@@ -600,9 +599,9 @@ class Profile extends Component {
                   />
                 </li>
               </ul>
-              <ul class="inline-layout clearfix">
+              <ul className="inline-layout clearfix">
                 <li style={{ width: '40%' }}>
-                  <label class="">Opening Time</label>
+                  <label className="">Opening Time</label>
                   <input
                     type="time"
                     step="1"
@@ -614,7 +613,7 @@ class Profile extends Component {
                   />
                 </li>
                 <li style={{ width: '40%' }}>
-                  <label class="">Closing Time</label>
+                  <label className="">Closing Time</label>
                   <input
                     type="time"
                     step="1"
@@ -632,7 +631,7 @@ class Profile extends Component {
                 <button
                   id="signup-button"
                   type="submit"
-                  class="ybtn ybtn--primary ybtn--big disable-on-submit submit signup-button"
+                  className="ybtn ybtn--primary ybtn--big disable-on-submit submit signup-button"
                   style={{
                     marginTop: '2%',
                     marginLeft: '40%',
@@ -642,7 +641,7 @@ class Profile extends Component {
                 </button>
 
                 <button
-                  class="ybtn ybtn--primary ybtn--big disable-on-submit submit signup-button"
+                  className="ybtn ybtn--primary ybtn--big disable-on-submit submit signup-button"
                   style={{
                     marginTop: '2%',
                     marginLeft: '2%',
@@ -657,7 +656,7 @@ class Profile extends Component {
         </form>
         {this.state.isFormDisable && (
           <button
-            class="ybtn ybtn--primary ybtn--big disable-on-submit submit signup-button"
+            className="ybtn ybtn--primary ybtn--big disable-on-submit submit signup-button"
             style={{
               marginTop: '2%',
               marginLeft: '45%',

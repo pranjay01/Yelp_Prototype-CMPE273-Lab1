@@ -8,13 +8,18 @@ const multer = require('multer');
 const multerS3 = require('multer-s3');
 const url = require('url');
 const geocoder = require('google-geocoder');
-// const { request } = require('http');
 const { getUserIdFromToken } = require('../common/loginLogout');
 
 const mysqlConnection = require('../mysqlConnection');
 const UserSignup = require('../Models/UserSignup');
 
 const Restaurant = require('../Models/Restaurant');
+
+const Appetizer = require('../Models/Appetizer');
+const Beverage = require('../Models/Beverage');
+const Dessert = require('../Models/Dessert');
+const MainCourse = require('../Models/MainCourse');
+const Salad = require('../Models/Salad');
 
 const geo = geocoder({
   key: 'AIzaSyBpI0r49yQH5FrrK6tsDHrbkYoBp8bWSXE',
@@ -36,9 +41,9 @@ const multipleUpload = multer({
     // eslint-disable-next-line func-names
     // eslint-disable-next-line object-shorthand
     key: function (req, file, cb) {
-      console.log(req.body);
+      // console.log(req.body);
       const folderName = 'yelpPrototype-restaurant-';
-      console.log('Multer Called', folderName);
+      // console.log('Multer Called', folderName);
       cb(null, `${folderName}/${Date.now().toString()}${file.originalname}`);
     },
   }),
@@ -48,12 +53,12 @@ const getOrderList = async (_order, _appetizers, _desserts, _beverages, _salads,
   const results = [];
   // eslint-disable-next-line no-restricted-syntax
   for (const item of _order) {
-    console.log('item: ', item);
+    // console.log('item: ', item);
     const itemInformation = item.split(':');
     if (itemInformation[1] === '1') {
-      console.log('_appetizers:', _appetizers);
+      // console.log('_appetizers:', _appetizers);
       const index = _appetizers.findIndex((x) => x.ID === Number(itemInformation[0]));
-      console.log('Index: ', index, '_appetizers[index] ', _appetizers[index]);
+      // console.log('Index: ', index, '_appetizers[index] ', _appetizers[index]);
       const tmpObj = {
         Name: _appetizers[index].Name,
         Count: Number(itemInformation[2]),
@@ -62,9 +67,9 @@ const getOrderList = async (_order, _appetizers, _desserts, _beverages, _salads,
       };
       results.push(tmpObj);
     } else if (itemInformation[1] === '2') {
-      console.log('_salads:', _salads);
+      // console.log('_salads:', _salads);
       const index = _salads.findIndex((x) => x.ID === Number(itemInformation[0]));
-      console.log('Index: ', index, '_salads[index] ', _salads[index]);
+      // console.log('Index: ', index, '_salads[index] ', _salads[index]);
       const tmpObj = {
         Name: _salads[index].Name,
         Count: Number(itemInformation[2]),
@@ -73,9 +78,9 @@ const getOrderList = async (_order, _appetizers, _desserts, _beverages, _salads,
       };
       results.push(tmpObj);
     } else if (itemInformation[1] === '3') {
-      console.log('_desserts:', _desserts);
+      // console.log('_desserts:', _desserts);
       const index = _desserts.findIndex((x) => x.ID === Number(itemInformation[0]));
-      console.log('Index: ', index, '_desserts[index] ', _desserts[index]);
+      // console.log('Index: ', index, '_desserts[index] ', _desserts[index]);
       const tmpObj = {
         Name: _desserts[index].Name,
         Count: Number(itemInformation[2]),
@@ -84,9 +89,9 @@ const getOrderList = async (_order, _appetizers, _desserts, _beverages, _salads,
       };
       results.push(tmpObj);
     } else if (itemInformation[1] === '4') {
-      console.log('_beverages:', _beverages);
+      // console.log('_beverages:', _beverages);
       const index = _beverages.findIndex((x) => x.ID === Number(itemInformation[0]));
-      console.log('Index: ', index, '_beverages[index] ', _beverages[index]);
+      // console.log('Index: ', index, '_beverages[index] ', _beverages[index]);
       const tmpObj = {
         Name: _beverages[index].Name,
         Count: Number(itemInformation[2]),
@@ -95,9 +100,9 @@ const getOrderList = async (_order, _appetizers, _desserts, _beverages, _salads,
       };
       results.push(tmpObj);
     } else if (itemInformation[1] === '5') {
-      console.log('_mainCourse:', _mainCourse);
+      // console.log('_mainCourse:', _mainCourse);
       const index = _mainCourse.findIndex((x) => x.ID === Number(itemInformation[0]));
-      console.log('Index: ', index, '_mainCourse[index] ', _mainCourse[index]);
+      // console.log('Index: ', index, '_mainCourse[index] ', _mainCourse[index]);
       const tmpObj = {
         Name: _mainCourse[index].Name,
         Count: Number(itemInformation[2]),
@@ -134,8 +139,8 @@ const signup = async (restaurant, response) => {
             });
             response.end('Incorrect Location');
           } else {
-            console.log(res[0].location.lat);
-            console.log(res[0].location.lng);
+            // console.log(res[0].location.lat);
+            // console.log(res[0].location.lng);
             const latitude = res[0].location.lat;
             const longitude = res[0].location.lng;
             const hashedPassword = await bcrypt.hash(restaurant.Password, 10);
@@ -158,7 +163,7 @@ const signup = async (restaurant, response) => {
                   Latitude: latitude,
                   Longitude: longitude,
                 });
-                newRestaurant.save((err2, result) => {
+                newRestaurant.save((err2) => {
                   if (err2) {
                     response.writeHead(500, {
                       'Content-Type': 'text/plain',
@@ -169,7 +174,7 @@ const signup = async (restaurant, response) => {
                       'Content-Type': 'text/plain',
                     });
                     response.end('User Created');
-                    console.log(result);
+                    // console.log(result);
                   }
                 });
               }
@@ -226,14 +231,14 @@ const updateRestaurantProfile = async (restaurant, response) => {
     Restaurant.updateOne(
       { RestaurantID: restaurant.RestaurantID },
       { ...restaurant },
-      async (error, data) => {
+      async (error) => {
         if (error) {
           response.writeHead(500, {
             'Content-Type': 'text/plain',
           });
           response.end('Network Error');
         } else {
-          console.log(data);
+          // console.log(data);
           response.writeHead(200, {
             'Content-Type': 'text/plain',
           });
@@ -253,7 +258,7 @@ const updateRestaurantProfile = async (restaurant, response) => {
 // upload restaurant profile to s3 bucket // mongoDbAdded
 const uploadRestaurantProfilePic = async (req, res) => {
   try {
-    console.log(req.body);
+    // console.log(req.body);
     multipleUpload(req, res, function (err) {
       if (err instanceof multer.MulterError) {
         res.json({ status: 400, error: err.message });
@@ -293,7 +298,7 @@ const uploadRestaurantProfilePic = async (req, res) => {
 // upload restaurant profile to only s3 bucket // mongoDbAdded
 const uploadPicToMulter = async (req, res) => {
   try {
-    console.log(req.body);
+    // console.log(req.body);
     multipleUpload(req, res, function (err) {
       if (err instanceof multer.MulterError) {
         res.json({ status: 400, error: err.message });
@@ -317,166 +322,220 @@ const uploadPicToMulter = async (req, res) => {
   return res;
 };
 
+// MongoDb Implemented
 const fetchMenu = async (request, response) => {
-  const { category } = url.parse(request.url, true).query;
-  const userID = getUserIdFromToken(request.cookies.cookie, request.cookies.userrole);
-  if (userID) {
-    let items = null;
-    if (category === 'APPETIZERS') {
-      items = 'CALL fetchAppetizerItems(?)';
-    } else if (category === 'BEVERAGES') {
-      items = 'CALL fetchBeveragesItems(?)';
-    } else if (category === 'DESSERTS') {
-      items = 'CALL fetchDessertsItems(?)';
-    } else if (category === 'MAIN_COURSE') {
-      items = 'CALL fetchMainCourseItems(?)';
-    } else {
-      items = 'CALL fetchSaladsItems(?)';
+  const { RestaurantID, selectedPage, category } = url.parse(request.url, true).query;
+  try {
+    let Food = null;
+    switch (category) {
+      case 'APPETIZERS':
+        Food = Appetizer;
+        break;
+      case 'SALADS':
+        Food = Salad;
+        break;
+      case 'MAIN_COURSE':
+        Food = MainCourse;
+        break;
+      case 'BEVERAGES':
+        Food = Beverage;
+        break;
+      case 'DESSERTS':
+        Food = Dessert;
+        break;
+      default:
+        break;
     }
-    const connection = await mysqlConnection();
-    // eslint-disable-next-line no-unused-vars
-    const [results, fields] = await connection.query(items, userID);
-    connection.end();
+    const allFood = await Food.find({ RestaurantID })
+      .limit(2)
+      .skip(selectedPage * 2)
+      .exec();
+    const foodCount = await Food.find({ RestaurantID }).countDocuments();
+    const results = {
+      allFoods: allFood,
+      foodCount,
+    };
+
     response.writeHead(200, {
-      'Content-Type': 'text/plain',
+      'Content-Type': 'application/json',
     });
     response.end(JSON.stringify(results));
-  } else {
-    response.writeHead(401, {
+    // console.log(results);
+    //   }
+    // });
+  } catch (error) {
+    response.writeHead(500, {
       'Content-Type': 'text/plain',
     });
-    response.end('Invalid User');
+    response.end('Cuisine Data Fetch Failed');
   }
   return response;
 };
 
+// MongoDb Implemented
+const uploadFoodImage = async (req, res) => {
+  try {
+    multipleUpload(req, res, function (err) {
+      if (err instanceof multer.MulterError) {
+        res.json({ status: 400, error: err.message });
+      } else if (err) {
+        res.json({ status: 400, error: err.message });
+      } else {
+        // console.log(req.file.location);
+
+        res.writeHead(200, {
+          'Content-Type': 'text/plain',
+        });
+        res.end(req.file.location);
+      }
+    });
+  } catch (error) {
+    res.writeHead(401, {
+      'Content-Type': 'text/plain',
+    });
+    res.end('Network Error');
+  }
+  return res;
+};
+
+// MongoDb Implemented
 const insertFood = async (request, response) => {
-  const { category, name, price, cuisine, ingredients, description, ImageUrl } = request.body;
-  const restroId = getUserIdFromToken(request.cookies.cookie, request.cookies.userrole);
-  if (restroId) {
-    let items = null;
-    if (category === 'APPETIZERS') {
-      items = 'CALL insertAppetizerItems(?,?,?,?,?,?,?)';
-    } else if (category === 'BEVERAGES') {
-      items = 'CALL insertBeveragesItems(?,?,?,?,?,?,?)';
-    } else if (category === 'DESSERTS') {
-      items = 'CALL insertDessertsItems(?,?,?,?,?,?,?)';
-    } else if (category === 'MAIN_COURSE') {
-      items = 'CALL insertMainCourseItems(?,?,?,?,?,?,?)';
-    } else {
-      items = 'CALL insertSaladsItems(?,?,?,?,?,?,?)';
+  try {
+    let newFood = null;
+    switch (request.body.category) {
+      case 'APPETIZERS':
+        newFood = new Appetizer({
+          ...request.body,
+        });
+        break;
+      case 'SALADS':
+        newFood = new Salad({
+          ...request.body,
+        });
+        break;
+      case 'MAIN_COURSE':
+        newFood = new MainCourse({
+          ...request.body,
+        });
+        break;
+      case 'BEVERAGES':
+        newFood = new Beverage({
+          ...request.body,
+        });
+        break;
+      case 'DESSERTS':
+        newFood = new Dessert({
+          ...request.body,
+        });
+        break;
+      default:
+        break;
     }
-    const connection = await mysqlConnection();
-    // eslint-disable-next-line no-unused-vars
-    const [results, fields] = await connection.query(items, [
-      restroId,
-      name,
-      price,
-      cuisine,
-      ingredients,
-      description,
-      ImageUrl,
-    ]);
-    connection.end();
-    console.log(results);
-    response.writeHead(200, {
+    newFood.save((err) => {
+      if (err) {
+        response.writeHead(500, {
+          'Content-Type': 'text/plain',
+        });
+        response.end('Network Error');
+      } else {
+        response.writeHead(200, {
+          'Content-Type': 'application/json',
+        });
+        response.end('Food Item Created Successfully!!!');
+      }
+    });
+  } catch (error) {
+    response.writeHead(500, {
       'Content-Type': 'text/plain',
     });
-    response.end(JSON.stringify(results));
-  } else {
-    response.writeHead(401, {
-      'Content-Type': 'text/plain',
-    });
-    response.end('Invalid User');
+    response.end('Network Error');
   }
   return response;
 };
 
+// MongoDb Implemented
 const deleteFoodItem = async (request, response) => {
-  const { category, foodId } = request.body;
-  const id = getUserIdFromToken(request.cookies.cookie, request.cookies.userrole);
-  if (id) {
-    let items = null;
-    if (category === 'APPETIZERS') {
-      items = 'CALL deleteAppetizerItems(?,?)';
-    } else if (category === 'BEVERAGES') {
-      items = 'CALL deleteBeveragesItems(?,?)';
-    } else if (category === 'DESSERTS') {
-      items = 'CALL deleteDessertsItems(?,?)';
-    } else if (category === 'MAIN_COURSE') {
-      items = 'CALL deleteMainCourseItems(?,?)';
-    } else {
-      items = 'CALL deleteSaladsItems(?,?)';
+  const { _id } = request.body;
+  try {
+    let FoodCategory = null;
+    switch (request.body.category) {
+      case 'APPETIZERS':
+        FoodCategory = Appetizer;
+        break;
+      case 'SALADS':
+        FoodCategory = Salad;
+        break;
+      case 'MAIN_COURSE':
+        FoodCategory = MainCourse;
+        break;
+      case 'BEVERAGES':
+        FoodCategory = Beverage;
+        break;
+      case 'DESSERTS':
+        FoodCategory = Dessert;
+        break;
+      default:
+        break;
     }
-    const connection = await mysqlConnection();
-    // eslint-disable-next-line no-unused-vars
-    const [results, fields] = await connection.query(items, [id, Number(foodId)]);
-    connection.end();
-    response.writeHead(200, {
+    FoodCategory.findByIdAndDelete({ _id }, (error) => {
+      if (error) {
+        response.writeHead(500, {
+          'Content-Type': 'text/plain',
+        });
+        response.end(error.message);
+      } else {
+        response.writeHead(200, {
+          'Content-Type': 'text/plain',
+        });
+        response.end('Delete Successfull!!!');
+      }
+    });
+  } catch (error) {
+    response.writeHead(500, {
       'Content-Type': 'text/plain',
     });
-    response.end('Food Item Deleted Successfully');
-  } else {
-    response.writeHead(401, {
-      'Content-Type': 'text/plain',
-    });
-    response.end('Invalid User');
+    response.end('Network Error');
   }
   return response;
 };
 
-// Update Restaurant Profile
+// Update FoodItem // MongoDb Implemented
 const updateFoodItem = async (request, response) => {
   try {
-    const foodItem = request.body;
-    const {
-      ID,
-      category,
-      Name,
-      MainIngredients,
-      CuisineID,
-      Description,
-      Price,
-      ImageUrl,
-    } = foodItem;
-    const restroID = getUserIdFromToken(request.cookies.cookie, request.cookies.userrole);
-    let updateFoodItemQuery = '';
-    if (restroID) {
-      if (category === 'APPETIZERS') {
-        updateFoodItemQuery = 'CALL updateAppetizerItems(?,?,?,?,?,?,?,?)';
-      } else if (category === 'BEVERAGES') {
-        updateFoodItemQuery = 'CALL updateBeveragesItems(?,?,?,?,?,?,?,?)';
-      } else if (category === 'DESSERTS') {
-        updateFoodItemQuery = 'CALL updateDessertItems(?,?,?,?,?,?,?,?)';
-      } else if (category === 'MAIN_COURSE') {
-        updateFoodItemQuery = 'CALL updateMainCourseItems(?,?,?,?,?,?,?,?)';
-      } else {
-        updateFoodItemQuery = 'CALL updateSaladsItems(?,?,?,?,?,?,?,?)';
-      }
-      const connection = await mysqlConnection();
-      // eslint-disable-next-line no-unused-vars
-      const [results, fields] = await connection.query(updateFoodItemQuery, [
-        ID,
-        restroID,
-        Name,
-        MainIngredients,
-        Price,
-        CuisineID,
-        Description,
-        ImageUrl,
-      ]);
-      connection.end();
-      console.log(results);
-      response.writeHead(200, {
-        'Content-Type': 'text/plain',
-      });
-      response.end('Food Item Updated successfully');
-    } else {
-      response.writeHead(401, {
-        'Content-Type': 'text/plain',
-      });
-      response.end('Invalid User');
+    let FoodCategory = null;
+    switch (request.body.category) {
+      case 'APPETIZERS':
+        FoodCategory = Appetizer;
+        break;
+      case 'SALADS':
+        FoodCategory = Salad;
+        break;
+      case 'MAIN_COURSE':
+        FoodCategory = MainCourse;
+        break;
+      case 'BEVERAGES':
+        FoodCategory = Beverage;
+        break;
+      case 'DESSERTS':
+        FoodCategory = Dessert;
+        break;
+      default:
+        break;
     }
+    FoodCategory.updateOne({ _id: request.body._id }, { ...request.body }, async (error) => {
+      if (error) {
+        response.writeHead(500, {
+          'Content-Type': 'text/plain',
+        });
+        response.end('Network Error');
+      } else {
+        // console.log(data);
+        response.writeHead(200, {
+          'Content-Type': 'text/plain',
+        });
+        response.end('Food Item Updated Successfully');
+      }
+    });
   } catch (error) {
     response.writeHead(401, {
       'Content-Type': 'text/plain',
@@ -552,7 +611,7 @@ const orderFetch = async (request, response) => {
     const mainCourse = results[5];
     const orders = await getOrderList(order, appetizers, desserts, beverages, salads, mainCourse);
 
-    console.log(orders);
+    // console.log(orders);
 
     connection.end();
     response.writeHead(200, {
@@ -586,7 +645,7 @@ const updateDeliveryStatus = async (request, response) => {
         deliveryStatus,
       ]);
       connection.end();
-      console.log(results);
+      // console.log(results);
       response.writeHead(200, {
         'Content-Type': 'text/plain',
       });
@@ -645,7 +704,7 @@ const createNewEvent = async (request, response) => {
         hashtags,
       ]);
       connection.end();
-      console.log(results);
+      // console.log(results);
       response.writeHead(201, {
         'Content-Type': 'text/plain',
       });
@@ -727,39 +786,6 @@ const getCustomerList = async (request, response) => {
   return response;
 };
 
-const uploadFoodImage = async (req, res) => {
-  try {
-    const restroId = getUserIdFromToken(req.cookies.cookie, req.cookies.userrole);
-    if (restroId) {
-      multipleUpload(req, res, function (err) {
-        if (err instanceof multer.MulterError) {
-          res.json({ status: 400, error: err.message });
-        } else if (err) {
-          res.json({ status: 400, error: err.message });
-        } else {
-          console.log(req.file.location);
-
-          res.writeHead(200, {
-            'Content-Type': 'text/plain',
-          });
-          res.end(req.file.location);
-        }
-      });
-    } else {
-      res.writeHead(401, {
-        'Content-Type': 'text/plain',
-      });
-      res.end('Invalid User');
-    }
-  } catch (error) {
-    res.writeHead(401, {
-      'Content-Type': 'text/plain',
-    });
-    res.end('Network Error');
-  }
-  return res;
-};
-
 // Get Contact Information
 const getCustomerCompleteProfileForRestaurant = async (request, response) => {
   const { cusID } = url.parse(request.url, true).query;
@@ -772,7 +798,7 @@ const getCustomerCompleteProfileForRestaurant = async (request, response) => {
       // eslint-disable-next-line no-unused-vars
       const [results, fields] = await connection.query(getCustomerCompleteProfileQuery, cusID);
       connection.end();
-      console.log(results);
+      // console.log(results);
 
       response.writeHead(200, {
         'Content-Type': 'text/plain',

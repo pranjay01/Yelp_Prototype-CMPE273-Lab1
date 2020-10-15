@@ -714,9 +714,7 @@ class RestaurantLogin extends Component {
                     >
                       ×
                     </a>
-                    <p className="alert-message">
-                      <ul>{errorBlock}</ul>
-                    </p>
+                    <p className="alert-message">{errorBlock}</p>
                   </div>
                   {/*<div className={successClass}>
                     <a

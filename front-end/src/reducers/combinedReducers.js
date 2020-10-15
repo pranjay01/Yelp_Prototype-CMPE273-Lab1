@@ -6,6 +6,7 @@ import customerBasicInfoReducer from './customerBasicInfoReducer';
 import searchTabReducer from './searchTabReducer';
 import restaurantSearchResultReducer from './restaurantSearchResultReducer';
 import masterDataReducer from './masterDataReducer';
+import restaurntFoodMenuReducer from './restaurntFoodMenuReducer';
 
 import { combineReducers } from 'redux';
 
@@ -18,6 +19,7 @@ const finalReducers = combineReducers({
   searchTabReducer: searchTabReducer,
   restaurantSearchResultReducer: restaurantSearchResultReducer,
   masterDataReducer: masterDataReducer,
+  restaurntFoodMenuReducer: restaurntFoodMenuReducer,
 });
 
 export default finalReducers;

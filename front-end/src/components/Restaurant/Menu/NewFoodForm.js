@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 
 class NewFoodForm extends Component {
   constructor(props) {
@@ -8,7 +9,7 @@ class NewFoodForm extends Component {
   render() {
     return (
       <li
-        class="job-form-section-group-viewer-styles__viewer--2SPgS"
+        className="job-form-section-group-viewer-styles__viewer--2SPgS"
         style={{
           background: 'right',
           backgroundRepeat: 'no-repeat',
@@ -19,17 +20,17 @@ class NewFoodForm extends Component {
       >
         <div data-ui="group">
           <form
-            onSubmit={this.props.onSaveCreateNew}
-            class="yform signup-form  city-hidden"
+            onSubmit={(event) => this.props.onSaveCreateNew(event)}
+            className="yform signup-form  city-hidden"
             id="signup-form"
           >
-            <div class="js-password-meter-container">
-              <ul class="inline-layout clearfix">
+            <div className="js-password-meter-container">
+              <ul className="inline-layout clearfix">
                 <li style={{ width: '12%' }}>
                   <p style={{ margin: '5px' }}>Name</p>
                 </li>
                 <li style={{ width: '38%' }}>
-                  <label class="placeholder-sub">Name</label>
+                  <label className="placeholder-sub">Name</label>
                   <input
                     maxLength="50"
                     id="Name"
@@ -38,7 +39,7 @@ class NewFoodForm extends Component {
                     required="required"
                     type="text"
                     onChange={(event) => this.props.onNameChangeHandler(event.target.value)}
-                    value={this.props.food.Name}
+                    value={this.props.food.FoodName}
                   />
                 </li>
                 <li style={{ width: '5%' }}></li>
@@ -46,7 +47,7 @@ class NewFoodForm extends Component {
                   <p style={{ margin: '5px' }}>Price</p>
                 </li>
                 <li style={{ width: '22%' }}>
-                  <label class="placeholder-sub">Price</label>
+                  <label className="placeholder-sub">Price</label>
                   <input
                     id="Price"
                     name="Price"
@@ -63,13 +64,13 @@ class NewFoodForm extends Component {
                 </li>
               </ul>
 
-              <ul class="inline-layout clearfix">
+              <ul className="inline-layout clearfix">
                 <li style={{ width: '13%' }}>
                   <p style={{ margin: '4px' }}>Cusine:</p>
                 </li>
 
                 <li style={{ width: '22%' }}>
-                  <label class="placeholder-sub">CUISINE</label>
+                  <label className="placeholder-sub">CUISINE</label>
                   <select
                     placeholder="CUISINE"
                     className="form-control"
@@ -80,9 +81,9 @@ class NewFoodForm extends Component {
                     <option className="Dropdown-menu" key="" value="">
                       select
                     </option>
-                    {this.props.CUISINES.map((CUISINE) => (
-                      <option className="Dropdown-menu" key={CUISINE.key} value={CUISINE.key}>
-                        {CUISINE.value}
+                    {this.props.foodData.Cuisines.map((Cuisine) => (
+                      <option className="Dropdown-menu" key={Cuisine.key} value={Cuisine.value}>
+                        {Cuisine.value}
                       </option>
                     ))}
                   </select>
@@ -91,7 +92,7 @@ class NewFoodForm extends Component {
                   <p style={{ margin: '5px' }}>Main Ingredents</p>
                 </li>
                 <li style={{ width: '40%' }}>
-                  <label class="placeholder-sub"></label>
+                  <label className="placeholder-sub"></label>
                   <input
                     maxLength="100"
                     id="MainIngredents"
@@ -104,13 +105,13 @@ class NewFoodForm extends Component {
                 </li>
               </ul>
 
-              <ul class="inline-layout clearfix">
+              <ul className="inline-layout clearfix">
                 <li style={{ width: '17%' }}>
                   <p style={{ margin: '5px' }}>Description</p>
                 </li>
 
                 <li style={{ width: '81%' }}>
-                  <label class="placeholder-sub">Description</label>
+                  <label className="placeholder-sub">Description</label>
                   <input
                     maxLength="100"
                     id="Description"
@@ -143,7 +144,7 @@ class NewFoodForm extends Component {
                 type="submit"
                 data-ui="add-section"
                 aria-describedby="education_label"
-                class="_-_-shared-ui-atoms-button-base-___button__button _-_-shared-ui-atoms-button-base-___button__small _-_-shared-ui-atoms-button-secondary-___secondary__default "
+                className="_-_-shared-ui-atoms-button-base-___button__button _-_-shared-ui-atoms-button-base-___button__small _-_-shared-ui-atoms-button-secondary-___secondary__default "
               >
                 Save
               </button>
@@ -155,4 +156,14 @@ class NewFoodForm extends Component {
   }
 }
 
-export default NewFoodForm;
+const mapStateToProps = (state) => {
+  // const snackbarData = state.snackBarReducer.snackbarData;
+  const { foodData } = state.restaurntFoodMenuReducer;
+  return {
+    // snackbarData: snackbarData,
+    foodData,
+  };
+};
+
+export default connect(mapStateToProps, null)(NewFoodForm);
+// export default NewFoodForm;

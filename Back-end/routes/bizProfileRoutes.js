@@ -86,15 +86,22 @@ Router.post('/uploadPicToMulter', validateUser, async (req, res) => {
 });
 
 // Fetch menu of asked category
-Router.get('/menuFetch', async (req, res) => {
+Router.get('/menuFetch', validateUser, async (req, res) => {
   console.log('Fetch Menu');
   let results = null;
   results = await fetchMenu(req, res);
   return results;
 });
 
+Router.post('/uploadFoodImage', validateUser, async (req, res) => {
+  console.log('uploadFoodImage');
+  let results = null;
+  results = await uploadFoodImage(req, res);
+  return results;
+});
+
 // nsert New Food Item
-Router.post('/insertFood', async (req, res) => {
+Router.post('/insertFood', validateUser, async (req, res) => {
   console.log('Insert New Food Item');
   let results = null;
   results = await insertFood(req, res);
@@ -102,7 +109,7 @@ Router.post('/insertFood', async (req, res) => {
 });
 
 // Delete Food Item
-Router.post('/deleteFoodItem', async (req, res) => {
+Router.post('/deleteFoodItem', validateUser, async (req, res) => {
   console.log('Delete Food Item');
   let results = null;
   results = await deleteFoodItem(req, res);
@@ -110,7 +117,7 @@ Router.post('/deleteFoodItem', async (req, res) => {
 });
 
 // Update Food Item
-Router.post('/updateFoodItem', async (req, res) => {
+Router.post('/updateFoodItem', validateUser, async (req, res) => {
   console.log('Update Food Item');
   let results = null;
   results = await updateFoodItem(req, res);
@@ -170,13 +177,6 @@ Router.get('/getCustomerList', async (req, res) => {
   console.log('Fetch Events');
   let results = null;
   results = await getCustomerList(req, res);
-  return results;
-});
-
-Router.post('/uploadFoodImage', async (req, res) => {
-  console.log('uploadFoodImage');
-  let results = null;
-  results = await uploadFoodImage(req, res);
   return results;
 });
 

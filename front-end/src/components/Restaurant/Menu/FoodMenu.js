@@ -4,366 +4,81 @@ import serverUrl from '../../../config';
 import './FoodMenu.css';
 import Food from './Food';
 import NewFoodForm from './NewFoodForm';
+import { connect } from 'react-redux';
+import {
+  updateFoodData,
+  updateSnackbarData,
+  SALADS,
+  APPETIZERS,
+  MAIN_COURSE,
+  BEVERAGES,
+  DESSERTS,
+} from '../../../constants/action-types';
+// import { updateSnackbarData } from '../../constants/action-types';
+
+import ReactPaginate from 'react-paginate';
+
 class FoodMenu extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      APPETIZERS: [],
-      BEVERAGES: [],
-      DESSERTS: [],
-      MAIN_COURSE: [],
-      SALADS: [],
-      CUISINES: [],
       showFoodCategory: localStorage.getItem('showFoodCategory'),
       addFoodItemForm: false,
       newFood: {
-        category: '',
-        Name: '',
+        RestaurantID: localStorage.getItem('userId'),
+        FoodName: '',
+
         MainIngredients: '',
-        CuisineID: null,
+        Cuisine: '',
         Description: '',
-        Price: null,
         ImageUrl: '',
+        Price: '',
       },
       tmpFood: {
-        ID: null,
-        category: '',
-        Name: '',
+        RestaurantID: localStorage.getItem('userId'),
+        FoodName: '',
         MainIngredients: '',
-        CuisineID: null,
+        Cuisine: '',
         Description: '',
-        Price: null,
+        ImageUrl: '',
+        Price: '',
       },
       editableId: null,
       editableCategory: '',
+      selectedPage: 0,
     };
   }
+
   // Call On render
   componentDidMount() {
     if (localStorage.getItem('showFoodCategory')) {
       this.showMenuCategory(localStorage.getItem('showFoodCategory'));
     }
-    console.log('inside Signup');
+    // console.log('inside Signup');
     axios.get(serverUrl + 'static/getCusinesForMenu').then((response) => {
-      console.log(response.data);
-      let allCusines = response.data[0].map((Cusine) => {
-        return { key: Cusine.ID, value: Cusine.Category };
+      // console.log(response.data);
+      let Cuisines = response.data.map((cuisine) => {
+        return { key: cuisine._id, value: cuisine.CuisineName };
       });
 
-      this.setState({
-        CUISINES: this.state.CUISINES.concat(allCusines),
-      });
+      let payload = {
+        Cuisines,
+      };
+      this.props.updateFoodData(payload);
     });
   }
-
-  // change editable food state
-  makeEditable = (FoodId) => {
-    let index = null;
-    let foodItem = null;
-    switch (this.state.showFoodCategory) {
-      case 'APPETIZERS':
-        index = this.state.APPETIZERS.findIndex((x) => x.ID === FoodId);
-        foodItem = { ...this.state.APPETIZERS[index], category: this.state.showFoodCategory };
-
-        break;
-      case 'SALADS':
-        index = this.state.SALADS.findIndex((x) => x.ID === FoodId);
-        foodItem = { ...this.state.SALADS[index], category: this.state.showFoodCategory };
-
-        break;
-      case 'MAIN_COURSE':
-        index = this.state.MAIN_COURSE.findIndex((x) => x.ID === FoodId);
-        foodItem = { ...this.state.MAIN_COURSE[index], category: this.state.showFoodCategory };
-
-        break;
-      case 'BEVERAGES':
-        index = this.state.BEVERAGES.findIndex((x) => x.ID === FoodId);
-        foodItem = { ...this.state.BEVERAGES[index], category: this.state.showFoodCategory };
-
-        break;
-      case 'DESSERTS':
-        index = this.state.DESSERTS.findIndex((x) => x.ID === FoodId);
-        foodItem = { ...this.state.DESSERTS[index], category: this.state.showFoodCategory };
-
-        break;
-      default:
-        console.log('wrong Input');
-        break;
-    }
-
-    let newFood = {
-      category: '',
-      Name: '',
-      MainIngredients: '',
-      CuisineID: null,
-      Description: '',
-      Price: null,
-      ImageUrl: '',
-    };
-    this.setState({
-      editableId: FoodId,
-      tmpFood: { ...foodItem },
-      addFoodItemForm: false,
-      newFood,
-    });
-    console.log('tmp food store for editable: ', this.state.tmpFood);
-    console.log('editable ID: ', this.state.editableId);
-  };
-
-  // open or hide on select menu and fetch data if not in state
-  showMenuCategory = (menuCategory) => {
-    let tmp = {
-      ID: null,
-      category: '',
-      Name: '',
-      MainIngredients: '',
-      CuisineID: null,
-      Description: '',
-      Price: null,
-    };
-    if (this.state.showFoodCategory === menuCategory) {
-      localStorage.setItem('showFoodCategory', '');
-      this.setState({
-        editableCategory: '',
-        showFoodCategory: '',
-        addFoodItemForm: false,
-        tmpFood: { ...this.state.tmpFood, ...tmp },
-      });
-    } else {
-      localStorage.setItem('showFoodCategory', menuCategory);
-      this.setState({
-        showFoodCategory: menuCategory,
-        editableCategory: menuCategory,
-        addFoodItemForm: false,
-      });
-    }
-    switch (menuCategory) {
-      case 'APPETIZERS':
-        if (this.state.APPETIZERS.length === 0) {
-          axios
-            .get(
-              serverUrl + 'biz/menuFetch',
-
-              { params: { category: menuCategory }, withCredentials: true }
-            )
-            .then((response) => {
-              console.log(response.data);
-              let allAppetizers = response.data[0].map((Appetizer) => {
-                return {
-                  ID: Appetizer.ID,
-                  Name: Appetizer.Name,
-                  MainIngredients: Appetizer.Main_Ingredients,
-                  CuisineID: Appetizer.Cuisine_ID,
-                  Description: Appetizer.Description,
-                  Price: Appetizer.Price,
-                  ImageUrl: Appetizer.ImageURL,
-                };
-              });
-
-              this.setState({
-                APPETIZERS: this.state.APPETIZERS.concat(allAppetizers),
-              });
-            });
-        }
-        break;
-      case 'SALADS':
-        if (this.state.SALADS.length === 0) {
-          axios
-            .get(
-              serverUrl + 'biz/menuFetch',
-
-              { params: { category: menuCategory }, withCredentials: true }
-            )
-            .then((response) => {
-              console.log(response.data);
-              let allSalads = response.data[0].map((Salad) => {
-                return {
-                  ID: Salad.ID,
-                  Name: Salad.Name,
-                  MainIngredients: Salad.Main_Ingredients,
-                  CuisineID: Salad.Cuisine_ID,
-                  Description: Salad.Description,
-                  Price: Salad.Price,
-                  ImageUrl: Salad.ImageURL,
-                };
-              });
-
-              this.setState({
-                SALADS: this.state.SALADS.concat(allSalads),
-              });
-            });
-        }
-        break;
-      case 'MAIN_COURSE':
-        if (this.state.MAIN_COURSE.length === 0) {
-          axios
-            .get(
-              serverUrl + 'biz/menuFetch',
-
-              { params: { category: menuCategory }, withCredentials: true }
-            )
-            .then((response) => {
-              console.log(response.data);
-              let allMainCourse = response.data[0].map((MainCourse) => {
-                return {
-                  ID: MainCourse.ID,
-                  Name: MainCourse.Name,
-                  MainIngredients: MainCourse.Main_Ingredients,
-                  CuisineID: MainCourse.Cuisine_ID,
-                  Description: MainCourse.Description,
-                  Price: MainCourse.Price,
-                  ImageUrl: MainCourse.ImageURL,
-                };
-              });
-
-              this.setState({
-                MAIN_COURSE: this.state.MAIN_COURSE.concat(allMainCourse),
-              });
-            });
-        }
-        break;
-      case 'BEVERAGES':
-        if (this.state.BEVERAGES.length === 0) {
-          axios
-            .get(
-              serverUrl + 'biz/menuFetch',
-
-              { params: { category: menuCategory }, withCredentials: true }
-            )
-            .then((response) => {
-              console.log(response.data);
-              let allBeverages = response.data[0].map((Beverage) => {
-                return {
-                  ID: Beverage.ID,
-                  Name: Beverage.Name,
-                  MainIngredients: Beverage.Main_Ingredients,
-                  CuisineID: Beverage.Cuisine_ID,
-                  Description: Beverage.Description,
-                  Price: Beverage.Price,
-                  ImageUrl: Beverage.ImageURL,
-                };
-              });
-
-              this.setState({
-                BEVERAGES: this.state.BEVERAGES.concat(allBeverages),
-              });
-            });
-        }
-        break;
-      case 'DESSERTS':
-        if (this.state.DESSERTS.length === 0) {
-          axios
-            .get(serverUrl + 'biz/menuFetch', {
-              params: { category: menuCategory },
-              withCredentials: true,
-            })
-            .then((response) => {
-              console.log(response.data);
-              let allDesert = response.data[0].map((Dessert) => {
-                return {
-                  ID: Dessert.ID,
-                  Name: Dessert.Name,
-                  MainIngredients: Dessert.Main_Ingredients,
-                  CuisineID: Dessert.Cuisine_ID,
-                  Description: Dessert.Description,
-                  Price: Dessert.Price,
-                  ImageUrl: Dessert.ImageURL,
-                };
-              });
-
-              this.setState({
-                DESSERTS: this.state.DESSERTS.concat(allDesert),
-              });
-            });
-        }
-        break;
-      default:
-        console.log('wrong Input');
-        break;
-    }
-  };
-
-  //on successfull delete remove from state also
-  deleteFoodItem = (foodId) => {
-    let category = this.state.showFoodCategory;
-    const data = {
-      category: this.state.showFoodCategory,
-      foodId: foodId,
-    };
-    console.log('Delete Appetizer Food:', foodId, 'catefory: ', category);
-    axios.defaults.withCredentials = true;
-    //make a post request with the user data
-    axios.post(serverUrl + 'biz/deleteFoodItem', data).then(
-      (response) => {
-        console.log('Status Code : ', response.status);
-        if (response.status === 200) {
-          console.log(response.data);
-
-          // newFoodId = { ...newFoodId, ...this.state.newFood };
-          let index = -1;
-          switch (this.state.showFoodCategory) {
-            case 'APPETIZERS':
-              index = this.state.APPETIZERS.findIndex((x) => x.ID === foodId);
-              let tmpAPPETIZERS = [...this.state.APPETIZERS];
-              tmpAPPETIZERS.splice(index, 1);
-              this.setState({
-                APPETIZERS: tmpAPPETIZERS,
-              });
-              break;
-            case 'SALADS':
-              index = this.state.SALADS.findIndex((x) => x.ID === foodId);
-              let tmpSALADS = [...this.state.SALADS];
-              tmpSALADS.splice(index, 1);
-              this.setState({
-                SALADS: tmpSALADS,
-              });
-              break;
-            case 'MAIN_COURSE':
-              index = this.state.MAIN_COURSE.findIndex((x) => x.ID === foodId);
-              let tmpMainCourse = [...this.state.MAIN_COURSE];
-              tmpMainCourse.splice(index, 1);
-              this.setState({
-                MAIN_COURSE: tmpMainCourse,
-              });
-              break;
-            case 'BEVERAGES':
-              index = this.state.BEVERAGES.findIndex((x) => x.ID === foodId);
-              let tmpBEVERAGES = [...this.state.BEVERAGES];
-              tmpBEVERAGES.splice(index, 1);
-              this.setState({
-                BEVERAGES: tmpBEVERAGES,
-              });
-              break;
-            case 'DESSERTS':
-              index = this.state.DESSERTS.findIndex((x) => x.ID === foodId);
-              let tmpDESSERTS = [...this.state.DESSERTS];
-              tmpDESSERTS.splice(index, 1);
-              this.setState({
-                DESSERTS: tmpDESSERTS,
-              });
-              break;
-            default:
-              console.log('wrong Input');
-              break;
-          }
-        }
-      },
-      (error) => {
-        console.log(error);
-      }
-    );
-  };
 
   //Open or close Food Addition FOrm
   openFoodForm = () => {
     if (this.state.addFoodItemForm) {
       let tmp = {
-        Name: '',
+        RestaurantID: localStorage.getItem('userId'),
+        FoodName: '',
         MainIngredients: '',
-        CuisineID: null,
+        Cuisine: '',
         Description: '',
-        Price: null,
         ImageUrl: '',
+        Price: '',
       };
       this.setState({
         newFood: { ...this.state.newFood, ...tmp },
@@ -377,503 +92,35 @@ class FoodMenu extends Component {
   };
 
   // onChange Handeler for new food item form
-  onNameChangeHandler = (value, menuCategory) => {
-    let tmp = { Name: value, category: menuCategory };
+  onNameChangeHandler = (value) => {
+    let tmp = { FoodName: value };
     this.setState({
       newFood: { ...this.state.newFood, ...tmp },
     });
   };
-  onPriceChangeHandler = (value, menuCategory) => {
-    let tmp = { Price: value, category: menuCategory };
+  onPriceChangeHandler = (value) => {
+    let tmp = { Price: value };
     this.setState({
       newFood: { ...this.state.newFood, ...tmp },
     });
   };
-  onCusineChangeHandler = (value, menuCategory) => {
-    let tmp = { CuisineID: value, category: menuCategory };
+  onCusineChangeHandler = (value) => {
+    let tmp = { Cuisine: value };
     this.setState({
       newFood: { ...this.state.newFood, ...tmp },
     });
   };
-  onIngredentsChangeHandler = (value, menuCategory) => {
-    let tmp = { MainIngredients: value, category: menuCategory };
+  onIngredentsChangeHandler = (value) => {
+    let tmp = { MainIngredients: value };
     this.setState({
       newFood: { ...this.state.newFood, ...tmp },
     });
   };
-  onDescriptionChangeHandler = (value, menuCategory) => {
-    let tmp = { Description: value, category: menuCategory };
+  onDescriptionChangeHandler = (value) => {
+    let tmp = { Description: value };
     this.setState({
       newFood: { ...this.state.newFood, ...tmp },
     });
-  };
-
-  // onCHange handlers for old food items
-  onNameChangeHandlerUpdate = (value, id, menuCategory) => {
-    let index = null;
-    let food = null;
-    switch (this.state.showFoodCategory) {
-      case 'APPETIZERS':
-        index = this.state.APPETIZERS.findIndex((x) => x.ID === id);
-        // 1. Make a shallow copy of the items
-        let APPETIZERS = [...this.state.APPETIZERS];
-        // 2. Make a shallow copy of the item you want to mutate
-        food = { ...APPETIZERS[index] };
-        // 3. Replace the property you're intested in
-        food.Name = value;
-        // 4. Put it back into our array. N.B. we *are* mutating the array here, but that's why we made a copy first
-        APPETIZERS[index] = food;
-        // 5. Set the state to our new copy
-        this.setState({ APPETIZERS });
-        break;
-      case 'SALADS':
-        index = this.state.SALADS.findIndex((x) => x.ID === id);
-        let SALADS = [...this.state.SALADS];
-        food = { ...SALADS[index] };
-        food.Name = value;
-        SALADS[index] = food;
-        this.setState({ SALADS });
-        break;
-      case 'MAIN_COURSE':
-        index = this.state.MAIN_COURSE.findIndex((x) => x.ID === id);
-        let MAIN_COURSE = [...this.state.MAIN_COURSE];
-        food = { ...MAIN_COURSE[index] };
-        food.Name = value;
-        MAIN_COURSE[index] = food;
-        this.setState({ MAIN_COURSE });
-        break;
-      case 'BEVERAGES':
-        index = this.state.BEVERAGES.findIndex((x) => x.ID === id);
-        let BEVERAGES = [...this.state.BEVERAGES];
-        food = { ...BEVERAGES[index] };
-        food.Name = value;
-        BEVERAGES[index] = food;
-        this.setState({ BEVERAGES });
-        break;
-      case 'DESSERTS':
-        index = this.state.DESSERTS.findIndex((x) => x.ID === id);
-        let DESSERTS = [...this.state.DESSERTS];
-        food = { ...DESSERTS[index] };
-        food.Name = value;
-        DESSERTS[index] = food;
-        this.setState({ DESSERTS });
-        break;
-      default:
-        console.log('wrong Input');
-        break;
-    }
-  };
-  onPriceChangeHandlerUpdate = (value, id, menuCategory) => {
-    let index = null;
-    let food = null;
-    switch (this.state.showFoodCategory) {
-      case 'APPETIZERS':
-        index = this.state.APPETIZERS.findIndex((x) => x.ID === id);
-        let APPETIZERS = [...this.state.APPETIZERS];
-        food = { ...APPETIZERS[index] };
-        food.Price = value;
-        APPETIZERS[index] = food;
-        this.setState({ APPETIZERS });
-        break;
-      case 'SALADS':
-        index = this.state.SALADS.findIndex((x) => x.ID === id);
-        let SALADS = [...this.state.SALADS];
-        food = { ...SALADS[index] };
-        food.Price = value;
-        SALADS[index] = food;
-        this.setState({ SALADS });
-        break;
-      case 'MAIN_COURSE':
-        index = this.state.MAIN_COURSE.findIndex((x) => x.ID === id);
-        let MAIN_COURSE = [...this.state.MAIN_COURSE];
-        food = { ...MAIN_COURSE[index] };
-        food.Price = value;
-        MAIN_COURSE[index] = food;
-        this.setState({ MAIN_COURSE });
-        break;
-      case 'BEVERAGES':
-        index = this.state.BEVERAGES.findIndex((x) => x.ID === id);
-        let BEVERAGES = [...this.state.BEVERAGES];
-        food = { ...BEVERAGES[index] };
-        food.Price = value;
-        BEVERAGES[index] = food;
-        this.setState({ BEVERAGES });
-        break;
-      case 'DESSERTS':
-        index = this.state.DESSERTS.findIndex((x) => x.ID === id);
-        let DESSERTS = [...this.state.DESSERTS];
-        food = { ...DESSERTS[index] };
-        food.Price = value;
-        DESSERTS[index] = food;
-        this.setState({ DESSERTS });
-        break;
-      default:
-        console.log('wrong Input');
-        break;
-    }
-  };
-  onCusineChangeHandlerUpdate = (value, id, menuCategory) => {
-    let tmp = { CuisineID: value };
-    let index = null;
-    let food = null;
-    switch (this.state.showFoodCategory) {
-      case 'APPETIZERS':
-        index = this.state.APPETIZERS.findIndex((x) => x.ID === id);
-        let APPETIZERS = [...this.state.APPETIZERS];
-        food = { ...APPETIZERS[index] };
-        food.CuisineID = value;
-        APPETIZERS[index] = food;
-        this.setState({ APPETIZERS });
-        break;
-      case 'SALADS':
-        index = this.state.SALADS.findIndex((x) => x.ID === id);
-        let SALADS = [...this.state.SALADS];
-        food = { ...SALADS[index] };
-        food.CuisineID = value;
-        SALADS[index] = food;
-        this.setState({ SALADS });
-        break;
-      case 'MAIN_COURSE':
-        index = this.state.MAIN_COURSE.findIndex((x) => x.ID === id);
-        let MAIN_COURSE = [...this.state.MAIN_COURSE];
-        food = { ...MAIN_COURSE[index] };
-        food.CuisineID = value;
-        MAIN_COURSE[index] = food;
-        this.setState({ MAIN_COURSE });
-        break;
-      case 'BEVERAGES':
-        index = this.state.BEVERAGES.findIndex((x) => x.ID === id);
-        let BEVERAGES = [...this.state.BEVERAGES];
-        food = { ...BEVERAGES[index] };
-        food.CuisineID = value;
-        BEVERAGES[index] = food;
-        this.setState({ BEVERAGES });
-        break;
-      case 'DESSERTS':
-        index = this.state.DESSERTS.findIndex((x) => x.ID === id);
-        let DESSERTS = [...this.state.DESSERTS];
-        food = { ...DESSERTS[index] };
-        food.CuisineID = value;
-        DESSERTS[index] = food;
-        this.setState({ DESSERTS });
-        break;
-      default:
-        console.log('wrong Input');
-        break;
-    }
-  };
-  onIngredentsChangeHandlerUpdate = (value, id, menuCategory) => {
-    let index = null;
-    let food = null;
-    switch (this.state.showFoodCategory) {
-      case 'APPETIZERS':
-        index = this.state.APPETIZERS.findIndex((x) => x.ID === id);
-        let APPETIZERS = [...this.state.APPETIZERS];
-        food = { ...APPETIZERS[index] };
-        food.MainIngredients = value;
-        APPETIZERS[index] = food;
-        this.setState({ APPETIZERS });
-        break;
-      case 'SALADS':
-        index = this.state.SALADS.findIndex((x) => x.ID === id);
-        let SALADS = [...this.state.SALADS];
-        food = { ...SALADS[index] };
-        food.MainIngredients = value;
-        SALADS[index] = food;
-        this.setState({ SALADS });
-        break;
-      case 'MAIN_COURSE':
-        index = this.state.MAIN_COURSE.findIndex((x) => x.ID === id);
-        let MAIN_COURSE = [...this.state.MAIN_COURSE];
-        food = { ...MAIN_COURSE[index] };
-        food.MainIngredients = value;
-        MAIN_COURSE[index] = food;
-        this.setState({ MAIN_COURSE });
-        break;
-      case 'BEVERAGES':
-        index = this.state.BEVERAGES.findIndex((x) => x.ID === id);
-        let BEVERAGES = [...this.state.BEVERAGES];
-        food = { ...BEVERAGES[index] };
-        food.MainIngredients = value;
-        BEVERAGES[index] = food;
-        this.setState({ BEVERAGES });
-        break;
-      case 'DESSERTS':
-        index = this.state.DESSERTS.findIndex((x) => x.ID === id);
-        let DESSERTS = [...this.state.DESSERTS];
-        food = { ...DESSERTS[index] };
-        food.MainIngredients = value;
-        DESSERTS[index] = food;
-        this.setState({ DESSERTS });
-        break;
-      default:
-        console.log('wrong Input');
-        break;
-    }
-  };
-  onDescriptionChangeHandlerUpdate = (value, id, menuCategory) => {
-    let index = null;
-    let food = null;
-    switch (this.state.showFoodCategory) {
-      case 'APPETIZERS':
-        index = this.state.APPETIZERS.findIndex((x) => x.ID === id);
-        let APPETIZERS = [...this.state.APPETIZERS];
-        food = { ...APPETIZERS[index] };
-        food.Description = value;
-        APPETIZERS[index] = food;
-        this.setState({ APPETIZERS });
-        break;
-      case 'SALADS':
-        index = this.state.SALADS.findIndex((x) => x.ID === id);
-        let SALADS = [...this.state.SALADS];
-        food = { ...SALADS[index] };
-        food.Description = value;
-        SALADS[index] = food;
-        this.setState({ SALADS });
-        break;
-      case 'MAIN_COURSE':
-        index = this.state.MAIN_COURSE.findIndex((x) => x.ID === id);
-        let MAIN_COURSE = [...this.state.MAIN_COURSE];
-        food = { ...MAIN_COURSE[index] };
-        food.Description = value;
-        MAIN_COURSE[index] = food;
-        this.setState({ MAIN_COURSE });
-        break;
-      case 'BEVERAGES':
-        index = this.state.BEVERAGES.findIndex((x) => x.ID === id);
-        let BEVERAGES = [...this.state.BEVERAGES];
-        food = { ...BEVERAGES[index] };
-        food.Description = value;
-        BEVERAGES[index] = food;
-        this.setState({ BEVERAGES });
-        break;
-      case 'DESSERTS':
-        index = this.state.DESSERTS.findIndex((x) => x.ID === id);
-        let DESSERTS = [...this.state.DESSERTS];
-        food = { ...DESSERTS[index] };
-        food.Description = value;
-        DESSERTS[index] = food;
-        this.setState({ DESSERTS });
-        break;
-      default:
-        console.log('wrong Input');
-        break;
-    }
-  };
-
-  //update old food item
-  updateFoodItem = (FoodId, event) => {
-    let index = null;
-    let foodItem = null;
-    switch (this.state.showFoodCategory) {
-      case 'APPETIZERS':
-        index = this.state.APPETIZERS.findIndex((x) => x.ID === FoodId);
-        foodItem = { ...this.state.APPETIZERS[index] };
-        console.log('Update food item', foodItem);
-        break;
-      case 'SALADS':
-        index = this.state.SALADS.findIndex((x) => x.ID === FoodId);
-        foodItem = { ...this.state.SALADS[index] };
-        console.log('Update food item', foodItem);
-        break;
-      case 'MAIN_COURSE':
-        index = this.state.MAIN_COURSE.findIndex((x) => x.ID === FoodId);
-        foodItem = { ...this.state.MAIN_COURSE[index] };
-        console.log('Update food item', foodItem);
-        break;
-      case 'BEVERAGES':
-        index = this.state.BEVERAGES.findIndex((x) => x.ID === FoodId);
-        foodItem = { ...this.state.BEVERAGES[index] };
-        console.log('Update food item', foodItem);
-        break;
-      case 'DESSERTS':
-        index = this.state.DESSERTS.findIndex((x) => x.ID === FoodId);
-        foodItem = { ...this.state.DESSERTS[index] };
-        console.log('Update food item', foodItem);
-        break;
-      default:
-        console.log('wrong Input');
-        break;
-    }
-
-    foodItem = { ...foodItem, category: this.state.showFoodCategory };
-    event.preventDefault();
-    axios.defaults.withCredentials = true;
-    //make a post request with the user data
-    axios.post(serverUrl + 'biz/updateFoodItem', foodItem).then(
-      (response) => {
-        console.log('Status Code : ', response.status);
-        if (response.status === 200) {
-          console.log(response.data);
-          let tmpFood = {
-            ID: null,
-            category: '',
-            Name: '',
-            MainIngredients: '',
-            CuisineID: null,
-            Description: '',
-            Price: null,
-          };
-          this.setState({ tmpFood, editableId: null });
-          // newFoodId = { ...newFoodId, ...this.state.newFood };
-        }
-      },
-      (error) => {
-        console.log(error);
-      }
-    );
-  };
-
-  //cancel Updating food, and revert back to orignal
-  cancelFoodUpdate = (FoodId) => {
-    let index = null;
-    let foodItem = null;
-    let tmpFood = {
-      ID: null,
-      category: '',
-      Name: '',
-      MainIngredients: '',
-      CuisineID: null,
-      Description: '',
-      Price: null,
-    };
-    switch (this.state.showFoodCategory) {
-      case 'APPETIZERS':
-        index = this.state.APPETIZERS.findIndex((x) => x.ID === FoodId);
-        let APPETIZERS = [...this.state.APPETIZERS];
-        foodItem = { ...APPETIZERS[index] };
-        foodItem = { ...foodItem, ...this.state.tmpFood };
-        APPETIZERS[index] = foodItem;
-        this.setState({ APPETIZERS, tmpFood, editableId: null });
-        console.log('Cance Update, orignal food item', foodItem);
-        break;
-      case 'SALADS':
-        index = this.state.SALADS.findIndex((x) => x.ID === FoodId);
-        let SALADS = [...this.state.SALADS];
-        foodItem = { ...SALADS[index] };
-        foodItem = { ...foodItem, ...this.state.tmpFood };
-        SALADS[index] = foodItem;
-        this.setState({ SALADS, tmpFood, editableId: null });
-        console.log('Cance Update, orignal food item', foodItem);
-        break;
-      case 'MAIN_COURSE':
-        index = this.state.MAIN_COURSE.findIndex((x) => x.ID === FoodId);
-        let MAIN_COURSE = [...this.state.MAIN_COURSE];
-        foodItem = { ...MAIN_COURSE[index] };
-        foodItem = { ...foodItem, ...this.state.tmpFood };
-        MAIN_COURSE[index] = foodItem;
-        this.setState({ MAIN_COURSE, tmpFood, editableId: null });
-        console.log('Cance Update, orignal food item', foodItem);
-        break;
-      case 'BEVERAGES':
-        index = this.state.BEVERAGES.findIndex((x) => x.ID === FoodId);
-        let BEVERAGES = [...this.state.BEVERAGES];
-        foodItem = { ...BEVERAGES[index] };
-        foodItem = { ...foodItem, ...this.state.tmpFood };
-        BEVERAGES[index] = foodItem;
-        this.setState({ BEVERAGES, tmpFood, editableId: null });
-        console.log('Cance Update, orignal food item', foodItem);
-        break;
-      case 'DESSERTS':
-        index = this.state.DESSERTS.findIndex((x) => x.ID === FoodId);
-        let DESSERTS = [...this.state.DESSERTS];
-        foodItem = { ...DESSERTS[index] };
-        foodItem = { ...foodItem, ...this.state.tmpFood };
-        DESSERTS[index] = foodItem;
-        this.setState({ DESSERTS, tmpFood, editableId: null });
-        console.log('Cance Update, orignal food item', foodItem);
-        break;
-      default:
-        console.log('wrong Input');
-        break;
-    }
-  };
-
-  onChangeFileHandlerOld = (event, id) => {
-    if (event.target.files.length === 1) {
-      event.preventDefault();
-      let formData = new FormData();
-      formData.append('file', event.target.files[0], event.target.files[0].name);
-      axios({
-        method: 'post',
-        url: serverUrl + 'biz/uploadFoodImage',
-        data: formData,
-        headers: { 'Content-Type': 'multipart/form-data' },
-      })
-        .then((response) => {
-          console.log('Status Code : ', response.status);
-          if (parseInt(response.status) === 200) {
-            console.log('Product Saved');
-            let tmp = { ImageUrl: response.data };
-            this.updateImageUrl(response.data, id);
-            // this.setState({
-            //   newFood: { ...this.state.newFood, ...tmp },
-            // });
-            //Router.push('/vendor/' + localStorage.getItem('user_id'));
-          } else if (parseInt(response.status) === 400) {
-            console.log(response.data);
-          }
-        })
-        .catch((error) => {
-          this.setState({
-            errorMsg: error.message,
-            authFlag: false,
-          });
-        });
-      // this.setState({
-      //   uploadedPic: event.target.files,
-      // });
-    }
-  };
-
-  updateImageUrl = (value, id) => {
-    let index = null;
-    let food = null;
-    switch (this.state.showFoodCategory) {
-      case 'APPETIZERS':
-        index = this.state.APPETIZERS.findIndex((x) => x.ID === id);
-        let APPETIZERS = [...this.state.APPETIZERS];
-        food = { ...APPETIZERS[index] };
-        food.ImageUrl = value;
-        APPETIZERS[index] = food;
-        this.setState({ APPETIZERS });
-        break;
-      case 'SALADS':
-        index = this.state.SALADS.findIndex((x) => x.ID === id);
-        let SALADS = [...this.state.SALADS];
-        food = { ...SALADS[index] };
-        food.ImageUrl = value;
-        SALADS[index] = food;
-        this.setState({ SALADS });
-        break;
-      case 'MAIN_COURSE':
-        index = this.state.MAIN_COURSE.findIndex((x) => x.ID === id);
-        let MAIN_COURSE = [...this.state.MAIN_COURSE];
-        food = { ...MAIN_COURSE[index] };
-        food.ImageUrl = value;
-        MAIN_COURSE[index] = food;
-        this.setState({ MAIN_COURSE });
-        break;
-      case 'BEVERAGES':
-        index = this.state.BEVERAGES.findIndex((x) => x.ID === id);
-        let BEVERAGES = [...this.state.BEVERAGES];
-        food = { ...BEVERAGES[index] };
-        food.ImageUrl = value;
-        BEVERAGES[index] = food;
-        this.setState({ BEVERAGES });
-        break;
-      case 'DESSERTS':
-        index = this.state.DESSERTS.findIndex((x) => x.ID === id);
-        let DESSERTS = [...this.state.DESSERTS];
-        food = { ...DESSERTS[index] };
-        food.ImageUrl = value;
-        DESSERTS[index] = food;
-        this.setState({ DESSERTS });
-        break;
-      default:
-        console.log('wrong Input');
-        break;
-    }
   };
 
   onChangeFileHandler = (event) => {
@@ -888,16 +135,16 @@ class FoodMenu extends Component {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
         .then((response) => {
-          console.log('Status Code : ', response.status);
+          // console.log('Status Code : ', response.status);
           if (parseInt(response.status) === 200) {
-            console.log('Product Saved');
+            // console.log('Product Saved');
             let tmp = { ImageUrl: response.data };
             this.setState({
               newFood: { ...this.state.newFood, ...tmp },
             });
             //Router.push('/vendor/' + localStorage.getItem('user_id'));
           } else if (parseInt(response.status) === 400) {
-            console.log(response.data);
+            // console.log(response.data);
           }
         })
         .catch((error) => {
@@ -914,87 +161,901 @@ class FoodMenu extends Component {
 
   onSaveCreateNew = () => {
     const data = {
+      ...this.state.newFood,
       category: this.state.showFoodCategory,
-      name: this.state.newFood.Name,
-      price: this.state.newFood.Price,
-      cuisine: this.state.newFood.CuisineID,
-      ingredients: this.state.newFood.MainIngredients,
-      description: this.state.newFood.Description,
-      ImageUrl: this.state.newFood.ImageUrl,
     };
     //set the with credentials to true
     axios.defaults.withCredentials = true;
     //make a post request with the user data
     axios.post(serverUrl + 'biz/insertFood', data).then(
       (response) => {
-        console.log('Status Code : ', response.status);
+        // console.log('Status Code : ', response.status);
         if (response.status === 200) {
-          console.log(response.data);
-          let newFood = {
-            category: this.state.showFoodCategory,
-            Name: response.data[0][0].Name,
-            MainIngredients: response.data[0][0].Main_Ingredients,
-            CuisineID: response.data[0][0].Cuisine_ID,
-            Description: response.data[0][0].Description,
-            Price: response.data[0][0].Price,
-            ImageUrl: response.data[0][0].ImageURL,
+          // console.log(response.data);
+          let payload = {
+            success: true,
+            message: response.data,
           };
-
-          // newFoodId = { ...newFoodId, ...this.state.newFood };
-          switch (this.state.showFoodCategory) {
-            case 'APPETIZERS':
-              this.setState({
-                APPETIZERS: this.state.APPETIZERS.concat(newFood),
-              });
-              break;
-            case 'SALADS':
-              this.setState({
-                SALADS: this.state.SALADS.concat(newFood),
-              });
-              break;
-            case 'MAIN_COURSE':
-              this.setState({
-                MAIN_COURSE: this.state.MAIN_COURSE.concat(newFood),
-              });
-              break;
-            case 'BEVERAGES':
-              this.setState({
-                BEVERAGES: this.state.BEVERAGES.concat(newFood),
-              });
-              break;
-            case 'DESSERTS':
-              this.setState({
-                DESSERTS: this.state.DESSERTS.concat(newFood),
-              });
-              break;
-            default:
-              console.log('wrong Input');
-              break;
-          }
+          this.props.updateSnackbarData(payload);
+          this.fetchFoodMenu(this.state.selectedPage, this.state.showFoodCategory);
         }
       },
       (error) => {
-        console.log(error);
+        // console.log(error);
       }
     );
     let newFood = {
-      category: '',
-      Name: '',
+      RestaurantID: localStorage.getItem('userId'),
+      FoodName: '',
       MainIngredients: '',
-      CuisineID: null,
+      Cuisine: '',
       Description: '',
-      Price: null,
+      ImageUrl: '',
+      Price: '',
     };
     this.setState({
       newFood: { ...this.setState.newFood, ...newFood },
       addFoodItemForm: false,
     });
   };
+
+  // Common method to fetch data
+  fetchFoodMenu(pageNumber, menuCategory) {
+    switch (menuCategory) {
+      case APPETIZERS:
+        axios
+          .get(
+            serverUrl + 'biz/menuFetch',
+
+            {
+              params: {
+                selectedPage: pageNumber,
+                category: menuCategory,
+                RestaurantID: localStorage.getItem('userId'),
+              },
+              withCredentials: true,
+            }
+          )
+          .then((response) => {
+            // console.log(response.data);
+            let Appetizers = response.data.allFoods.map((Appetizer) => {
+              return {
+                ...Appetizer,
+              };
+            });
+
+            let payload = {
+              PageCount: Math.ceil(response.data.foodCount / 2),
+              Appetizers,
+              FoodCount: response.data.foodCount,
+            };
+            this.props.updateFoodData(payload);
+            // this.setState({
+            //   APPETIZERS: this.props.foodData.Appetizers.concat(allAppetizers),
+            // });
+          });
+        break;
+      case SALADS:
+        axios
+          .get(
+            serverUrl + 'biz/menuFetch',
+
+            {
+              params: {
+                selectedPage: pageNumber,
+                category: menuCategory,
+                RestaurantID: localStorage.getItem('userId'),
+              },
+              withCredentials: true,
+            }
+          )
+          .then((response) => {
+            // console.log(response.data);
+            let Salads = response.data.allFoods.map((Salad) => {
+              return {
+                ...Salad,
+              };
+            });
+
+            let payload = {
+              PageCount: Math.ceil(response.data.foodCount / 2),
+              Salads,
+            };
+            this.props.updateFoodData(payload);
+          });
+        break;
+      case MAIN_COURSE:
+        axios
+          .get(
+            serverUrl + 'biz/menuFetch',
+
+            {
+              params: {
+                selectedPage: pageNumber,
+                category: menuCategory,
+                RestaurantID: localStorage.getItem('userId'),
+              },
+              withCredentials: true,
+            }
+          )
+          .then((response) => {
+            // console.log(response.data);
+            let MainCourse = response.data.allFoods.map((MainCours) => {
+              return {
+                ...MainCours,
+              };
+            });
+
+            let payload = {
+              PageCount: Math.ceil(response.data.foodCount / 2),
+              MainCourse,
+            };
+            this.props.updateFoodData(payload);
+          });
+        break;
+      case BEVERAGES:
+        axios
+          .get(
+            serverUrl + 'biz/menuFetch',
+
+            {
+              params: {
+                selectedPage: pageNumber,
+                category: menuCategory,
+                RestaurantID: localStorage.getItem('userId'),
+              },
+              withCredentials: true,
+            }
+          )
+          .then((response) => {
+            // console.log(response.data);
+            let Beverages = response.data.allFoods.map((Beverage) => {
+              return {
+                ...Beverage,
+              };
+            });
+
+            let payload = {
+              PageCount: Math.ceil(response.data.foodCount / 2),
+              Beverages,
+            };
+            this.props.updateFoodData(payload);
+          });
+        break;
+      case DESSERTS:
+        axios
+          .get(serverUrl + 'biz/menuFetch', {
+            params: {
+              selectedPage: pageNumber,
+              category: menuCategory,
+              RestaurantID: localStorage.getItem('userId'),
+            },
+            withCredentials: true,
+          })
+          .then((response) => {
+            // console.log(response.data);
+            let Desserts = response.data.allFoods.map((Dessert) => {
+              return {
+                ...Dessert,
+              };
+            });
+
+            let payload = {
+              PageCount: Math.ceil(response.data.foodCount / 2),
+              Desserts,
+            };
+            this.props.updateFoodData(payload);
+          });
+        break;
+      default:
+        // console.log('wrong Input');
+        break;
+    }
+  }
+
+  // open or hide on select menu and fetch data if not in state
+  showMenuCategory = (menuCategory) => {
+    let tmp = {
+      RestaurantID: localStorage.getItem('userId'),
+      FoodName: '',
+      MainIngredients: '',
+      Cuisine: '',
+      Description: '',
+      ImageUrl: '',
+      Price: '',
+    };
+    if (this.state.showFoodCategory === menuCategory) {
+      localStorage.setItem('showFoodCategory', '');
+      this.setState({
+        editableCategory: '',
+        showFoodCategory: '',
+        addFoodItemForm: false,
+        tmpFood: { ...this.state.tmpFood, ...tmp },
+      });
+    } else {
+      localStorage.setItem('showFoodCategory', menuCategory);
+      this.setState({
+        showFoodCategory: menuCategory,
+        editableCategory: menuCategory,
+        addFoodItemForm: false,
+        selectedPage: 0,
+      });
+    }
+    this.fetchFoodMenu(0, menuCategory);
+  };
+
+  // on page click
+  handlePageClick = (e) => {
+    // const selectedPage = e.selected;
+    this.fetchFoodMenu(e.selected, this.state.showFoodCategory);
+    this.setState({
+      selectedPage: e.selected,
+    });
+  };
+
+  //on successfull delete remove from state also
+  deleteFoodItem = (event, foodId) => {
+    event.preventDefault();
+    let category = this.state.showFoodCategory;
+    const data = {
+      category: this.state.showFoodCategory,
+      _id: foodId,
+    };
+    // console.log('Delete Appetizer Food:', foodId, 'catefory: ', category);
+    axios.defaults.withCredentials = true;
+    //make a post request with the user data
+    axios.post(serverUrl + 'biz/deleteFoodItem', data).then(
+      (response) => {
+        // console.log('Status Code : ', response.status);
+        if (response.status === 200) {
+          // console.log(response.data);
+          const payload = {
+            success: true,
+            message: response.data,
+          };
+          this.props.updateSnackbarData(payload);
+          let pageNo = this.state.selectedPage;
+          if (this.props.foodDataFoodCount % 2 !== 0) {
+            pageNo -= 1;
+          }
+          this.fetchFoodMenu(pageNo, this.state.showFoodCategory);
+        }
+      },
+      (error) => {
+        // console.log(error);
+      }
+    );
+  };
+
+  // change editable food state
+  makeEditable = (FoodId) => {
+    let index = null;
+    let foodItem = null;
+    switch (this.state.showFoodCategory) {
+      case APPETIZERS:
+        index = this.props.foodData.Appetizers.findIndex((x) => x._id === FoodId);
+        foodItem = {
+          ...this.props.foodData.Appetizers[index],
+          category: this.state.showFoodCategory,
+        };
+
+        break;
+      case SALADS:
+        index = this.props.foodData.Salads.findIndex((x) => x._id === FoodId);
+        foodItem = { ...this.props.foodData.Salads[index], category: this.state.showFoodCategory };
+
+        break;
+      case MAIN_COURSE:
+        index = this.props.foodData.MainCourse.findIndex((x) => x._id === FoodId);
+        foodItem = {
+          ...this.props.foodData.MainCourse[index],
+          category: this.state.showFoodCategory,
+        };
+
+        break;
+      case BEVERAGES:
+        index = this.props.foodData.Beverages.findIndex((x) => x._id === FoodId);
+        foodItem = {
+          ...this.props.foodData.Beverages[index],
+          category: this.state.showFoodCategory,
+        };
+
+        break;
+      case DESSERTS:
+        index = this.props.foodData.Desserts.findIndex((x) => x._id === FoodId);
+        foodItem = {
+          ...this.props.foodData.Desserts[index],
+          category: this.state.showFoodCategory,
+        };
+
+        break;
+      default:
+        // console.log('wrong Input');
+        break;
+    }
+
+    let newFood = {
+      RestaurantID: localStorage.getItem('userId'),
+      FoodName: '',
+      MainIngredients: '',
+      Cuisine: '',
+      Description: '',
+      ImageUrl: '',
+      Price: '',
+    };
+    this.setState({
+      editableId: FoodId,
+      tmpFood: { ...foodItem },
+      addFoodItemForm: false,
+      newFood,
+    });
+    // console.log('tmp food store for editable: ', this.state.tmpFood);
+    // console.log('editable ID: ', this.state.editableId);
+  };
+
+  // onCHange handlers for old food items
+  onNameChangeHandlerUpdate = (value, id) => {
+    let index = null;
+    let food = null;
+    let payload = null;
+    switch (this.state.showFoodCategory) {
+      case APPETIZERS:
+        index = this.props.foodData.Appetizers.findIndex((x) => x._id === id);
+        // 1. Make a shallow copy of the items
+        let Appetizers = [...this.props.foodData.Appetizers];
+        // 2. Make a shallow copy of the item you want to mutate
+        food = { ...Appetizers[index] };
+        // 3. Replace the property you're intested in
+        food.FoodName = value;
+        // 4. Put it back into our array. N.B. we *are* mutating the array here, but that's why we made a copy first
+        Appetizers[index] = food;
+        // 5. Set the state to our new copy
+        payload = {
+          Appetizers,
+        };
+
+        break;
+      case SALADS:
+        index = this.props.foodData.Salads.findIndex((x) => x._id === id);
+        let Salads = [...this.props.foodData.Salads];
+        food = { ...Salads[index] };
+        food.FoodName = value;
+        Salads[index] = food;
+        payload = {
+          Salads,
+        };
+
+        break;
+      case MAIN_COURSE:
+        index = this.props.foodData.MainCourse.findIndex((x) => x._id === id);
+        let MainCourse = [...this.props.foodData.MainCourse];
+        food = { ...MainCourse[index] };
+        food.FoodName = value;
+        MainCourse[index] = food;
+        payload = {
+          MainCourse,
+        };
+        break;
+      case BEVERAGES:
+        index = this.props.foodData.Beverages.findIndex((x) => x._id === id);
+        let Beverages = [...this.props.foodData.Beverages];
+        food = { ...Beverages[index] };
+        food.FoodName = value;
+        Beverages[index] = food;
+        payload = {
+          Beverages,
+        };
+        break;
+      case DESSERTS:
+        index = this.props.foodData.Desserts.findIndex((x) => x._id === id);
+        let Desserts = [...this.props.foodData.Desserts];
+        food = { ...Desserts[index] };
+        food.FoodName = value;
+        Desserts[index] = food;
+        payload = {
+          Desserts,
+        };
+        break;
+      default:
+        // console.log('wrong Input');
+        break;
+    }
+    this.props.updateFoodData(payload);
+  };
+  onPriceChangeHandlerUpdate = (value, id) => {
+    let index = null;
+    let food = null;
+    let payload = null;
+    switch (this.state.showFoodCategory) {
+      case APPETIZERS:
+        index = this.props.foodData.Appetizers.findIndex((x) => x._id === id);
+        let Appetizers = [...this.props.foodData.Appetizers];
+        food = { ...Appetizers[index] };
+        food.Price = value;
+        Appetizers[index] = food;
+        payload = {
+          Appetizers,
+        };
+        break;
+      case SALADS:
+        index = this.props.foodData.Salads.findIndex((x) => x._id === id);
+        let Salads = [...this.props.foodData.Salads];
+        food = { ...Salads[index] };
+        food.Price = value;
+        Salads[index] = food;
+        payload = {
+          Salads,
+        };
+        break;
+      case MAIN_COURSE:
+        index = this.props.foodData.MainCourse.findIndex((x) => x._id === id);
+        let MainCourse = [...this.props.foodData.MainCourse];
+        food = { ...MainCourse[index] };
+        food.Price = value;
+        MainCourse[index] = food;
+        payload = {
+          MainCourse,
+        };
+        break;
+      case BEVERAGES:
+        index = this.props.foodData.Beverages.findIndex((x) => x._id === id);
+        let Beverages = [...this.props.foodData.Beverages];
+        food = { ...Beverages[index] };
+        food.Price = value;
+        Beverages[index] = food;
+        payload = {
+          Beverages,
+        };
+        break;
+      case DESSERTS:
+        index = this.props.foodData.Desserts.findIndex((x) => x._id === id);
+        let Desserts = [...this.props.foodData.Desserts];
+        food = { ...Desserts[index] };
+        food.Price = value;
+        Desserts[index] = food;
+        payload = {
+          Desserts,
+        };
+        break;
+      default:
+        // console.log('wrong Input');
+        break;
+    }
+    this.props.updateFoodData(payload);
+  };
+  onCusineChangeHandlerUpdate = (value, id) => {
+    let index = null;
+    let food = null;
+    let payload = null;
+    switch (this.state.showFoodCategory) {
+      case APPETIZERS:
+        index = this.props.foodData.Appetizers.findIndex((x) => x._id === id);
+        let Appetizers = [...this.props.foodData.Appetizers];
+        food = { ...Appetizers[index] };
+        food.Cuisine = value;
+        Appetizers[index] = food;
+        payload = {
+          Appetizers,
+        };
+        break;
+      case SALADS:
+        index = this.props.foodData.Salads.findIndex((x) => x._id === id);
+        let Salads = [...this.props.foodData.Salads];
+        food = { ...Salads[index] };
+        food.Cuisine = value;
+        Salads[index] = food;
+        payload = {
+          Salads,
+        };
+        break;
+      case MAIN_COURSE:
+        index = this.props.foodData.MainCourse.findIndex((x) => x._id === id);
+        let MainCourse = [...this.props.foodData.MainCourse];
+        food = { ...MainCourse[index] };
+        food.Cuisine = value;
+        MainCourse[index] = food;
+        payload = {
+          MainCourse,
+        };
+        break;
+      case BEVERAGES:
+        index = this.props.foodData.Beverages.findIndex((x) => x._id === id);
+        let Beverages = [...this.props.foodData.Beverages];
+        food = { ...Beverages[index] };
+        food.Cuisine = value;
+        Beverages[index] = food;
+        payload = {
+          Beverages,
+        };
+        break;
+      case DESSERTS:
+        index = this.props.foodData.Desserts.findIndex((x) => x._id === id);
+        let Desserts = [...this.props.foodData.Desserts];
+        food = { ...Desserts[index] };
+        food.Cuisine = value;
+        Desserts[index] = food;
+        payload = {
+          Desserts,
+        };
+        break;
+      default:
+        // console.log('wrong Input');
+        break;
+    }
+    this.props.updateFoodData(payload);
+  };
+  onIngredentsChangeHandlerUpdate = (value, id, menuCategory) => {
+    let index = null;
+    let food = null;
+    let payload = null;
+    switch (this.state.showFoodCategory) {
+      case APPETIZERS:
+        index = this.props.foodData.Appetizers.findIndex((x) => x._id === id);
+        let Appetizers = [...this.props.foodData.Appetizers];
+        food = { ...Appetizers[index] };
+        food.MainIngredients = value;
+        Appetizers[index] = food;
+        payload = {
+          Appetizers,
+        };
+        break;
+      case SALADS:
+        index = this.props.foodData.Salads.findIndex((x) => x._id === id);
+        let Salads = [...this.props.foodData.Salads];
+        food = { ...Salads[index] };
+        food.MainIngredients = value;
+        Salads[index] = food;
+        payload = {
+          Salads,
+        };
+        break;
+      case MAIN_COURSE:
+        index = this.props.foodData.MainCourse.findIndex((x) => x._id === id);
+        let MainCourse = [...this.props.foodData.MainCourse];
+        food = { ...MainCourse[index] };
+        food.MainIngredients = value;
+        MainCourse[index] = food;
+        payload = {
+          MainCourse,
+        };
+        break;
+      case BEVERAGES:
+        index = this.props.foodData.Beverages.findIndex((x) => x._id === id);
+        let Beverages = [...this.props.foodData.Beverages];
+        food = { ...Beverages[index] };
+        food.MainIngredients = value;
+        Beverages[index] = food;
+        payload = {
+          Beverages,
+        };
+        break;
+      case DESSERTS:
+        index = this.props.foodData.Desserts.findIndex((x) => x._id === id);
+        let Desserts = [...this.props.foodData.Desserts];
+        food = { ...Desserts[index] };
+        food.MainIngredients = value;
+        Desserts[index] = food;
+        payload = {
+          Desserts,
+        };
+        break;
+      default:
+        // console.log('wrong Input');
+        break;
+    }
+    this.props.updateFoodData(payload);
+  };
+  onDescriptionChangeHandlerUpdate = (value, id, menuCategory) => {
+    let index = null;
+    let food = null;
+    let payload = null;
+    switch (this.state.showFoodCategory) {
+      case APPETIZERS:
+        index = this.props.foodData.Appetizers.findIndex((x) => x._id === id);
+        let Appetizers = [...this.props.foodData.Appetizers];
+        food = { ...Appetizers[index] };
+        food.Description = value;
+        Appetizers[index] = food;
+        payload = {
+          Appetizers,
+        };
+        break;
+      case SALADS:
+        index = this.props.foodData.Salads.findIndex((x) => x._id === id);
+        let Salads = [...this.props.foodData.Salads];
+        food = { ...Salads[index] };
+        food.Description = value;
+        Salads[index] = food;
+        payload = {
+          Salads,
+        };
+        break;
+      case MAIN_COURSE:
+        index = this.props.foodData.MainCourse.findIndex((x) => x._id === id);
+        let MainCourse = [...this.props.foodData.MainCourse];
+        food = { ...MainCourse[index] };
+        food.Description = value;
+        MainCourse[index] = food;
+        payload = {
+          MainCourse,
+        };
+        break;
+      case BEVERAGES:
+        index = this.props.foodData.Beverages.findIndex((x) => x._id === id);
+        let Beverages = [...this.props.foodData.Beverages];
+        food = { ...Beverages[index] };
+        food.Description = value;
+        Beverages[index] = food;
+        payload = {
+          Beverages,
+        };
+        break;
+      case DESSERTS:
+        index = this.props.foodData.Desserts.findIndex((x) => x._id === id);
+        let Desserts = [...this.props.foodData.Desserts];
+        food = { ...Desserts[index] };
+        food.Description = value;
+        Desserts[index] = food;
+        payload = {
+          Desserts,
+        };
+        break;
+      default:
+        // console.log('wrong Input');
+        break;
+    }
+    this.props.updateFoodData(payload);
+  };
+  updateImageUrl = (value, id) => {
+    let index = null;
+    let food = null;
+    let payload = null;
+    switch (this.state.showFoodCategory) {
+      case APPETIZERS:
+        index = this.props.foodData.Appetizers.findIndex((x) => x._id === id);
+        let Appetizers = [...this.props.foodData.Appetizers];
+        food = { ...Appetizers[index] };
+        food.ImageUrl = value;
+        Appetizers[index] = food;
+        payload = {
+          Appetizers,
+        };
+        break;
+      case SALADS:
+        index = this.props.foodData.Salads.findIndex((x) => x._id === id);
+        let Salads = [...this.props.foodData.Salads];
+        food = { ...Salads[index] };
+        food.ImageUrl = value;
+        Salads[index] = food;
+        payload = {
+          Salads,
+        };
+        break;
+      case MAIN_COURSE:
+        index = this.props.foodData.MainCourse.findIndex((x) => x._id === id);
+        let MainCourse = [...this.props.foodData.MainCourse];
+        food = { ...MainCourse[index] };
+        food.ImageUrl = value;
+        MainCourse[index] = food;
+        payload = {
+          MainCourse,
+        };
+        break;
+      case BEVERAGES:
+        index = this.props.foodData.Beverages.findIndex((x) => x._id === id);
+        let Beverages = [...this.props.foodData.Beverages];
+        food = { ...Beverages[index] };
+        food.ImageUrl = value;
+        Beverages[index] = food;
+        payload = {
+          Beverages,
+        };
+        break;
+      case DESSERTS:
+        index = this.props.foodData.Desserts.findIndex((x) => x._id === id);
+        let Desserts = [...this.props.foodData.Desserts];
+        food = { ...Desserts[index] };
+        food.ImageUrl = value;
+        Desserts[index] = food;
+        payload = {
+          Desserts,
+        };
+        break;
+      default:
+        // console.log('wrong Input');
+        break;
+    }
+    this.props.updateFoodData(payload);
+  };
+
+  //update old food item
+  updateFoodItem = (FoodId, event) => {
+    let index = null;
+    let foodItem = null;
+    switch (this.state.showFoodCategory) {
+      case APPETIZERS:
+        index = this.props.foodData.Appetizers.findIndex((x) => x._id === FoodId);
+        foodItem = { ...this.props.foodData.Appetizers[index] };
+        // console.log('Update food item', foodItem);
+        break;
+      case SALADS:
+        index = this.props.foodData.Salads.findIndex((x) => x._id === FoodId);
+        foodItem = { ...this.props.foodData.Salads[index] };
+        // console.log('Update food item', foodItem);
+        break;
+      case MAIN_COURSE:
+        index = this.props.foodData.MainCourse.findIndex((x) => x._id === FoodId);
+        foodItem = { ...this.props.foodData.MainCourse[index] };
+        // console.log('Update food item', foodItem);
+        break;
+      case BEVERAGES:
+        index = this.props.foodData.Beverages.findIndex((x) => x._id === FoodId);
+        foodItem = { ...this.props.foodData.Beverages[index] };
+        // console.log('Update food item', foodItem);
+        break;
+      case DESSERTS:
+        index = this.props.foodData.Desserts.findIndex((x) => x._id === FoodId);
+        foodItem = { ...this.props.foodData.Desserts[index] };
+        // console.log('Update food item', foodItem);
+        break;
+      default:
+        // console.log('wrong Input');
+        break;
+    }
+
+    foodItem = { ...foodItem, category: this.state.showFoodCategory };
+    event.preventDefault();
+    axios.defaults.withCredentials = true;
+    //make a post request with the user data
+    axios.post(serverUrl + 'biz/updateFoodItem', foodItem).then(
+      (response) => {
+        // console.log('Status Code : ', response.status);
+        if (response.status === 200) {
+          // console.log(response.data);
+          const payload = {
+            success: true,
+            message: response.data,
+          };
+          this.props.updateSnackbarData(payload);
+          let tmpFood = {
+            RestaurantID: localStorage.getItem('userId'),
+            FoodName: '',
+            MainIngredients: '',
+            Cuisine: '',
+            Description: '',
+            ImageUrl: '',
+            Price: '',
+          };
+          this.setState({ tmpFood, editableId: null });
+          // newFoodId = { ...newFoodId, ...this.state.newFood };
+        }
+      },
+      (error) => {
+        // console.log(error);
+      }
+    );
+  };
+
+  //cancel Updating food, and revert back to orignal
+  cancelFoodUpdate = (FoodId) => {
+    let index = null;
+    let foodItem = null;
+    let tmpFood = {
+      RestaurantID: localStorage.getItem('userId'),
+      FoodName: '',
+      MainIngredients: '',
+      Cuisine: '',
+      Description: '',
+      ImageUrl: '',
+      Price: '',
+    };
+    let payload = null;
+    switch (this.state.showFoodCategory) {
+      case APPETIZERS:
+        index = this.props.foodData.Appetizers.findIndex((x) => x._id === FoodId);
+        let Appetizers = [...this.props.foodData.Appetizers];
+        foodItem = { ...Appetizers[index] };
+        foodItem = { ...foodItem, ...this.state.tmpFood };
+        Appetizers[index] = foodItem;
+        payload = {
+          Appetizers,
+        };
+        // this.props.updateFoodData(payload);
+        break;
+      case SALADS:
+        index = this.props.foodData.Salads.findIndex((x) => x._id === FoodId);
+        let Salads = [...this.props.foodData.Salads];
+        foodItem = { ...Salads[index] };
+        foodItem = { ...foodItem, ...this.state.tmpFood };
+        Salads[index] = foodItem;
+        payload = {
+          Salads,
+        };
+        // this.props.updateFoodData(payload);
+        break;
+      case MAIN_COURSE:
+        index = this.props.foodData.MainCourse.findIndex((x) => x._id === FoodId);
+        let MainCourse = [...this.props.foodData.MainCourse];
+        foodItem = { ...MainCourse[index] };
+        foodItem = { ...foodItem, ...this.state.tmpFood };
+        MainCourse[index] = foodItem;
+        payload = {
+          MainCourse,
+        };
+        // this.props.updateFoodData(payload);
+        break;
+      case BEVERAGES:
+        index = this.props.foodData.Beverages.findIndex((x) => x._id === FoodId);
+        let Beverages = [...this.props.foodData.Beverages];
+        foodItem = { ...Beverages[index] };
+        foodItem = { ...foodItem, ...this.state.tmpFood };
+        Beverages[index] = foodItem;
+        payload = {
+          Beverages,
+        };
+        // this.props.updateFoodData(payload);
+        break;
+      case DESSERTS:
+        index = this.props.foodData.Desserts.findIndex((x) => x._id === FoodId);
+        let Desserts = [...this.props.foodData.Desserts];
+        foodItem = { ...Desserts[index] };
+        foodItem = { ...foodItem, ...this.state.tmpFood };
+        Desserts[index] = foodItem;
+        payload = {
+          Desserts,
+        };
+
+        break;
+      default:
+        // console.log('wrong Input');
+        break;
+    }
+    this.props.updateFoodData(payload);
+    this.setState({ tmpFood, editableId: null });
+  };
+
+  onChangeFileHandlerOld = (event, id) => {
+    if (event.target.files.length === 1) {
+      event.preventDefault();
+      let formData = new FormData();
+      formData.append('file', event.target.files[0], event.target.files[0].name);
+      axios({
+        method: 'post',
+        url: serverUrl + 'biz/uploadFoodImage',
+        data: formData,
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+        .then((response) => {
+          // console.log('Status Code : ', response.status);
+          if (parseInt(response.status) === 200) {
+            // console.log('Product Saved');
+            let tmp = { ImageUrl: response.data };
+            this.updateImageUrl(response.data, id);
+            // this.setState({
+            //   newFood: { ...this.state.newFood, ...tmp },
+            // });
+            //Router.push('/vendor/' + localStorage.getItem('user_id'));
+          } else if (parseInt(response.status) === 400) {
+            // console.log(response.data);
+          }
+        })
+        .catch((error) => {
+          this.setState({
+            errorMsg: error.message,
+            authFlag: false,
+          });
+        });
+      // this.setState({
+      //   uploadedPic: event.target.files,
+      // });
+    }
+  };
+
   render() {
     return (
       <div>
-        <div class="job-form-section-group-styles__group--ArVfo" data-ui="education">
-          <div class="job-form-section-group-styles__header--2Z5fi">
+        <div className="job-form-section-group-styles__group--ArVfo" data-ui="education">
+          <div className="job-form-section-group-styles__header--2Z5fi">
             <p id="education_label">Food Menu</p>
           </div>
           {/**Main div */}
@@ -1017,39 +1078,39 @@ class FoodMenu extends Component {
               >
                 <a
                   onClick={() => {
-                    this.showMenuCategory('APPETIZERS');
+                    this.showMenuCategory(APPETIZERS);
                   }}
                 >
                   <p style={{ color: '#000', cursor: 'pointer' }}>
                     <strong>APPETIZERS</strong>
                   </p>
                 </a>
-                {this.state.showFoodCategory === 'APPETIZERS' && !this.state.addFoodItemForm && (
+                {this.state.showFoodCategory === APPETIZERS && !this.state.addFoodItemForm && (
                   <button
                     onClick={this.openFoodForm}
                     data-ui="add-section"
                     aria-describedby="education_label"
-                    class="_-_-shared-ui-atoms-button-base-___button__button _-_-shared-ui-atoms-button-base-___button__small _-_-shared-ui-atoms-button-secondary-___secondary__default "
+                    className="_-_-shared-ui-atoms-button-base-___button__button _-_-shared-ui-atoms-button-base-___button__small _-_-shared-ui-atoms-button-secondary-___secondary__default "
                   >
                     + Add
                   </button>
                 )}
-                {this.state.showFoodCategory === 'APPETIZERS' && this.state.addFoodItemForm && (
+                {this.state.showFoodCategory === APPETIZERS && this.state.addFoodItemForm && (
                   <button
                     onClick={this.openFoodForm}
                     data-ui="add-section"
                     aria-describedby="education_label"
-                    class="_-_-shared-ui-atoms-button-base-___button__button _-_-shared-ui-atoms-button-base-___button__small _-_-shared-ui-atoms-button-secondary-___secondary__default "
+                    className="_-_-shared-ui-atoms-button-base-___button__button _-_-shared-ui-atoms-button-base-___button__small _-_-shared-ui-atoms-button-secondary-___secondary__default "
                   >
                     - Cancel
                   </button>
                 )}
               </div>
 
-              {this.state.showFoodCategory === 'APPETIZERS' && this.state.addFoodItemForm && (
+              {this.state.showFoodCategory === APPETIZERS && this.state.addFoodItemForm && (
                 <div>
                   <NewFoodForm
-                    CUISINES={this.state.CUISINES}
+                    // CUISINES={this.state.CUISINES}
                     // onNameChangeHandler={this.onNameChangeHandler}
                     onPriceChangeHandler={(evt) => this.onPriceChangeHandler(evt)}
                     onCusineChangeHandler={(evt) => this.onCusineChangeHandler(evt)}
@@ -1062,18 +1123,19 @@ class FoodMenu extends Component {
                   ></NewFoodForm>
                 </div>
               )}
-              {this.state.showFoodCategory === 'APPETIZERS' && (
+              {this.state.showFoodCategory === APPETIZERS && (
                 <div>
                   <ul>
-                    {this.state.APPETIZERS.map((food) => (
+                    {this.props.foodData.Appetizers.map((food) => (
                       <Food
+                        key={food._id}
                         food={food}
                         CUISINES={this.state.CUISINES}
                         editableId={this.state.editableId}
                         makeEditable={(ID) => this.makeEditable(ID)}
-                        onDelete={this.deleteFoodItem}
-                        onCancelUpdate={() => this.cancelFoodUpdate(food.ID)}
-                        onSave={(event) => this.updateFoodItem(food.ID, event)}
+                        onDelete={(event) => this.deleteFoodItem(event, food._id)}
+                        onCancelUpdate={() => this.cancelFoodUpdate(food._id)}
+                        onSave={(event) => this.updateFoodItem(food._id, event)}
                         onNameChangeHandler={(evt, id) => this.onNameChangeHandlerUpdate(evt, id)}
                         onPriceChangeHandler={(evt, id) => this.onPriceChangeHandlerUpdate(evt, id)}
                         onCusineChangeHandler={(evt, id) =>
@@ -1086,11 +1148,24 @@ class FoodMenu extends Component {
                           this.onDescriptionChangeHandlerUpdate(evt, id)
                         }
                         onChangeFileHandlerOld={(event) =>
-                          this.onChangeFileHandlerOld(event, food.ID)
+                          this.onChangeFileHandlerOld(event, food._id)
                         }
                       />
                     ))}
                   </ul>
+                  <ReactPaginate
+                    previousLabel={'prev'}
+                    nextLabel={'next'}
+                    breakLabel={'...'}
+                    breakClassName={'break-me'}
+                    pageCount={this.props.foodData.PageCount}
+                    marginPagesDisplayed={2}
+                    pageRangeDisplayed={2}
+                    onPageChange={this.handlePageClick}
+                    containerClassName={'pagination'}
+                    subContainerClassName={'pages pagination'}
+                    activeClassName={'active'}
+                  />
                 </div>
               )}
             </div>
@@ -1110,39 +1185,39 @@ class FoodMenu extends Component {
               >
                 <a
                   onClick={() => {
-                    this.showMenuCategory('SALADS');
+                    this.showMenuCategory(SALADS);
                   }}
                 >
                   <p style={{ color: '#000', cursor: 'pointer' }}>
                     <strong>SALADS</strong>
                   </p>
                 </a>
-                {this.state.showFoodCategory === 'SALADS' && !this.state.addFoodItemForm && (
+                {this.state.showFoodCategory === SALADS && !this.state.addFoodItemForm && (
                   <button
                     onClick={this.openFoodForm}
                     data-ui="add-section"
                     aria-describedby="education_label"
-                    class="_-_-shared-ui-atoms-button-base-___button__button _-_-shared-ui-atoms-button-base-___button__small _-_-shared-ui-atoms-button-secondary-___secondary__default "
+                    className="_-_-shared-ui-atoms-button-base-___button__button _-_-shared-ui-atoms-button-base-___button__small _-_-shared-ui-atoms-button-secondary-___secondary__default "
                   >
                     + Add
                   </button>
                 )}
-                {this.state.showFoodCategory === 'SALADS' && this.state.addFoodItemForm && (
+                {this.state.showFoodCategory === SALADS && this.state.addFoodItemForm && (
                   <button
                     onClick={this.openFoodForm}
                     data-ui="add-section"
                     aria-describedby="education_label"
-                    class="_-_-shared-ui-atoms-button-base-___button__button _-_-shared-ui-atoms-button-base-___button__small _-_-shared-ui-atoms-button-secondary-___secondary__default "
+                    className="_-_-shared-ui-atoms-button-base-___button__button _-_-shared-ui-atoms-button-base-___button__small _-_-shared-ui-atoms-button-secondary-___secondary__default "
                   >
                     - Cancel
                   </button>
                 )}
               </div>
               {/**New Form Div */}
-              {this.state.showFoodCategory === 'SALADS' && this.state.addFoodItemForm && (
+              {this.state.showFoodCategory === SALADS && this.state.addFoodItemForm && (
                 <div>
                   <NewFoodForm
-                    CUISINES={this.state.CUISINES}
+                    // CUISINES={this.state.CUISINES}
                     // onNameChangeHandler={this.onNameChangeHandler}
                     onPriceChangeHandler={(evt) => this.onPriceChangeHandler(evt)}
                     onCusineChangeHandler={(evt) => this.onCusineChangeHandler(evt)}
@@ -1155,18 +1230,18 @@ class FoodMenu extends Component {
                   ></NewFoodForm>
                 </div>
               )}
-              {this.state.showFoodCategory === 'SALADS' && (
+              {this.state.showFoodCategory === SALADS && (
                 <div>
                   <ul>
-                    {this.state.SALADS.map((food) => (
+                    {this.props.foodData.Salads.map((food) => (
                       <Food
                         food={food}
-                        CUISINES={this.state.CUISINES}
+                        // CUISINES={this.state.CUISINES}
                         editableId={this.state.editableId}
                         makeEditable={(ID) => this.makeEditable(ID)}
-                        onDelete={this.deleteFoodItem}
-                        onSave={(event) => this.updateFoodItem(food.ID, event)}
-                        onCancelUpdate={() => this.cancelFoodUpdate(food.ID)}
+                        onDelete={(event) => this.deleteFoodItem(event, food._id)}
+                        onSave={(event) => this.updateFoodItem(food._id, event)}
+                        onCancelUpdate={() => this.cancelFoodUpdate(food._id)}
                         onNameChangeHandler={(evt, id) => this.onNameChangeHandlerUpdate(evt, id)}
                         onPriceChangeHandler={(evt, id) => this.onPriceChangeHandlerUpdate(evt, id)}
                         onCusineChangeHandler={(evt, id) =>
@@ -1179,11 +1254,24 @@ class FoodMenu extends Component {
                           this.onDescriptionChangeHandlerUpdate(evt, id)
                         }
                         onChangeFileHandlerOld={(event) =>
-                          this.onChangeFileHandlerOld(event, food.ID)
+                          this.onChangeFileHandlerOld(event, food._id)
                         }
                       />
                     ))}
                   </ul>
+                  <ReactPaginate
+                    previousLabel={'prev'}
+                    nextLabel={'next'}
+                    breakLabel={'...'}
+                    breakClassName={'break-me'}
+                    pageCount={this.props.foodData.PageCount}
+                    marginPagesDisplayed={2}
+                    pageRangeDisplayed={2}
+                    onPageChange={this.handlePageClick}
+                    containerClassName={'pagination'}
+                    subContainerClassName={'pages pagination'}
+                    activeClassName={'active'}
+                  />
                 </div>
               )}
             </div>
@@ -1202,40 +1290,40 @@ class FoodMenu extends Component {
               >
                 <a
                   onClick={() => {
-                    this.showMenuCategory('MAIN_COURSE');
+                    this.showMenuCategory(MAIN_COURSE);
                   }}
                 >
                   <p style={{ color: '#000', cursor: 'pointer' }}>
                     <strong>MAIN COURSE</strong>
                   </p>
                 </a>
-                {this.state.showFoodCategory === 'MAIN_COURSE' && !this.state.addFoodItemForm && (
+                {this.state.showFoodCategory === MAIN_COURSE && !this.state.addFoodItemForm && (
                   <button
                     onClick={this.openFoodForm}
                     data-ui="add-section"
                     aria-describedby="education_label"
-                    class="_-_-shared-ui-atoms-button-base-___button__button _-_-shared-ui-atoms-button-base-___button__small _-_-shared-ui-atoms-button-secondary-___secondary__default "
+                    className="_-_-shared-ui-atoms-button-base-___button__button _-_-shared-ui-atoms-button-base-___button__small _-_-shared-ui-atoms-button-secondary-___secondary__default "
                   >
                     + Add
                   </button>
                 )}
 
-                {this.state.showFoodCategory === 'MAIN_COURSE' && this.state.addFoodItemForm && (
+                {this.state.showFoodCategory === MAIN_COURSE && this.state.addFoodItemForm && (
                   <button
                     onClick={this.openFoodForm}
                     data-ui="add-section"
                     aria-describedby="education_label"
-                    class="_-_-shared-ui-atoms-button-base-___button__button _-_-shared-ui-atoms-button-base-___button__small _-_-shared-ui-atoms-button-secondary-___secondary__default "
+                    className="_-_-shared-ui-atoms-button-base-___button__button _-_-shared-ui-atoms-button-base-___button__small _-_-shared-ui-atoms-button-secondary-___secondary__default "
                   >
                     - Cancel
                   </button>
                 )}
               </div>
               {/**New Form Div */}
-              {this.state.showFoodCategory === 'MAIN_COURSE' && this.state.addFoodItemForm && (
+              {this.state.showFoodCategory === MAIN_COURSE && this.state.addFoodItemForm && (
                 <div>
                   <NewFoodForm
-                    CUISINES={this.state.CUISINES}
+                    // CUISINES={this.state.CUISINES}
                     // onNameChangeHandler={this.onNameChangeHandler}
                     onPriceChangeHandler={(evt) => this.onPriceChangeHandler(evt)}
                     onCusineChangeHandler={(evt) => this.onCusineChangeHandler(evt)}
@@ -1248,18 +1336,18 @@ class FoodMenu extends Component {
                   ></NewFoodForm>
                 </div>
               )}
-              {this.state.showFoodCategory === 'MAIN_COURSE' && (
+              {this.state.showFoodCategory === MAIN_COURSE && (
                 <div>
                   <ul>
-                    {this.state.MAIN_COURSE.map((food) => (
+                    {this.props.foodData.MainCourse.map((food) => (
                       <Food
                         food={food}
-                        CUISINES={this.state.CUISINES}
+                        // CUISINES={this.state.CUISINES}
                         editableId={this.state.editableId}
                         makeEditable={(ID) => this.makeEditable(ID)}
-                        onDelete={this.deleteFoodItem}
-                        onSave={(event) => this.updateFoodItem(food.ID, event)}
-                        onCancelUpdate={() => this.cancelFoodUpdate(food.ID)}
+                        onDelete={(event) => this.deleteFoodItem(event, food._id)}
+                        onSave={(event) => this.updateFoodItem(food._id, event)}
+                        onCancelUpdate={() => this.cancelFoodUpdate(food._id)}
                         onNameChangeHandler={(evt, id) => this.onNameChangeHandlerUpdate(evt, id)}
                         onPriceChangeHandler={(evt, id) => this.onPriceChangeHandlerUpdate(evt, id)}
                         onCusineChangeHandler={(evt, id) =>
@@ -1272,11 +1360,24 @@ class FoodMenu extends Component {
                           this.onDescriptionChangeHandlerUpdate(evt, id)
                         }
                         onChangeFileHandlerOld={(event) =>
-                          this.onChangeFileHandlerOld(event, food.ID)
+                          this.onChangeFileHandlerOld(event, food._id)
                         }
                       />
                     ))}
                   </ul>
+                  <ReactPaginate
+                    previousLabel={'prev'}
+                    nextLabel={'next'}
+                    breakLabel={'...'}
+                    breakClassName={'break-me'}
+                    pageCount={this.props.foodData.PageCount}
+                    marginPagesDisplayed={2}
+                    pageRangeDisplayed={2}
+                    onPageChange={this.handlePageClick}
+                    containerClassName={'pagination'}
+                    subContainerClassName={'pages pagination'}
+                    activeClassName={'active'}
+                  />
                 </div>
               )}
             </div>
@@ -1295,40 +1396,40 @@ class FoodMenu extends Component {
               >
                 <a
                   onClick={() => {
-                    this.showMenuCategory('BEVERAGES');
+                    this.showMenuCategory(BEVERAGES);
                   }}
                 >
                   <p style={{ color: '#000', cursor: 'pointer' }}>
                     <strong>BEVERAGES</strong>
                   </p>
                 </a>
-                {this.state.showFoodCategory === 'BEVERAGES' && !this.state.addFoodItemForm && (
+                {this.state.showFoodCategory === BEVERAGES && !this.state.addFoodItemForm && (
                   <button
                     onClick={this.openFoodForm}
                     data-ui="add-section"
                     aria-describedby="education_label"
-                    class="_-_-shared-ui-atoms-button-base-___button__button _-_-shared-ui-atoms-button-base-___button__small _-_-shared-ui-atoms-button-secondary-___secondary__default "
+                    className="_-_-shared-ui-atoms-button-base-___button__button _-_-shared-ui-atoms-button-base-___button__small _-_-shared-ui-atoms-button-secondary-___secondary__default "
                   >
                     + Add
                   </button>
                 )}
 
-                {this.state.showFoodCategory === 'BEVERAGES' && this.state.addFoodItemForm && (
+                {this.state.showFoodCategory === BEVERAGES && this.state.addFoodItemForm && (
                   <button
                     onClick={this.openFoodForm}
                     data-ui="add-section"
                     aria-describedby="education_label"
-                    class="_-_-shared-ui-atoms-button-base-___button__button _-_-shared-ui-atoms-button-base-___button__small _-_-shared-ui-atoms-button-secondary-___secondary__default "
+                    className="_-_-shared-ui-atoms-button-base-___button__button _-_-shared-ui-atoms-button-base-___button__small _-_-shared-ui-atoms-button-secondary-___secondary__default "
                   >
                     - Cancel
                   </button>
                 )}
               </div>
               {/**New Form Div */}
-              {this.state.showFoodCategory === 'BEVERAGES' && this.state.addFoodItemForm && (
+              {this.state.showFoodCategory === BEVERAGES && this.state.addFoodItemForm && (
                 <div>
                   <NewFoodForm
-                    CUISINES={this.state.CUISINES}
+                    // CUISINES={this.state.CUISINES}
                     // onNameChangeHandler={this.onNameChangeHandler}
                     onPriceChangeHandler={(evt) => this.onPriceChangeHandler(evt)}
                     onCusineChangeHandler={(evt) => this.onCusineChangeHandler(evt)}
@@ -1341,18 +1442,18 @@ class FoodMenu extends Component {
                   ></NewFoodForm>
                 </div>
               )}
-              {this.state.showFoodCategory === 'BEVERAGES' && (
+              {this.state.showFoodCategory === BEVERAGES && (
                 <div>
                   <ul>
-                    {this.state.BEVERAGES.map((food) => (
+                    {this.props.foodData.Beverages.map((food) => (
                       <Food
                         food={food}
-                        CUISINES={this.state.CUISINES}
+                        // CUISINES={this.state.CUISINES}
                         editableId={this.state.editableId}
                         makeEditable={(ID) => this.makeEditable(ID)}
-                        onDelete={this.deleteFoodItem}
-                        onSave={(event) => this.updateFoodItem(food.ID, event)}
-                        onCancelUpdate={() => this.cancelFoodUpdate(food.ID)}
+                        onDelete={(event) => this.deleteFoodItem(event, food._id)}
+                        onSave={(event) => this.updateFoodItem(food._id, event)}
+                        onCancelUpdate={() => this.cancelFoodUpdate(food._id)}
                         onNameChangeHandler={(evt, id) => this.onNameChangeHandlerUpdate(evt, id)}
                         onPriceChangeHandler={(evt, id) => this.onPriceChangeHandlerUpdate(evt, id)}
                         onCusineChangeHandler={(evt, id) =>
@@ -1365,11 +1466,24 @@ class FoodMenu extends Component {
                           this.onDescriptionChangeHandlerUpdate(evt, id)
                         }
                         onChangeFileHandlerOld={(event) =>
-                          this.onChangeFileHandlerOld(event, food.ID)
+                          this.onChangeFileHandlerOld(event, food._id)
                         }
                       />
                     ))}
                   </ul>
+                  <ReactPaginate
+                    previousLabel={'prev'}
+                    nextLabel={'next'}
+                    breakLabel={'...'}
+                    breakClassName={'break-me'}
+                    pageCount={this.props.foodData.PageCount}
+                    marginPagesDisplayed={2}
+                    pageRangeDisplayed={2}
+                    onPageChange={this.handlePageClick}
+                    containerClassName={'pagination'}
+                    subContainerClassName={'pages pagination'}
+                    activeClassName={'active'}
+                  />
                 </div>
               )}
             </div>
@@ -1388,40 +1502,40 @@ class FoodMenu extends Component {
               >
                 <a
                   onClick={() => {
-                    this.showMenuCategory('DESSERTS');
+                    this.showMenuCategory(DESSERTS);
                   }}
                 >
                   <p style={{ color: '#000', cursor: 'pointer' }}>
                     <strong>DESSERTS</strong>
                   </p>
                 </a>
-                {this.state.showFoodCategory === 'DESSERTS' && !this.state.addFoodItemForm && (
+                {this.state.showFoodCategory === DESSERTS && !this.state.addFoodItemForm && (
                   <button
                     onClick={this.openFoodForm}
                     data-ui="add-section"
                     aria-describedby="education_label"
-                    class="_-_-shared-ui-atoms-button-base-___button__button _-_-shared-ui-atoms-button-base-___button__small _-_-shared-ui-atoms-button-secondary-___secondary__default "
+                    className="_-_-shared-ui-atoms-button-base-___button__button _-_-shared-ui-atoms-button-base-___button__small _-_-shared-ui-atoms-button-secondary-___secondary__default "
                   >
                     + Add
                   </button>
                 )}
 
-                {this.state.showFoodCategory === 'DESSERTS' && this.state.addFoodItemForm && (
+                {this.state.showFoodCategory === DESSERTS && this.state.addFoodItemForm && (
                   <button
                     onClick={this.openFoodForm}
                     data-ui="add-section"
                     aria-describedby="education_label"
-                    class="_-_-shared-ui-atoms-button-base-___button__button _-_-shared-ui-atoms-button-base-___button__small _-_-shared-ui-atoms-button-secondary-___secondary__default "
+                    className="_-_-shared-ui-atoms-button-base-___button__button _-_-shared-ui-atoms-button-base-___button__small _-_-shared-ui-atoms-button-secondary-___secondary__default "
                   >
                     - Cancel
                   </button>
                 )}
               </div>
               {/**New Form Div */}
-              {this.state.showFoodCategory === 'DESSERTS' && this.state.addFoodItemForm && (
+              {this.state.showFoodCategory === DESSERTS && this.state.addFoodItemForm && (
                 <div>
                   <NewFoodForm
-                    CUISINES={this.state.CUISINES}
+                    // CUISINES={this.state.CUISINES}
                     // onNameChangeHandler={this.onNameChangeHandler}
                     onPriceChangeHandler={(evt) => this.onPriceChangeHandler(evt)}
                     onCusineChangeHandler={(evt) => this.onCusineChangeHandler(evt)}
@@ -1434,18 +1548,18 @@ class FoodMenu extends Component {
                   ></NewFoodForm>
                 </div>
               )}
-              {this.state.showFoodCategory === 'DESSERTS' && (
+              {this.state.showFoodCategory === DESSERTS && (
                 <div>
                   <ul>
-                    {this.state.DESSERTS.map((food) => (
+                    {this.props.foodData.Desserts.map((food) => (
                       <Food
                         food={food}
-                        CUISINES={this.state.CUISINES}
-                        onDelete={this.deleteFoodItem}
+                        // CUISINES={this.state.CUISINES}
+                        onDelete={(event) => this.deleteFoodItem(event, food._id)}
                         editableId={this.state.editableId}
                         makeEditable={(ID) => this.makeEditable(ID)}
-                        onSave={(event) => this.updateFoodItem(food.ID, event)}
-                        onCancelUpdate={() => this.cancelFoodUpdate(food.ID)}
+                        onSave={(event) => this.updateFoodItem(food._id, event)}
+                        onCancelUpdate={() => this.cancelFoodUpdate(food._id)}
                         onNameChangeHandler={(evt, id) => this.onNameChangeHandlerUpdate(evt, id)}
                         onPriceChangeHandler={(evt, id) => this.onPriceChangeHandlerUpdate(evt, id)}
                         onCusineChangeHandler={(evt, id) =>
@@ -1458,11 +1572,24 @@ class FoodMenu extends Component {
                           this.onDescriptionChangeHandlerUpdate(evt, id)
                         }
                         onChangeFileHandlerOld={(event) =>
-                          this.onChangeFileHandlerOld(event, food.ID)
+                          this.onChangeFileHandlerOld(event, food._id)
                         }
                       />
                     ))}
                   </ul>
+                  <ReactPaginate
+                    previousLabel={'prev'}
+                    nextLabel={'next'}
+                    breakLabel={'...'}
+                    breakClassName={'break-me'}
+                    pageCount={this.props.foodData.PageCount}
+                    marginPagesDisplayed={2}
+                    pageRangeDisplayed={2}
+                    onPageChange={this.handlePageClick}
+                    containerClassName={'pagination'}
+                    subContainerClassName={'pages pagination'}
+                    activeClassName={'active'}
+                  />
                 </div>
               )}
             </div>
@@ -1473,4 +1600,28 @@ class FoodMenu extends Component {
   }
 }
 
-export default FoodMenu;
+const mapStateToProps = (state) => {
+  const { foodData } = state.restaurntFoodMenuReducer;
+  return {
+    foodData,
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    updateFoodData: (payload) => {
+      dispatch({
+        type: updateFoodData,
+        payload,
+      });
+    },
+    updateSnackbarData: (payload) => {
+      dispatch({
+        type: updateSnackbarData,
+        payload,
+      });
+    },
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(FoodMenu);

@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
 import { Redirect } from 'react-router';
 import axios from 'axios';
 import serverUrl from '../../config';
@@ -71,7 +70,6 @@ class RestaurantHome extends Component {
     localStorage.setItem('showFoodCategory', '');
   };
   componentDidMount() {
-    console.log('Inside restaurant home component did mount');
     axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
     axios
       .get(serverUrl + 'biz/homeProfile', {
@@ -103,21 +101,6 @@ class RestaurantHome extends Component {
                 ' ' +
                 response.data.Zip,
               ...response.data,
-              // CountryName: response.data.CountryName,
-              // StateName: response.data.StateName,
-              // City: response.data.City,
-              // Zip: response.data.Zip,
-              // Street: response.data.Street,
-              // PhoneNo: response.data.PhoneNo,
-              // CountryCode: response.data.,
-              // OpeningTime: response.data.,
-              // ClosingTime: response.data.,
-              // ImageURL: response.data.,
-              // CurbsidePickup: response.data.,
-              // DineIn: response.data.,
-              // YelpDelivery: response.data.,
-              // Reviews: response.data.,
-              // Following: response.data.,
             };
             this.props.updateHomeProfile(payload);
           }
@@ -378,8 +361,8 @@ class RestaurantHome extends Component {
                       return <OrdersList />;
                     case 'Events':
                       return <EventList />;
-                    // default:
-                    //   return <DefaultHome />;
+                    default:
+                      return <DefaultHome />;
                   }
                 })()}
                 {/*<DefaultHome profileInfo={this.state} />*/}
