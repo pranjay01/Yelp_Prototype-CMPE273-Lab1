@@ -2,3 +2,4 @@ node_modules
 .env
 ../Database/SQLCredentials.txt
 Models/config.js
+retaurant/config.js
