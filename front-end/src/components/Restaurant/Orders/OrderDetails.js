@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { MDBTable, MDBTableBody, MDBTableHead } from 'mdbreact';
+import { connect } from 'react-redux';
 
 class OrderDetails extends Component {
   constructor(props) {
@@ -45,7 +46,7 @@ class OrderDetails extends Component {
           </span>
           <MDBTable scrollY maxHeight="100%" striped>
             <MDBTableHead columns={this.state.columns} />
-            <MDBTableBody rows={this.props.orderDetails} />
+            <MDBTableBody rows={this.props.orderStore.orderDetails} />
           </MDBTable>
         </div>
       </div>
@@ -53,4 +54,13 @@ class OrderDetails extends Component {
   }
 }
 
-export default OrderDetails;
+const mapStateToProps = (state) => {
+  const { orderStore } = state.orderStoreReducer;
+  return {
+    orderStore,
+  };
+};
+
+export default connect(mapStateToProps, null)(OrderDetails);
+
+// export default OrderDetails;

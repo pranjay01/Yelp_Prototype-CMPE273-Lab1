@@ -4,12 +4,12 @@ const { Schema } = mongoose;
 
 const orderSchema = new Schema(
   {
-    CustomerId: { type: String, required: true },
+    CustomerID: { type: String, required: true },
     CustomerName: { type: String, required: true },
     CustomerImageUrl: { type: String, required: true },
-    RestaurantId: { type: String, required: true },
+    RestaurantID: { type: String, required: true },
     RestaurantName: { type: String, required: true },
-    OrderedDate: { type: Date, required: true },
+    OrderedDate: { type: String, required: true },
     OrderType: { type: String, enum: ['Delivery', 'Pick_up'], required: true },
     DeliveryStatus: {
       type: String,
@@ -20,13 +20,19 @@ const orderSchema = new Schema(
         'Pick up Ready',
         'Delivered',
         'Picked up',
-        'Canceled',
+        'Cancel Order',
       ],
       required: true,
     },
+    DeliverStatusID: { type: Number },
     Bill: { type: Number, required: true },
     OrderCart: [
-      { FoodName: { type: String }, MenuCategory: { type: String }, Quantity: { type: String } },
+      {
+        FoodName: { type: String },
+        MenuCategory: { type: String },
+        Quantity: { type: Number },
+        Price: { type: Number },
+      },
     ],
   },
   { versionKey: false }

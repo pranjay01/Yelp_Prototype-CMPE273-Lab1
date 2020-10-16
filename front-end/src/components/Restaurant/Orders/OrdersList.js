@@ -6,17 +6,24 @@ import './Orders.css';
 import axios from 'axios';
 import serverUrl from '../../../config';
 import CustomerStaticProfile from '../CommonComponent/CustomerStaticProfile';
+import { connect } from 'react-redux';
+import { updateOrderStore, updateSnackbarData } from '../../../constants/action-types';
+import ReactPaginate from 'react-paginate';
 
 class ordersList extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      DeliveryStatuses: [
+        { key: 1, value: 'Order Received' },
+        { key: 2, value: 'Preparing' },
+        { key: 3, value: 'On the way' },
+        { key: 4, value: 'Pick up Ready' },
+        { key: 5, value: 'Delivered' },
+        { key: 6, value: 'Picked up' },
+        { key: 7, value: 'Canceled' },
+      ],
       staticProfileSeen: false,
-      orderSortBy: localStorage.getItem('orderSortBy'),
-      popSeen: false,
-      ORDERS: [],
-      orderDetails: [],
-      OrdersOrignalCopy: [],
       customerProfile: {
         Name: '',
         NickName: '',
@@ -33,167 +40,113 @@ class ordersList extends Component {
     };
   }
 
-  fetchOrders(event, sortValue) {
-    let newOrdersList = [];
-    event.preventDefault();
-    if (sortValue === 'New') {
-      newOrdersList = this.state.OrdersOrignalCopy.filter(
-        (order) => Number(order.DeliverStatusID) < 5
-      );
-    } else if (sortValue === 'Delivered') {
-      newOrdersList = this.state.OrdersOrignalCopy.filter(
-        (order) => Number(order.DeliverStatusID) === 5 || Number(order.DeliverStatusID) === 6
-      );
-    } else if (sortValue === 'Canceled') {
-      newOrdersList = this.state.OrdersOrignalCopy.filter(
-        (order) => Number(order.DeliverStatusID) === 7
-      );
-    } else {
-      newOrdersList = this.state.OrdersOrignalCopy;
-    }
-    this.setState({
-      ORDERS: newOrdersList,
-    });
-    localStorage.setItem('orderSortBy', sortValue);
-    // axios
-    //   .get(
-    //     serverUrl + 'biz/getOrderDetailsNew',
-
-    //     { params: { sortValue }, withCredentials: true }
-    //   )
-    //   .then((response) => {
-    //     console.log(response.data);
-    //     let allOrders = response.data[0].map((order) => {
-    //       return {
-    //         ID: order.ID,
-    //         CustomerId: order.CustomerID,
-    //         CustomerName: order.CustomerName,
-    //         OrderedTime: order.OrderedTime,
-    //         OrderType: order.Order_Type,
-    //         DeliverStatusID: order.DeliverStatusID,
-    //         DeliverStatusValue: order.DeliverStatusValue,
-    //         Bill: order.Bill,
-    //         tmpStatus: order.DeliverStatusID,
-    //         ImageUrl: order.ImageUrl,
-    //       };
-    //     });
-
-    //     this.setState({
-    //       ORDERS: this.state.ORDERS.concat(allOrders),
-    //       orderSortBy: sortValue,
-    //     });
-    //   });
-  }
-
-  componentDidMount() {
-    //this.fetchOrders(localStorage.getItem('orderSortBy'));
-    const sortValue = 'All';
+  commonFetch(sortValue = 'All', selectedPage = 0) {
+    axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
     axios
       .get(
-        serverUrl + 'biz/getOrderDetailsNew',
+        serverUrl + 'biz/getOrderDetails',
 
-        { params: { sortValue }, withCredentials: true }
+        {
+          params: { sortValue, RestaurantID: localStorage.getItem('userId'), selectedPage },
+          withCredentials: true,
+        }
       )
       .then((response) => {
         console.log(response.data);
-        let allOrders = response.data[0].map((order) => {
+        let OrderList = response.data.OrderList.map((order) => {
           return {
-            ID: order.ID,
-            CustomerId: order.CustomerID,
-            CustomerName: order.CustomerName,
-            OrderedTime: order.OrderedTime,
-            OrderType: order.Order_Type,
-            DeliverStatusID: order.DeliverStatusID,
-            DeliverStatusValue: order.DeliverStatusValue,
-            Bill: order.Bill,
-            tmpStatus: order.DeliverStatusID,
-            ImageUrl: order.ImageUrl,
+            ...order,
+            OrderedDate: new Date(order.OrderedDate),
+            tmpStatusValue: order.DeliveryStatus,
+            tmpStatusID: order.DeliverStatusID,
           };
         });
 
-        this.setState({
-          OrdersOrignalCopy: allOrders,
-          ORDERS: allOrders,
-          orderSortBy: sortValue,
-        });
+        let payload = {
+          OrderList,
+          orderCount: response.data.orderCount,
+          PageCount: Math.ceil(response.data.orderCount / 3),
+          sortValue,
+          selectedPage,
+        };
+        this.props.updateOrderStore(payload);
       });
-    localStorage.setItem('orderSortBy', sortValue);
+  }
+
+  handlePageClick = (e) => {
+    this.commonFetch('All', e.selected);
+  };
+  fetchOrders(event, sortValue) {
+    // let newOrdersList = [];
+    event.preventDefault();
+    this.commonFetch(sortValue);
+  }
+
+  componentDidMount() {
+    this.commonFetch();
   }
 
   onStatusChangeHandler = (value, orderID) => {
-    const index = this.state.ORDERS.findIndex((x) => x.ID === Number(orderID));
-    let ORDERS = [...this.state.ORDERS];
-    let order = { ...ORDERS[index] };
-    order.tmpStatus = value;
-    ORDERS[index] = order;
-    this.setState({ ORDERS });
+    const index = this.props.orderStore.OrderList.findIndex((x) => x._id === orderID);
+    const tmpStatusValue = this.state.DeliveryStatuses.findIndex((x) => x.key === Number(value));
+    let OrderList = [...this.props.orderStore.OrderList];
+    let order = { ...OrderList[index] };
+    order.tmpStatusValue = this.state.DeliveryStatuses[tmpStatusValue].value;
+    order.tmpStatusID = value;
+    OrderList[index] = order;
+    let payload = {
+      OrderList,
+    };
+    this.props.updateOrderStore(payload);
   };
 
   openOrderDetails = (orderID) => {
-    if (this.state.popSeen) {
-      this.setState({
-        popSeen: !this.state.popSeen,
+    if (this.props.orderStore.popSeen) {
+      let payload = {
         orderDetails: [],
-      });
+        popSeen: !this.props.orderStore.popSeen,
+      };
+      this.props.updateOrderStore(payload);
     } else {
-      axios
-        .get(
-          serverUrl + 'biz/orderFetch',
-
-          { params: { orderID }, withCredentials: true }
-        )
-        .then((response) => {
-          console.log(response.data);
-          let allItems = response.data.map((Item) => {
-            return {
-              first: Item.Name,
-              count: Item.Count,
-              price: Item.PPrice,
-              totalPrice: Item.TPrice,
-            };
-          });
-
-          this.setState({
-            orderDetails: this.state.orderDetails.concat(allItems),
-            popSeen: !this.state.popSeen,
-          });
-        });
+      const index = this.props.orderStore.OrderList.findIndex((x) => x._id === orderID);
+      let orderItem = { ...this.props.orderStore.OrderList[index] };
+      let orderDetails = orderItem.OrderCart.map((Item) => {
+        return {
+          first: Item.FoodName,
+          count: Item.Quantity,
+          price: Item.Price,
+          totalPrice: Item.Quantity * Item.Price,
+        };
+      });
+      let payload = {
+        orderDetails,
+        popSeen: !this.props.orderStore.popSeen,
+      };
+      this.props.updateOrderStore(payload);
     }
-
-    console.log('fetching food details');
   };
 
   updateStatus = (orderID) => {
-    const index = this.state.ORDERS.findIndex((x) => x.ID === orderID);
-    const index2 = this.state.OrdersOrignalCopy.findIndex((x) => x.ID === orderID);
-    let foodItem = { ...this.state.ORDERS[index] };
-    const newStatus = foodItem.tmpStatus;
-    let data = {
-      deliveryStatus: newStatus,
-      orderID,
-      token: localStorage.getItem('token'),
-      userrole: localStorage.getItem('userrole'),
+    const index = this.props.orderStore.OrderList.findIndex((x) => x._id === orderID);
+
+    let orderItem = { ...this.props.orderStore.OrderList[index] };
+    orderItem = {
+      ...orderItem,
+      DeliveryStatus: orderItem.tmpStatusValue,
+      DeliverStatusID: orderItem.tmpStatusID,
     };
-    axios.post(serverUrl + 'biz/updateDeliveryStatus', data).then(
+
+    axios.post(serverUrl + 'biz/updateDeliveryStatus', orderItem).then(
       (response) => {
         console.log('Status Code : ', response.status);
         if (response.status === 200) {
           console.log(response.data);
-          foodItem = { ...foodItem, DeliverStatusID: foodItem.tmpStatus };
-          let ORDERS = [...this.state.ORDERS];
-          ORDERS.splice(index, 1);
-          let OrdersOrignalCopy = [...this.state.OrdersOrignalCopy];
-          OrdersOrignalCopy.splice(index2, 1);
-          // ORDERS.push(foodItem);
-          OrdersOrignalCopy.splice(index2, 0, foodItem);
-          if (Number(foodItem.tmpStatus) < 5) {
-            ORDERS.splice(index, 0, foodItem);
-          }
-          this.setState({
-            ORDERS,
-            OrdersOrignalCopy,
-          });
-          // newFoodId = { ...newFoodId, ...this.state.newFood };
+          const payload = {
+            success: true,
+            message: response.data,
+          };
+          this.props.updateSnackbarData(payload);
+          this.commonFetch(this.props.orderStore.sortValue, this.props.orderStore.selectedPage);
         }
       },
       (error) => {
@@ -206,7 +159,6 @@ class ordersList extends Component {
     if (this.state.staticProfileSeen) {
       this.setState({
         staticProfileSeen: !this.state.staticProfileSeen,
-        //orderDetails: [],
       });
     } else {
       event.preventDefault();
@@ -244,28 +196,30 @@ class ordersList extends Component {
     return (
       <div>
         {/*redirectVar*/}
-        <nav class="navbar navbar-inverse">
-          <div class="container-fluid">
-            <div class="navbar-header">
-              <a class="navbar-brand">Filter By</a>
+        <nav className="navbar navbar-inverse">
+          <div className="container-fluid">
+            <div className="navbar-header">
+              <a className="navbar-brand">Filter By</a>
             </div>
-            <ul class="nav navbar-nav">
-              <li className={localStorage.getItem('orderSortBy') === 'All' && 'active'}>
+            <ul className="nav navbar-nav">
+              <li className={this.props.orderStore.sortValue === 'All' ? 'active' : undefined}>
                 <Link to="/#" onClick={(event) => this.fetchOrders(event, 'All')}>
                   All Orders
                 </Link>
               </li>
-              <li className={localStorage.getItem('orderSortBy') === 'New' && 'active'}>
+              <li className={this.props.orderStore.sortValue === 'New' ? 'active' : undefined}>
                 <Link to="/#" onClick={(event) => this.fetchOrders(event, 'New')}>
                   New Orders
                 </Link>
               </li>
-              <li className={localStorage.getItem('orderSortBy') === 'Delivered' && 'active'}>
+              <li
+                className={this.props.orderStore.sortValue === 'Delivered' ? 'active' : undefined}
+              >
                 <Link to="/#" onClick={(event) => this.fetchOrders(event, 'Delivered')}>
                   Delevered Orders
                 </Link>
               </li>
-              <li className={localStorage.getItem('orderSortBy') === 'Canceled' && 'active'}>
+              <li className={this.props.orderStore.sortValue === 'Canceled' ? 'active' : undefined}>
                 <Link to="/#" onClick={(event) => this.fetchOrders(event, 'Canceled')}>
                   Canceled Orders
                 </Link>
@@ -282,38 +236,69 @@ class ordersList extends Component {
             openStaticProfile={(event) => this.openStaticProfile(event, '')}
           />
         ) : null}
-        {this.state.popSeen ? (
-          <OrderDetails
-            modeTop={'10%'}
-            orderDetails={this.state.orderDetails}
-            toggle={this.openOrderDetails}
-          />
+        {this.props.orderStore.popSeen ? (
+          <OrderDetails modeTop={'10%'} toggle={this.openOrderDetails} />
         ) : null}
         <div>
           <ul className="lemon--ul__373c0__1_cxs undefined list__373c0__2G8oH">
-            {this.state.ORDERS.map((order) => (
+            {this.props.orderStore.OrderList.map((order) => (
               <Order
+                key={order._id}
                 order={order}
-                openOrderDetails={() => this.openOrderDetails(order.ID)}
-                onSave={() => this.updateStatus(order.ID)}
-                onStatusChangeHandler={(evt, id) => this.onStatusChangeHandler(evt, id)}
+                openOrderDetails={() => this.openOrderDetails(order._id)}
+                onSave={() => this.updateStatus(order._id)}
+                onStatusChangeHandler={(value) => this.onStatusChangeHandler(value, order._id)}
                 openStaticProfile={(event) => this.openStaticProfile(event, order.CustomerId)}
 
                 //   }
               />
             ))}
           </ul>
-          {/*<Pagination
-            activePage={this.state.activePage}
-            itemsCountPerPage={5}
-            //totalItemsCount={450}
-            pageRangeDisplayed={5}
-            onChange={this.handlePageChange.bind(this)}
-         />*/}
+          <div style={{ position: 'relative', left: '50%', bottom: '3%', right: '0' }}>
+            <ReactPaginate
+              previousLabel={'prev'}
+              nextLabel={'next'}
+              breakLabel={'...'}
+              breakClassName={'break-me'}
+              pageCount={this.props.orderStore.PageCount}
+              marginPagesDisplayed={2}
+              pageRangeDisplayed={2}
+              onPageChange={this.handlePageClick}
+              containerClassName={'pagination'}
+              subContainerClassName={'pages pagination'}
+              activeClassName={'active'}
+            />
+          </div>
         </div>
       </div>
     );
   }
 }
 
-export default ordersList;
+const mapStateToProps = (state) => {
+  const { orderStore } = state.orderStoreReducer;
+  return {
+    orderStore,
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    updateOrderStore: (payload) => {
+      dispatch({
+        type: updateOrderStore,
+        payload,
+      });
+    },
+    updateSnackbarData: (payload) => {
+      dispatch({
+        type: updateSnackbarData,
+        payload,
+      });
+    },
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(ordersList);
+
+// export default ordersList;

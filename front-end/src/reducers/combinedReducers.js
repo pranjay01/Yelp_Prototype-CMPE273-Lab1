@@ -8,7 +8,7 @@ import restaurantSearchResultReducer from './restaurantSearchResultReducer';
 import masterDataReducer from './masterDataReducer';
 import restaurntFoodMenuReducer from './restaurntFoodMenuReducer';
 import reviewStoreReducer from './reviewStoreReducer';
-
+import orderStoreReducer from './orderStoreReducer';
 import { combineReducers } from 'redux';
 
 const finalReducers = combineReducers({
@@ -22,6 +22,7 @@ const finalReducers = combineReducers({
   masterDataReducer: masterDataReducer,
   restaurntFoodMenuReducer: restaurntFoodMenuReducer,
   reviewStoreReducer: reviewStoreReducer,
+  orderStoreReducer: orderStoreReducer,
 });
 
 export default finalReducers;

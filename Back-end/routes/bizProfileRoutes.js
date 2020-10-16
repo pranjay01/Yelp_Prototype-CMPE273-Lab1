@@ -10,7 +10,7 @@ const {
   deleteFoodItem,
   updateFoodItem,
   fetchReviews,
-  getOrderDetailsNew,
+  getOrderDetails,
   orderFetch,
   updateDeliveryStatus,
   createNewEvent,
@@ -133,10 +133,10 @@ Router.get('/fetchReviews', validateUser, async (req, res) => {
 });
 
 // Fetch Orders
-Router.get('/getOrderDetailsNew', async (req, res) => {
+Router.get('/getOrderDetails', async (req, res) => {
   console.log('Fetch Orders');
   let results = null;
-  results = await getOrderDetailsNew(req, res);
+  results = await getOrderDetails(req, res);
   return results;
 });
 

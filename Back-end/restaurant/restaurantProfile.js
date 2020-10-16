@@ -16,6 +16,8 @@ const UserSignup = require('../Models/UserSignup');
 const Restaurant = require('../Models/Restaurant');
 const Reviews = require('../Models/Review');
 
+const Orders = require('../Models/Order');
+
 const Appetizer = require('../Models/Appetizer');
 const Beverage = require('../Models/Beverage');
 const Dessert = require('../Models/Dessert');
@@ -558,7 +560,7 @@ const updateFoodItem = async (request, response) => {
   return response;
 };
 
-// fetch Reviews
+// fetch Reviews // MongoDb Implemented
 const fetchReviews = async (request, response) => {
   const { RestaurantID, selectedPage } = url.parse(request.url, true).query;
   try {
@@ -586,25 +588,55 @@ const fetchReviews = async (request, response) => {
 };
 
 // fetch order depending on filter value
-const getOrderDetailsNew = async (request, response) => {
-  const { sortValue } = url.parse(request.url, true).query;
-  const userID = getUserIdFromToken(request.cookies.cookie, request.cookies.userrole);
-  if (userID) {
-    const getOrderDetailsQuery = 'CALL getOrderDetails(?,?)';
+const getOrderDetails = async (request, response) => {
+  const { RestaurantID, selectedPage, sortValue } = url.parse(request.url, true).query;
+  try {
+    let filterArray = [];
+    switch (sortValue) {
+      case 'New':
+        filterArray = [
+          { DeliveryStatus: 'Order Received' },
+          { DeliveryStatus: 'Preparing' },
+          { DeliveryStatus: 'On the way' },
+          { DeliveryStatus: 'Pick up Ready' },
+        ];
+        break;
+      case 'Delivered':
+        filterArray = [{ DeliveryStatus: 'Delivered' }, { DeliveryStatus: 'Picked up' }];
+        break;
+      case 'Canceled':
+        filterArray = [{ DeliveryStatus: 'Canceled' }];
+        break;
+      default:
+        filterArray = [
+          { DeliveryStatus: 'Order Received' },
+          { DeliveryStatus: 'Preparing' },
+          { DeliveryStatus: 'On the way' },
+          { DeliveryStatus: 'Pick up Ready' },
+          { DeliveryStatus: 'Delivered' },
+          { DeliveryStatus: 'Canceled' },
+        ];
+        break;
+    }
+    const OrderList = await Orders.find({ $and: [{ RestaurantID }, { $or: filterArray }] })
+      .limit(3)
+      .skip(selectedPage * 3)
+      .exec();
+    const orderCount = await Orders.find({ RestaurantID }, { $or: filterArray }).countDocuments();
+    const results = {
+      OrderList,
+      orderCount,
+    };
 
-    const connection = await mysqlConnection();
-    // eslint-disable-next-line no-unused-vars
-    const [results, fields] = await connection.query(getOrderDetailsQuery, [userID, sortValue]);
-    connection.end();
     response.writeHead(200, {
-      'Content-Type': 'text/plain',
+      'Content-Type': 'application/json',
     });
     response.end(JSON.stringify(results));
-  } else {
-    response.writeHead(401, {
+  } catch (error) {
+    response.writeHead(500, {
       'Content-Type': 'text/plain',
     });
-    response.end('Invalid User');
+    response.end('Review Fetch Failed');
   }
   return response;
 };
@@ -647,32 +679,24 @@ const orderFetch = async (request, response) => {
 // Update Deliver Status
 const updateDeliveryStatus = async (request, response) => {
   try {
-    const order = request.body;
-    const { orderID, deliveryStatus, token, userrole } = order;
-    const restroID = getUserIdFromToken(token, userrole);
-
-    if (restroID) {
-      const updateOrderStatusQuery = 'CALL updateOrderStatus(?,?,?)';
-
-      const connection = await mysqlConnection();
-      // eslint-disable-next-line no-unused-vars
-      const [results, fields] = await connection.query(updateOrderStatusQuery, [
-        orderID,
-        restroID,
-        deliveryStatus,
-      ]);
-      connection.end();
-      // console.log(results);
-      response.writeHead(200, {
-        'Content-Type': 'text/plain',
-      });
-      response.end('Order Status Updated successfully');
-    } else {
-      response.writeHead(401, {
-        'Content-Type': 'text/plain',
-      });
-      response.end('Invalid User');
-    }
+    Orders.updateOne(
+      { $and: [{ _id: request.body._id }, { RestaurantID: request.body.RestaurantID }] },
+      { ...request.body },
+      async (error) => {
+        if (error) {
+          response.writeHead(500, {
+            'Content-Type': 'text/plain',
+          });
+          response.end('Network Error');
+        } else {
+          // console.log(data);
+          response.writeHead(200, {
+            'Content-Type': 'text/plain',
+          });
+          response.end('Order statuse succesfully updated to', request.body.DeliveryStatus);
+        }
+      }
+    );
   } catch (error) {
     response.writeHead(401, {
       'Content-Type': 'text/plain',
@@ -845,7 +869,7 @@ module.exports = {
   deleteFoodItem,
   updateFoodItem,
   fetchReviews,
-  getOrderDetailsNew,
+  getOrderDetails,
   orderFetch,
   updateDeliveryStatus,
   createNewEvent,
