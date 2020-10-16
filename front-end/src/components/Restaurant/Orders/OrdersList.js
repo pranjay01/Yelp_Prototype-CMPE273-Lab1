@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import Order from './Order';
@@ -74,12 +75,16 @@ class ordersList extends Component {
   }
 
   handlePageClick = (e) => {
-    this.commonFetch('All', e.selected);
+    this.commonFetch(this.props.orderStore.sortValue, e.selected);
   };
   fetchOrders(event, sortValue) {
     // let newOrdersList = [];
     event.preventDefault();
     this.commonFetch(sortValue);
+    // let payload = {
+    //   selectedPage: 0,
+    // };
+    // this.props.updateOrderStore(payload);
   }
 
   componentDidMount() {
@@ -267,6 +272,7 @@ class ordersList extends Component {
               containerClassName={'pagination'}
               subContainerClassName={'pages pagination'}
               activeClassName={'active'}
+              forcePage={this.props.orderStore.selectedPage}
             />
           </div>
         </div>

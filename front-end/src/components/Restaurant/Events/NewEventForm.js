@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import serverUrl from '../../../config';
 import axios from 'axios';
+import { connect } from 'react-redux';
 
 class NewEventForm extends Component {
   constructor(props) {
@@ -8,35 +9,33 @@ class NewEventForm extends Component {
     this.state = {
       errors: {},
       submitError: false,
-      Countries: [],
-      States: [],
-      CountryCodes: [],
       newEventInfo: {
-        Name: '',
+        RestaurantID: localStorage.getItem('userId'),
+        EventName: '',
         Description: '',
         EventDate: null,
-        EventStartTime: '00:00:00',
-        EventEndTime: '00:00:01',
-        CountryId: null,
-        StateId: null,
-        City: null,
-        Zip: null,
+        StartTime: '00:00:00',
+        EndTime: '00:00:01',
+        CountryName: '',
+        StateName: '',
+        City: '',
+        Zip: '',
         Street: '',
-        hashtags: '',
+        HashTags: '',
       },
     };
   }
 
   onChangeHandlerName = (e) => {
     this.setState({
-      newEventInfo: { ...this.state.newEventInfo, ...{ Name: e.target.value } },
+      newEventInfo: { ...this.state.newEventInfo, ...{ EventName: e.target.value } },
       submitError: false,
     });
   };
 
   onChangeHandlerHashtags = (e) => {
     this.setState({
-      newEventInfo: { ...this.state.newEventInfo, ...{ hashtags: e.target.value } },
+      newEventInfo: { ...this.state.newEventInfo, ...{ HashTags: e.target.value } },
       submitError: false,
     });
   };
@@ -50,14 +49,14 @@ class NewEventForm extends Component {
 
   onChangeHandlerCountry = (e) => {
     this.setState({
-      newEventInfo: { ...this.state.newEventInfo, ...{ CountryId: e.target.value } },
+      newEventInfo: { ...this.state.newEventInfo, ...{ CountryName: e.target.value } },
       submitError: false,
     });
   };
 
   onChangeHandlerState = (e) => {
     this.setState({
-      newEventInfo: { ...this.state.newEventInfo, ...{ StateId: e.target.value } },
+      newEventInfo: { ...this.state.newEventInfo, ...{ StateName: e.target.value } },
       submitError: false,
     });
   };
@@ -112,11 +111,11 @@ class NewEventForm extends Component {
 
   onChangeHandlerStartTime = (e) => {
     let errors = {};
-    if (e.target.value > this.state.newEventInfo.EventEndTime) {
+    if (e.target.value > this.state.newEventInfo.EndTime) {
       errors['timeError'] = 'Start Time cannot be before end time!';
     }
     this.setState({
-      newEventInfo: { ...this.state.newEventInfo, ...{ EventStartTime: e.target.value } },
+      newEventInfo: { ...this.state.newEventInfo, ...{ StartTime: e.target.value } },
       submitError: false,
       errors,
     });
@@ -124,40 +123,21 @@ class NewEventForm extends Component {
 
   onChangeHandlerEndTime = (e) => {
     let errors = {};
-    if (e.target.value <= this.state.newEventInfo.EventStartTime) {
+    if (e.target.value <= this.state.newEventInfo.StartTime) {
       errors['timeError'] = 'Start Time cannot be before end time!';
     }
     this.setState({
-      newEventInfo: { ...this.state.newEventInfo, ...{ EventEndTime: e.target.value } },
+      newEventInfo: { ...this.state.newEventInfo, ...{ EndTime: e.target.value } },
       submitError: false,
       errors,
     });
   };
 
-  componentDidMount() {
-    axios.get(serverUrl + 'static/signupMasterData').then((response) => {
-      console.log(response.data);
-      let allCountries = response.data[0].map((country) => {
-        return { key: country.ID, value: country.Name };
-      });
-      let allStates = response.data[1].map((state) => {
-        return { key: state.ID, value: state.Name };
-      });
-      let allCountrieCodes = response.data[0].map((countryCode) => {
-        return { key: countryCode.ID, value: countryCode.Country_Code };
-      });
-      this.setState({
-        Countries: this.state.Countries.concat(allCountries),
-        States: this.state.States.concat(allStates),
-        CountryCodes: this.state.CountryCodes.concat(allCountrieCodes),
-      });
-    });
-  }
+  componentDidMount() {}
   handleClick = () => {
     this.props.toggle();
   };
 
-  validityCheck = () => {};
   handleSubmit = (event) => {
     event.preventDefault();
     if (Object.keys(this.state.errors).length === 0) {
@@ -180,45 +160,45 @@ class NewEventForm extends Component {
             &times;{' '}
           </span>
           <div style={{ marginTop: '3%' }}>
-            <div class={errorClass}>
-              <p class="alert-message">
+            <div className={errorClass}>
+              <p className="alert-message">
                 <ul>{this.state.submitErrorBlock}</ul>
               </p>
             </div>
             <form
               onSubmit={(event) => this.handleSubmit(event)}
-              class="yform signup-form  city-hidden"
+              className="yform signup-form  city-hidden"
               id="signup-form"
             >
-              <div class="js-password-meter-container">
-                <ul class="inline-layout clearfix">
+              <div className="js-password-meter-container">
+                <ul className="inline-layout clearfix">
                   <li style={{ width: '5%' }}></li>
                   <li style={{ width: '40%' }}>
-                    <label class="placeholder-sub">Event Name</label>
+                    <label className="placeholder-sub">Event Name</label>
                     <input
                       maxLength="100"
                       placeholder="Event Name"
                       required="required"
                       type="text"
                       onChange={this.onChangeHandlerName}
-                      value={this.state.newEventInfo.Name}
+                      value={this.state.newEventInfo.EventName}
                     />
                   </li>
                   <li style={{ width: '10%' }}></li>
                   <li style={{ width: '40%' }}>
-                    <label class="placeholder-sub">Hashtags</label>
+                    <label className="placeholder-sub">Hashtags</label>
                     <input
                       maxLength="100"
                       placeholder="Hashtags"
                       required="required"
                       type="text"
                       onChange={this.onChangeHandlerHashtags}
-                      value={this.state.newEventInfo.hashtags}
+                      value={this.state.newEventInfo.HashTags}
                     />
                   </li>
                   <li style={{ width: '5%' }}></li>
                   <li style={{ width: '40%' }}>
-                    <label class="placeholder-sub">Description</label>
+                    <label className="placeholder-sub">Description</label>
                     <input
                       maxLength="500"
                       placeholder="Description max 500 characters"
@@ -230,27 +210,27 @@ class NewEventForm extends Component {
                   </li>
                 </ul>
               </div>
-              <fieldset class="login-separator hr-line">
+              <fieldset className="login-separator hr-line">
                 <legend align="left">Event Location & Timmings</legend>
               </fieldset>
 
-              <div class="js-more-fields more-fields">
-                <ul class="inline-layout clearfix">
+              <div className="js-more-fields more-fields">
+                <ul className="inline-layout clearfix">
                   <li style={{ width: '5%' }}></li>
                   <li style={{ width: '30%' }}>
-                    <label class="placeholder-sub">Country</label>
+                    <label className="placeholder-sub">Country</label>
                     <select
                       placeholder="Country"
                       className="form-control"
                       onChange={this.onChangeHandlerCountry}
-                      value={this.state.newEventInfo.CountryId}
+                      value={this.state.newEventInfo.CountryName}
                       required
                     >
                       <option className="Dropdown-menu" key="" value="">
                         Country
                       </option>
-                      {this.state.Countries.map((country) => (
-                        <option className="Dropdown-menu" key={country.key} value={country.key}>
+                      {this.props.masterData.Countries.map((country) => (
+                        <option className="Dropdown-menu" key={country.key} value={country.value}>
                           {country.value}
                         </option>
                       ))}
@@ -258,19 +238,19 @@ class NewEventForm extends Component {
                   </li>
                   <li style={{ width: '2%' }}></li>
                   <li style={{ width: '25%' }}>
-                    <label class="placeholder-sub">State</label>
+                    <label className="placeholder-sub">State</label>
                     <select
                       placeholder="State"
                       className="form-control"
                       onChange={this.onChangeHandlerState}
-                      value={this.state.newEventInfo.StateId}
+                      value={this.state.newEventInfo.StateName}
                       required
                     >
                       <option className="Dropdown-menu" key="" value="">
                         State
                       </option>
-                      {this.state.States.map((state) => (
-                        <option className="Dropdown-menu" key={state.key} value={state.key}>
+                      {this.props.masterData.States.map((state) => (
+                        <option className="Dropdown-menu" key={state.key} value={state.value}>
                           {state.value}
                         </option>
                       ))}
@@ -278,7 +258,7 @@ class NewEventForm extends Component {
                   </li>
                   <li style={{ width: '2%' }}></li>
                   <li style={{ width: '15%' }}>
-                    <label class="placeholder-sub">Zip Code</label>
+                    <label className="placeholder-sub">Zip Code</label>
                     <input
                       minlength="5"
                       maxlength="5"
@@ -294,7 +274,7 @@ class NewEventForm extends Component {
                   </li>
                   <li style={{ width: '5%' }}></li>
                   <li style={{ width: '30%' }}>
-                    <label class="placeholder-sub">City</label>
+                    <label className="placeholder-sub">City</label>
                     <input
                       id="city"
                       name="city"
@@ -307,7 +287,7 @@ class NewEventForm extends Component {
                   </li>
                   <li style={{ width: '5%' }}></li>
                   <li style={{ width: '50%' }}>
-                    <label class="placeholder-sub">Street</label>
+                    <label className="placeholder-sub">Street</label>
                     <input
                       id="street"
                       name="street"
@@ -320,10 +300,10 @@ class NewEventForm extends Component {
                   </li>
                 </ul>
 
-                <ul class="inline-layout clearfix">
+                <ul className="inline-layout clearfix">
                   <li style={{ width: '5%' }}></li>
                   <li style={{ width: '20%' }}>
-                    <label class="">Event Date</label>
+                    <label className="">Event Date</label>
                     <input
                       type="date"
                       //step="1"
@@ -340,7 +320,7 @@ class NewEventForm extends Component {
                   </li>
 
                   <li style={{ width: '20%' }}>
-                    <label class="">Event Start Time</label>
+                    <label className="">Event Start Time</label>
                     <input
                       type="time"
                       step="1"
@@ -348,12 +328,12 @@ class NewEventForm extends Component {
                       className="form-control"
                       placeholder="Start Time"
                       onChange={this.onChangeHandlerStartTime}
-                      value={this.state.newEventInfo.EventStartTime}
+                      value={this.state.newEventInfo.StartTime}
                     />
                   </li>
                   <li style={{ width: '5%' }}></li>
                   <li style={{ width: '20%' }}>
-                    <label class="">Event End Time</label>
+                    <label className="">Event End Time</label>
                     <input
                       type="time"
                       step="1"
@@ -361,7 +341,7 @@ class NewEventForm extends Component {
                       className="form-control"
                       placeholder="End Time"
                       onChange={this.onChangeHandlerEndTime}
-                      value={this.state.newEventInfo.EventEndTime}
+                      value={this.state.newEventInfo.EndTime}
                     />
                   </li>
                   <li style={{ width: '5%' }}></li>
@@ -372,14 +352,14 @@ class NewEventForm extends Component {
                 <button
                   id="signup-button"
                   type="submit"
-                  class="ybtn ybtn--primary ybtn--big disable-on-submit submit signup-button"
+                  className="ybtn ybtn--primary ybtn--big disable-on-submit submit signup-button"
                   style={{}}
                 >
                   <span>Save</span>
                 </button>
 
                 <button
-                  class="ybtn ybtn--primary ybtn--big disable-on-submit submit signup-button"
+                  className="ybtn ybtn--primary ybtn--big disable-on-submit submit signup-button"
                   style={{
                     marginLeft: '2%',
                   }}
@@ -396,4 +376,13 @@ class NewEventForm extends Component {
   }
 }
 
-export default NewEventForm;
+const mapStateToProps = (state) => {
+  const { masterData } = state.masterDataReducer;
+  return {
+    masterData: masterData,
+  };
+};
+
+export default connect(mapStateToProps, null)(NewEventForm);
+
+// export default NewEventForm;

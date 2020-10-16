@@ -15,6 +15,7 @@ const UserSignup = require('../Models/UserSignup');
 
 const Restaurant = require('../Models/Restaurant');
 const Reviews = require('../Models/Review');
+const Event = require('../Models/Event');
 
 const Orders = require('../Models/Order');
 
@@ -23,9 +24,10 @@ const Beverage = require('../Models/Beverage');
 const Dessert = require('../Models/Dessert');
 const MainCourse = require('../Models/MainCourse');
 const Salad = require('../Models/Salad');
+const key = require('./config');
 
 const geo = geocoder({
-  key: 'AIzaSyBpI0r49yQH5FrrK6tsDHrbkYoBp8bWSXE',
+  key,
 });
 
 const { BUCKET_NAME } = process.env;
@@ -51,7 +53,7 @@ const multipleUpload = multer({
     },
   }),
 }).single('file');
-
+/*
 const getOrderList = async (_order, _appetizers, _desserts, _beverages, _salads, _mainCourse) => {
   const results = [];
   // eslint-disable-next-line no-restricted-syntax
@@ -117,6 +119,8 @@ const getOrderList = async (_order, _appetizers, _desserts, _beverages, _salads,
   }
   return results;
 };
+
+*/
 
 // Function to create new restaurant // mongoDbAdded
 const signup = async (restaurant, response) => {
@@ -587,7 +591,7 @@ const fetchReviews = async (request, response) => {
   return response;
 };
 
-// fetch order depending on filter value
+// fetch order depending on filter value // MongoDb Implemented
 const getOrderDetails = async (request, response) => {
   const { RestaurantID, selectedPage, sortValue } = url.parse(request.url, true).query;
   try {
@@ -622,7 +626,9 @@ const getOrderDetails = async (request, response) => {
       .limit(3)
       .skip(selectedPage * 3)
       .exec();
-    const orderCount = await Orders.find({ RestaurantID }, { $or: filterArray }).countDocuments();
+    const orderCount = await Orders.find({
+      $and: [{ RestaurantID }, { $or: filterArray }],
+    }).countDocuments();
     const results = {
       OrderList,
       orderCount,
@@ -641,6 +647,7 @@ const getOrderDetails = async (request, response) => {
   return response;
 };
 
+/*
 // Fetch details of particular order
 const orderFetch = async (request, response) => {
   const { orderID } = url.parse(request.url, true).query;
@@ -675,8 +682,9 @@ const orderFetch = async (request, response) => {
   }
   return response;
 };
+*/
 
-// Update Deliver Status
+// Update Deliver Status // MongoDb Implemented
 const updateDeliveryStatus = async (request, response) => {
   try {
     Orders.updateOne(
@@ -706,123 +714,97 @@ const updateDeliveryStatus = async (request, response) => {
   return response;
 };
 
-// Create New Event
+// Create New Event // MongoDb Implemented
 const createNewEvent = async (request, response) => {
-  const {
-    Name,
-    Description,
-    EventDate,
-    EventStartTime,
-    EventEndTime,
-    CountryId,
-    StateId,
-    City,
-    hashtags,
-    Zip,
-    Street,
-    token,
-    userrole,
-  } = request.body;
   try {
-    const restroID = getUserIdFromToken(token, userrole);
-    if (restroID) {
-      const createNewEventQuery = 'CALL createNewEvent(?,?,?,?,?,?,?,?,?,?,?,?)';
+    const newEvent = new Event({
+      ...request.body,
+    });
 
-      const connection = await mysqlConnection();
-      // eslint-disable-next-line no-unused-vars
-      const [results, fields] = await connection.query(createNewEventQuery, [
-        Name,
-        restroID,
-        Description,
-        EventDate,
-        EventStartTime,
-        EventEndTime,
-        CountryId,
-        StateId,
-        City,
-        Zip,
-        Street,
-        hashtags,
-      ]);
-      connection.end();
-      // console.log(results);
-      response.writeHead(201, {
-        'Content-Type': 'text/plain',
-      });
-      response.end('Event created successfully');
-    } else {
-      response.writeHead(401, {
-        'Content-Type': 'text/plain',
-      });
-      response.end('Invalid User');
-    }
+    newEvent.save((err) => {
+      if (err) {
+        response.writeHead(500, {
+          'Content-Type': 'text/plain',
+        });
+        response.end('Network Error');
+      } else {
+        response.writeHead(201, {
+          'Content-Type': 'application/json',
+        });
+        response.end('Food Item Created Successfully!!!');
+      }
+    });
   } catch (error) {
     response.writeHead(500, {
       'Content-Type': 'text/plain',
     });
-    response.end('Network error');
+    response.end('Network Error');
   }
   return response;
 };
 
-// fetch events fased on filter
+// fetch events fased on filter // MongoDb Implemented
 const getEventList = async (request, response) => {
+  const { RestaurantID, selectedPage, sortValue } = url.parse(request.url, true).query;
   try {
-    const { sortValue } = url.parse(request.url, true).query;
-    const userID = getUserIdFromToken(request.cookies.cookie, request.cookies.userrole);
-    if (userID) {
-      const getEventListQuery = 'CALL getEventList(?,?)';
-
-      const connection = await mysqlConnection();
-      // eslint-disable-next-line no-unused-vars
-      const [results, fields] = await connection.query(getEventListQuery, [userID, sortValue]);
-      connection.end();
-      response.writeHead(200, {
-        'Content-Type': 'text/plain',
-      });
-      response.end(JSON.stringify(results));
+    let filter = {};
+    if (sortValue === 'upcoming') {
+      filter = { $gte: new Date() };
     } else {
-      response.writeHead(401, {
-        'Content-Type': 'text/plain',
-      });
-      response.end('Invalid User');
+      filter = { $lt: new Date() };
     }
+    const EventList = await Event.find(
+      { $and: [{ RestaurantID }, { EventDate: filter }] }
+      // { RegisteredCustomers: { $slice: [selectedPageRegisteredCustomers * 2, 2] } }
+    )
+      .limit(3)
+      .skip(selectedPage * 3)
+      .exec();
+    const eventCount = await Event.find({
+      $and: [{ RestaurantID }, { EventDate: filter }],
+    }).countDocuments();
+    const results = {
+      EventList,
+      eventCount,
+    };
+
+    response.writeHead(200, {
+      'Content-Type': 'application/json',
+    });
+    response.end(JSON.stringify(results));
   } catch (error) {
     response.writeHead(500, {
       'Content-Type': 'text/plain',
     });
-    response.end('Network error');
+    response.end('Review Fetch Failed');
   }
   return response;
 };
 
-// fetch events fased on filter
+// fetch events fased on filter // MongoDb Implemented
 const getCustomerList = async (request, response) => {
+  const { RestaurantID, _id, RegistrationPage } = url.parse(request.url, true).query;
   try {
-    const { eventID } = url.parse(request.url, true).query;
-    const userID = getUserIdFromToken(request.cookies.cookie, request.cookies.userrole);
-    if (userID) {
-      const getRegisteredCustomersQuery = 'CALL getRegisteredCustomers(?)';
+    const focusedEvent = await Event.findOne(
+      { $and: [{ RestaurantID }, { _id }] },
+      { RegisteredCustomers: { $slice: [RegistrationPage * 8, 8] } }
+    );
 
-      const connection = await mysqlConnection();
-      // eslint-disable-next-line no-unused-vars
-      const [results, fields] = await connection.query(getRegisteredCustomersQuery, eventID);
-      connection.end();
-      response.writeHead(200, {
-        'Content-Type': 'text/plain',
-      });
-      response.end(JSON.stringify(results));
-    } else {
-      response.writeHead(401, {
-        'Content-Type': 'text/plain',
-      });
-      response.end('Invalid User');
-    }
+    const registeredCustomerArray = await Event.findOne({ $and: [{ RestaurantID }, { _id }] });
+    const results = {
+      RegisteredCustomers: focusedEvent.RegisteredCustomers,
+      registeredCustomerCount: registeredCustomerArray.RegisteredCustomers.length,
+    };
+
+    response.writeHead(200, {
+      'Content-Type': 'application/json',
+    });
+    response.end(JSON.stringify(results));
   } catch (error) {
     response.writeHead(500, {
       'Content-Type': 'text/plain',
     });
-    response.end('Network error');
+    response.end('Review Fetch Failed');
   }
   return response;
 };
@@ -870,7 +852,7 @@ module.exports = {
   updateFoodItem,
   fetchReviews,
   getOrderDetails,
-  orderFetch,
+  // orderFetch,
   updateDeliveryStatus,
   createNewEvent,
   getEventList,
@@ -878,6 +860,6 @@ module.exports = {
   uploadRestaurantProfilePic,
   uploadPicToMulter,
   uploadFoodImage,
-  getOrderList,
+  // getOrderList,
   getCustomerCompleteProfileForRestaurant,
 };

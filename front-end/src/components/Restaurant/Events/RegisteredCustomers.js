@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import serverUrl from '../../../config';
 import CustomerStaticProfile from '../CommonComponent/CustomerStaticProfile';
+import { connect } from 'react-redux';
+import ReactPaginate from 'react-paginate';
+
 import './RegisteredCustomers.css';
 
 class RegisteredCustomers extends Component {
@@ -65,6 +68,10 @@ class RegisteredCustomers extends Component {
   handleClick = () => {
     this.props.toggle();
   };
+  handlePageClick = (e) => {
+    this.props.handlePageClickRegisteredCustomers(e);
+  };
+
   render() {
     return (
       <div className="modal" style={{ top: '0', left: '0', width: '100%', height: '100%' }}>
@@ -89,15 +96,11 @@ class RegisteredCustomers extends Component {
                   openStaticProfile={(event) => this.openStaticProfile(event, '')}
                 />
               ) : null}
-              {this.props.RegisteredCustomerList.map((customer) => (
-                <tr>
+              {this.props.registrationStore.RegisteredCustomers.map((customer) => (
+                <tr key={customer.CustomerID}>
                   <td>
-                    <a
-                      href="#"
-                      //onClick={(event) => this.props.fetchCustomerProfile(event, customer.ID)}
-                      onClick={(event) => this.openStaticProfile(event, customer.ID)}
-                    >
-                      {customer.cusName}
+                    <a href="#" onClick={(event) => this.openStaticProfile(event, customer.ID)}>
+                      {customer.CustomerName}
                     </a>
                   </td>
                   <td>{customer.Email}</td>
@@ -105,10 +108,38 @@ class RegisteredCustomers extends Component {
               ))}
             </tbody>
           </table>
+          <div style={{ position: 'absolute', left: '4%', bottom: '0%', right: '0' }}>
+            <ReactPaginate
+              previousLabel={'prev'}
+              nextLabel={'next'}
+              breakLabel={'...'}
+              breakClassName={'break-me'}
+              pageCount={this.props.registrationStore.RegistrationPageCount}
+              // pageCount={3}
+              marginPagesDisplayed={2}
+              pageRangeDisplayed={2}
+              onPageChange={this.handlePageClick}
+              containerClassName={'pagination'}
+              subContainerClassName={'pages pagination'}
+              activeClassName={'active'}
+            />
+          </div>
         </div>
       </div>
     );
   }
 }
 
-export default RegisteredCustomers;
+const mapStateToProps = (state) => {
+  const snackbarData = state.snackBarReducer;
+  const { eventStore, registrationStore } = state.eventStoreReducer;
+  return {
+    snackbarData: snackbarData,
+    eventStore,
+    registrationStore,
+  };
+};
+
+export default connect(mapStateToProps, null)(RegisteredCustomers);
+
+// export default RegisteredCustomers;

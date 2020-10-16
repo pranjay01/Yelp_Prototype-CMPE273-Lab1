@@ -11,7 +11,7 @@ const {
   updateFoodItem,
   fetchReviews,
   getOrderDetails,
-  orderFetch,
+  // orderFetch,
   updateDeliveryStatus,
   createNewEvent,
   getEventList,
@@ -133,23 +133,23 @@ Router.get('/fetchReviews', validateUser, async (req, res) => {
 });
 
 // Fetch Orders
-Router.get('/getOrderDetails', async (req, res) => {
+Router.get('/getOrderDetails', validateUser, async (req, res) => {
   console.log('Fetch Orders');
   let results = null;
   results = await getOrderDetails(req, res);
   return results;
 });
 
-// Fetch particukar order detail
-Router.get('/orderFetch', async (req, res) => {
-  console.log('Fetch OrderDetail');
-  let results = null;
-  results = await orderFetch(req, res);
-  return results;
-});
+// // Fetch particukar order detail
+// Router.get('/orderFetch', async (req, res) => {
+//   console.log('Fetch OrderDetail');
+//   let results = null;
+//   results = await orderFetch(req, res);
+//   return results;
+// });
 
 // Update Delivery Status
-Router.post('/updateDeliveryStatus', async (req, res) => {
+Router.post('/updateDeliveryStatus', validateUser, async (req, res) => {
   console.log('Update Delivery Status');
   let results = null;
   results = await updateDeliveryStatus(req, res);
@@ -157,7 +157,7 @@ Router.post('/updateDeliveryStatus', async (req, res) => {
 });
 
 // Update Delivery Status
-Router.post('/createNewEvent', async (req, res) => {
+Router.post('/createNewEvent', validateUser, async (req, res) => {
   console.log('Create new Event');
   let results = null;
   results = await createNewEvent(req, res);
@@ -165,7 +165,7 @@ Router.post('/createNewEvent', async (req, res) => {
 });
 
 // Fetch Events
-Router.get('/getEventList', async (req, res) => {
+Router.get('/getEventList', validateUser, async (req, res) => {
   console.log('Fetch Events');
   let results = null;
   results = await getEventList(req, res);
@@ -173,14 +173,14 @@ Router.get('/getEventList', async (req, res) => {
 });
 
 // Get Customer Register to event
-Router.get('/getCustomerList', async (req, res) => {
+Router.get('/getCustomerList', validateUser, async (req, res) => {
   console.log('Fetch Events');
   let results = null;
   results = await getCustomerList(req, res);
   return results;
 });
 
-Router.get('/getCustomerCompleteProfile', async (req, res) => {
+Router.get('/getCustomerCompleteProfile', validateUser, async (req, res) => {
   console.log('getContactInfo');
   let results = null;
   results = await getCustomerCompleteProfileForRestaurant(req, res);

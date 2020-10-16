@@ -4,8 +4,8 @@ const { Schema } = mongoose;
 
 const eventSchema = new Schema(
   {
-    RestaurantId: { type: String },
-    Name: { type: String, required: true },
+    RestaurantID: { type: String },
+    EventName: { type: String, required: true },
     Description: { type: String, required: true },
     EventDate: { type: Date, required: true },
     StartTime: { type: String, required: true },
@@ -16,7 +16,10 @@ const eventSchema = new Schema(
     Street: { type: String, required: true },
     HashTags: { type: String, required: true },
     Zip: { type: Number, min: 10000, max: 99999, required: true },
-    RegisteredCustomers: [{ ID: { type: Number }, Name: { type: String } }],
+    // concat customer name while insertion
+    RegisteredCustomers: [
+      { CustomerID: { type: String }, CustomerName: { type: String }, Email: { type: String } },
+    ],
   },
   { versionKey: false }
 );

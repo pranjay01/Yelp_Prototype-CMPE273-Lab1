@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { Component } from 'react';
 import axios from 'axios';
 import serverUrl from '../../../config';
@@ -396,7 +397,6 @@ class FoodMenu extends Component {
   //on successfull delete remove from state also
   deleteFoodItem = (event, foodId) => {
     event.preventDefault();
-    let category = this.state.showFoodCategory;
     const data = {
       category: this.state.showFoodCategory,
       _id: foodId,
@@ -1032,12 +1032,8 @@ class FoodMenu extends Component {
           // console.log('Status Code : ', response.status);
           if (parseInt(response.status) === 200) {
             // console.log('Product Saved');
-            let tmp = { ImageUrl: response.data };
+
             this.updateImageUrl(response.data, id);
-            // this.setState({
-            //   newFood: { ...this.state.newFood, ...tmp },
-            // });
-            //Router.push('/vendor/' + localStorage.getItem('user_id'));
           } else if (parseInt(response.status) === 400) {
             // console.log(response.data);
           }
