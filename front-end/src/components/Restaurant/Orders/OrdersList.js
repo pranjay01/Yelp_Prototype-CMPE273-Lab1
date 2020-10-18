@@ -151,7 +151,14 @@ class ordersList extends Component {
             message: response.data,
           };
           this.props.updateSnackbarData(payload);
-          this.commonFetch(this.props.orderStore.sortValue, this.props.orderStore.selectedPage);
+          let pageNo = this.props.orderStore.selectedPage;
+          if (
+            this.props.orderStore.orderCount % 3 === 1 &&
+            pageNo + 1 === this.props.orderStore.PageCount
+          ) {
+            pageNo -= 1;
+          }
+          this.commonFetch(this.props.orderStore.sortValue, pageNo);
         }
       },
       (error) => {

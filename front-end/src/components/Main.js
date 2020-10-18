@@ -24,7 +24,7 @@ import { updateMasterData } from '../constants/action-types';
 class Main extends Component {
   componentDidMount() {
     axios.get(serverUrl + 'static/signupMasterData').then((response) => {
-      console.log(response.data);
+      // console.log(response.data);
       let Countries = response.data[0].map((country) => {
         return { key: country._id, value: country.Name };
       });

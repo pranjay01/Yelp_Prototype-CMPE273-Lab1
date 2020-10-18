@@ -177,13 +177,6 @@ class CustomerLogin extends Component {
     );
   };
 
-  checkSnackbar = () => {
-    let payload = {
-      success: true,
-      message: 'Account Created Successfully!',
-    };
-    this.props.updateSnackbarData(payload);
-  };
   render() {
     let redirectVar = null;
     // console.log('token: ', localStorage.getItem('token'));
@@ -540,7 +533,7 @@ class CustomerLogin extends Component {
       <div>
         {redirectVar}
         {/*this.props.snackbarData != null && <SnackBar />*/}
-        <button onClick={this.checkSnackbar}></button>
+
         <div>
           <div className="lemon--div__373c0__1mboc header__373c0__AlFmH border-color--default__373c0__2oFDT">
             <div className="lemon--div__373c0__1mboc container__373c0__13FCe transparent__373c0__3oxYH">

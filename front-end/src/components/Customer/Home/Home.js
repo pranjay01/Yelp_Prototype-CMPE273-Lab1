@@ -202,7 +202,7 @@ class Home extends Component {
                     <div className="main-search_suggestions-field search-field-container find-decorator">
                       <label
                         className="pseudo-input business-search-form_input business-search-form_input--find"
-                        for="find_desc"
+                        htmlFor="find_desc"
                       >
                         <div className="pseudo-input_wrapper">
                           <span className="pseudo-input_text business-search-form_input-text">
@@ -214,7 +214,7 @@ class Home extends Component {
                           >
                             <input
                               disabled
-                              autocomplete="off"
+                              autoComplete="off"
                               style={{
                                 position: 'absolute',
                                 color: 'rgb(200, 200, 200)',
@@ -240,9 +240,9 @@ class Home extends Component {
                             <input
                               disabled={this.props.searchTabInfo.selectedFilter === '-Select-'}
                               onChange={this.onChangeStringSearchHanler}
-                              autocomplete="off"
+                              autoComplete="off"
                               id="find_desc"
-                              maxlength="64"
+                              maxLength="64"
                               placeholder="restaurant"
                               value={this.props.searchTabInfo.serchedString}
                               className="pseudo-input_field business-search-form_input-field"
@@ -254,7 +254,7 @@ class Home extends Component {
                                 boxSizing: 'border-box',
                               }}
                             />
-                            <input type="hidden" maxlength="64" name="find_desc" value="" />
+                            <input type="hidden" maxLength="64" name="find_desc" value="" />
                           </span>
                         </div>
                       </label>
@@ -320,14 +320,14 @@ class Home extends Component {
                                   ))}
                                 </select>
                                 {/* <input
-                                  maxlength="80"
+                                  maxLength="80"
                                   placeholder="address, neighborhood, city, state or zip"
                                   vale=""
                                   className="pseudo-input_field business-search-form_input-field"
                                 />
                                 <input
                                   type="hidden"
-                                  maxlength="80"
+                                  maxLength="80"
                                   name="find_loc"
                                   value="Willow Glen, San Jose, CA"
                                ></input>*/}

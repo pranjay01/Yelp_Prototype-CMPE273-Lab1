@@ -20,11 +20,11 @@ const customerSchema = new Schema(
     CountryCode: { type: Number, min: 1, max: 9 },
     Headline: { type: String },
     ILove: { type: String },
-    ImageURL: { type: String },
+    ImageURL: { type: String, default: '' },
     FindMeIn: { type: String },
     Website: { type: String },
     JoinDate: { type: Date },
-    RegisteredEvents: [Number],
+    RegisteredEvents: [String],
     ReviewCount: { type: Number },
   },
   { versionKey: false }

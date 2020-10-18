@@ -662,14 +662,7 @@ class RestaurantLogin extends Component {
     if (!errorBlock) {
       errorClass += 'hidden';
     }
-    // let successClass = 'alert alert-error ';
-    // if (!this.state.sigupSuccessful) {
-    //   successClass += 'hidden';
-    // }
-    // let successBlock = null;
-    // if (this.state.sigupSuccessful) {
-    //   successBlock = 'Account Created!! Login to Continue.';
-    // }
+
     return (
       <div>
         {redirectVar}

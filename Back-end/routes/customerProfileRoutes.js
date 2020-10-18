@@ -4,12 +4,9 @@ const express = require('express');
 const Router = express.Router();
 const {
   signup,
-  getBasicInfo,
-  getDataForCustomerUpdateProfile,
+  getCustomerInfo,
   updateProfile,
-  getContactInfo,
   updateContactInfo,
-  getCustomerCompleteProfile,
   uploadCustomerProfilePic,
   generateOrder,
   submitReview,
@@ -19,6 +16,7 @@ const {
   getAllOrders,
   orderDetailsFetch,
 } = require('../customer/customerProfile');
+const { validateUser } = require('../Utils/passport');
 const { login } = require('../common/loginLogout');
 
 // Customer signup
@@ -48,64 +46,43 @@ Router.post('/logout', async (req, res) => {
   return res;
 });
 
-Router.get('/getBasicInfo', async (req, res) => {
+Router.get('/getCustomerInfo', validateUser, async (req, res) => {
   console.log('getBasicInfo');
   let results = null;
-  results = await getBasicInfo(req, res);
+  results = await getCustomerInfo(req, res);
   return results;
 });
 
-Router.get('/getDataForCustomerUpdateProfile', async (req, res) => {
-  console.log('getDataForCustomerUpdateProfile');
-  let results = null;
-  results = await getDataForCustomerUpdateProfile(req, res);
-  return results;
-});
-
-Router.put('/updateProfile', async (req, res) => {
+Router.put('/updateProfile', validateUser, async (req, res) => {
   console.log('updateProfile');
   let results = null;
-  results = await updateProfile(req, res);
+  results = await updateProfile(req.body, res);
   return results;
 });
 
-Router.get('/getContactInfo', async (req, res) => {
-  console.log('getContactInfo');
-  let results = null;
-  results = await getContactInfo(req, res);
-  return results;
-});
-
-Router.put('/updateContactInfo', async (req, res) => {
+Router.post('/updateContactInfo', validateUser, async (req, res) => {
   console.log('updateContactInfo');
   let results = null;
   results = await updateContactInfo(req, res);
   return results;
 });
 
-Router.get('/getCustomerCompleteProfile', async (req, res) => {
-  console.log('getContactInfo');
-  let results = null;
-  results = await getCustomerCompleteProfile(req, res);
-  return results;
-});
-
 // Upload profile pic to s3 bucket
-Router.post('/uploadCustomerProfilePic', async (req, res) => {
+Router.post('/uploadCustomerProfilePic', validateUser, async (req, res) => {
   console.log('uploadCustomerProfilePic');
   let results = null;
   results = await uploadCustomerProfilePic(req, res);
   return results;
 });
 
-Router.post('/generateOrder', async (req, res) => {
+Router.post('/generateOrder', validateUser, async (req, res) => {
   console.log('generateOrder');
   let results = null;
   results = await generateOrder(req, res);
   return results;
 });
 
-Router.post('/submitReview', async (req, res) => {
+Router.post('/submitReview', validateUser, async (req, res) => {
   console.log('submitReview');
   let results = null;
   results = await submitReview(req, res);
@@ -113,35 +90,35 @@ Router.post('/submitReview', async (req, res) => {
 });
 
 // Fetch Events
-Router.get('/getEventList', async (req, res) => {
+Router.get('/getEventList', validateUser, async (req, res) => {
   console.log('Fetch Events');
   let results = null;
   results = await getEventList(req, res);
   return results;
 });
 
-Router.post('/registerForEvent', async (req, res) => {
+Router.post('/registerForEvent', validateUser, async (req, res) => {
   console.log('registerForEvent');
   let results = null;
   results = await registerForEvent(req, res);
   return results;
 });
 
-Router.get('/getRegisteredEventIds', async (req, res) => {
+Router.get('/getRegisteredEventIds', validateUser, async (req, res) => {
   console.log('getRegisteredEventIds');
   let results = null;
   results = await getRegisteredEventIds(req, res);
   return results;
 });
 
-Router.get('/getAllOrders', async (req, res) => {
+Router.get('/getAllOrders', validateUser, async (req, res) => {
   console.log('getAllOrders');
   let results = null;
   results = await getAllOrders(req, res);
   return results;
 });
 
-Router.get('/orderDetailsFetch', async (req, res) => {
+Router.get('/orderDetailsFetch', validateUser, async (req, res) => {
   console.log('orderDetailsFetch');
   let results = null;
   results = await orderDetailsFetch(req, res);

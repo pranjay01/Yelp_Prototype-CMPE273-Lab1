@@ -2,10 +2,8 @@ import { getCustomerBasicInfo } from '../constants/action-types';
 
 const defaultState = {
   customerInfo: {
-    Name: '',
-    Address: '',
-    ReviewCount: 0,
-    ImageUrl: '',
+    customerProfile: { ImageURL: '', LastName: '' },
+    reviewCount: 0,
   },
 };
 

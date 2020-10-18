@@ -222,19 +222,6 @@ const getRestaurantInfo = async (request, response) => {
       'Content-Type': 'application/json',
     });
     response.end(JSON.stringify(results));
-    // Restaurant.findOne({ RestaurantID: _id }, async (error, restaurant) => {
-    //   if (error) {
-    //     response.writeHead(500, {
-    //       'Content-Type': 'text/plain',
-    //     });
-    //     response.end('Network Error');
-    //   } else {
-    //     response.writeHead(200, {
-    //       'Content-Type': 'text/plain',
-    //     });
-    //     response.end(JSON.stringify(restaurant));
-    //   }
-    // });
   } catch (error) {
     response.writeHead(401, {
       'Content-Type': 'text/plain',
@@ -754,7 +741,8 @@ const getEventList = async (request, response) => {
       filter = { $lt: new Date() };
     }
     const EventList = await Event.find(
-      { $and: [{ RestaurantID }, { EventDate: filter }] }
+      { $and: [{ RestaurantID }, { EventDate: filter }] },
+      { RegisteredCustomers: 0 }
       // { RegisteredCustomers: { $slice: [selectedPageRegisteredCustomers * 2, 2] } }
     )
       .limit(3)

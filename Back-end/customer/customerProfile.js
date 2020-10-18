@@ -7,6 +7,9 @@ const AWS = require('aws-sdk');
 const multer = require('multer');
 const multerS3 = require('multer-s3');
 const url = require('url');
+const jwt = require('jsonwebtoken');
+
+const moment = require('moment');
 const { getUserIdFromToken } = require('../common/loginLogout');
 const mysqlConnection = require('../mysqlConnection');
 
@@ -22,22 +25,9 @@ const { getOrderList } = require('../restaurant/restaurantProfile');
 const UserSignup = require('../Models/UserSignup');
 
 const Customer = require('../Models/Customer');
-/*
-const checkEmailExists = async (email) => {
-  const verifyEmailExist = 'CALL getEmail(?,?)';
-  // 1 is for enum value customer
-  const connection = await mysqlConnection();
-  // eslint-disable-next-line no-unused-vars
-  const [results, fields] = await connection.query(verifyEmailExist, [email, 1]);
 
-  connection.end();
-  console.log(results);
-  if (results[0].length === 0) {
-    return true;
-  }
-  return false;
-};
-*/
+const Reviews = require('../Models/Review');
+
 const multipleUpload = multer({
   storage: multerS3({
     s3: s3Storage,
@@ -55,6 +45,7 @@ const multipleUpload = multer({
   }),
 }).single('file');
 
+// MongoDB Implemented
 const signup = async (customer, response) => {
   try {
     UserSignup.findOne({ Email: customer.Email, Role: 'Customer' }, async (error, user) => {
@@ -82,9 +73,12 @@ const signup = async (customer, response) => {
             });
             response.end('Network Error');
           } else {
+            // moment('America/Los_Angeles');
+            // JoinDate = JoinDate.toLocaleString('en-US', { timeZone: 'America/New_York' });
             const newCustomer = new Customer({
               ...customer,
               CustomerID: data._id,
+              JoinDate: moment().format(),
             });
             newCustomer.save((err1, result) => {
               if (err1) {
@@ -112,77 +106,24 @@ const signup = async (customer, response) => {
   }
   return response;
 };
-/*
-const signupOld = async (customer, response) => {
-  // eslint-disable-next-line camelcase
-  const { Email, Password, First_Name, Last_Name, Gender } = customer;
-  if (await checkEmailExists(Email)) {
-    try {
-      const hashedPassword = await bcrypt.hash(Password, 10);
-      console.log(hashedPassword);
-      const signupQuery = 'CALL customerSignup(?,?,?,?,?)';
 
-      const connection = await mysqlConnection();
-      const { _results } = await connection.query(signupQuery, [
-        Email,
-        hashedPassword,
-        // eslint-disable-next-line camelcase
-        First_Name,
-        // eslint-disable-next-line camelcase
-        Last_Name,
-        Number(Gender),
-      ]);
-      connection.end();
-      console.log(_results);
-      response.writeHead(200, {
-        'Content-Type': 'text/plain',
-      });
-      response.end('User Created');
-      return response;
-    } catch (error) {
-      response.writeHead(500, {
-        'Content-Type': 'text/plain',
-      });
-      response.end('Network error');
-      return response;
-    }
-  } else {
-    response.writeHead(401, {
-      'Content-Type': 'text/plain',
-    });
-    response.end('Email Already Exists');
-    return response;
-  }
-};
-
-*/
-// getCustomer Basic Info
-const getBasicInfo = async (request, response) => {
-  console.log(request.headers.cookie);
-  console.log(request.cookies);
+// getCustomer Basic Info // MongoDB Implemented
+const getCustomerInfo = async (request, response) => {
   try {
-    const userID = getUserIdFromToken(request.cookies.cookie, request.cookies.userrole);
-    if (userID) {
-      const getBasicInfoQuery = 'CALL getBasicInfoCustomer(?)';
+    const { _id } = url.parse(request.url, true).query;
 
-      const connection = await mysqlConnection();
-      // eslint-disable-next-line no-unused-vars
-      const [results, fields] = await connection.query(getBasicInfoQuery, userID);
-      connection.end();
-      console.log(results);
-      if (results[1].length === 0) {
-        results[1].push({ ReviewCount: 0 });
-      }
-      response.writeHead(200, {
-        'Content-Type': 'text/plain',
-      });
-      response.end(JSON.stringify(results));
-    } else {
-      response.writeHead(401, {
-        'Content-Type': 'text/plain',
-      });
-      response.end('Invalid User');
-    }
+    const customer = await Customer.findOne({ CustomerID: _id }, { RegisteredEvents: 0 }).exec();
+
+    const reviewCount = await Reviews.find({ CustomerID: _id }).countDocuments();
+    const results = {
+      customer,
+      reviewCount,
+    };
+
+    response.writeHead(200, {
+      'Content-Type': 'application/json',
+    });
+    response.end(JSON.stringify(results));
   } catch (error) {
     response.writeHead(401, {
       'Content-Type': 'text/plain',
@@ -192,237 +133,23 @@ const getBasicInfo = async (request, response) => {
   return response;
 };
 
-// get data static + user for update profile
-const getDataForCustomerUpdateProfile = async (request, response) => {
+// Update Customer profile // MongoDB Implemented
+const updateProfile = async (customer, response) => {
   try {
-    const userID = getUserIdFromToken(request.cookies.cookie, request.cookies.userrole);
-    if (userID) {
-      const getDataForCustomerUpdateProfileQuery = 'CALL getDataForCustomerUpdateProfile(?)';
-
-      const connection = await mysqlConnection();
-      // eslint-disable-next-line no-unused-vars
-      const [results, fields] = await connection.query(
-        getDataForCustomerUpdateProfileQuery,
-        userID
-      );
-      connection.end();
-      console.log(results);
-
-      response.writeHead(200, {
-        'Content-Type': 'text/plain',
-      });
-      response.end(JSON.stringify(results));
-    } else {
-      response.writeHead(401, {
-        'Content-Type': 'text/plain',
-      });
-      response.end('Invalid User');
-    }
-  } catch (error) {
-    response.writeHead(401, {
-      'Content-Type': 'text/plain',
-    });
-    response.end('Network Error');
-  }
-  return response;
-};
-
-// Update Customer profile
-const updateProfile = async (request, response) => {
-  const {
-    First_Name,
-    Last_Name,
-    Nick_Name,
-    Gender,
-    Date_Of_Birth,
-    Country_ID,
-    State_ID,
-    City,
-    Zip,
-    Street,
-    Headline,
-    I_Love,
-    Find_Me_In,
-    Website,
-    token,
-    userrole,
-    ImageUrl,
-  } = request.body;
-  try {
-    const cusID = getUserIdFromToken(token, userrole);
-    if (cusID) {
-      const updateCustomerProfileQuery =
-        'CALL updateCustomerProfile(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
-
-      const connection = await mysqlConnection();
-      // eslint-disable-next-line no-unused-vars
-      const [results, fields] = await connection.query(updateCustomerProfileQuery, [
-        cusID,
-        First_Name,
-        Last_Name,
-        Nick_Name,
-        Gender,
-        Date_Of_Birth,
-        Country_ID,
-        State_ID,
-        City,
-        Zip,
-        Street,
-        Headline,
-        I_Love,
-        Find_Me_In,
-        Website,
-        ImageUrl,
-      ]);
-      connection.end();
-      console.log(results);
-      response.writeHead(204, {
-        'Content-Type': 'text/plain',
-      });
-      response.end('Profile Update Successfully');
-    } else {
-      response.writeHead(401, {
-        'Content-Type': 'text/plain',
-      });
-      response.end('Invalid User');
-    }
-  } catch (error) {
-    response.writeHead(500, {
-      'Content-Type': 'text/plain',
-    });
-    response.end('Network error');
-  }
-  return response;
-};
-
-// Get Contact Information
-const getContactInfo = async (request, response) => {
-  try {
-    const userID = getUserIdFromToken(request.cookies.cookie, request.cookies.userrole);
-    if (userID) {
-      const getContactInfoQuery = 'CALL getContactInfoProfile(?)';
-
-      const connection = await mysqlConnection();
-      // eslint-disable-next-line no-unused-vars
-      const [results, fields] = await connection.query(getContactInfoQuery, userID);
-      connection.end();
-      console.log(results);
-
-      response.writeHead(200, {
-        'Content-Type': 'text/plain',
-      });
-      response.end(JSON.stringify(results));
-    } else {
-      response.writeHead(401, {
-        'Content-Type': 'text/plain',
-      });
-      response.end('Invalid User');
-    }
-  } catch (error) {
-    response.writeHead(401, {
-      'Content-Type': 'text/plain',
-    });
-    response.end('Network Error');
-  }
-  return response;
-};
-
-// Update Customer Contact Information
-const updateContactInfo = async (request, response) => {
-  const { Email, NewEmail, ContactNo, Password, CountryCode, token, userrole } = request.body;
-
-  try {
-    const cusID = getUserIdFromToken(token, userrole);
-    if (cusID) {
-      const getUserDetails = 'CALL getPassword(?)';
-      const connection = await mysqlConnection();
-      let [results, fields] = await connection.query(getUserDetails, cusID);
-
-      if (await bcrypt.compare(Password, results[0][0].password)) {
-        let updateContactInfoQuery = '';
-
-        if (NewEmail === Email) {
-          updateContactInfoQuery = 'CALL updateContactInformation2(?,?,?)';
-
-          [results, fields] = await connection.query(updateContactInfoQuery, [
-            cusID,
-            ContactNo,
-            CountryCode,
-          ]);
-          connection.end();
-          console.log(results);
-          response.writeHead(204, {
-            'Content-Type': 'text/plain',
-          });
-          response.end('Contact Information successfully');
-        } else {
-          updateContactInfoQuery = 'CALL updateContactInformation(?,?,?,?,?)';
-          // eslint-disable-next-line no-unused-vars
-          [results, fields] = await connection.query(updateContactInfoQuery, [
-            cusID,
-            Email,
-            NewEmail,
-            ContactNo,
-            CountryCode,
-          ]);
-          connection.end();
-          console.log(results);
-          if (results[0][0] && results[0][0].result === 'Email Already Exists') {
-            response.writeHead(401, {
-              'Content-Type': 'text/plain',
-            });
-            response.end('Email Already Exists');
-          } else {
-            response.writeHead(204, {
-              'Content-Type': 'text/plain',
-            });
-            response.end('Contact Information successfully');
-          }
-        }
-      } else {
-        response.writeHead(401, {
+    Customer.updateOne({ CustomerID: customer.CustomerID }, { ...customer }, async (error) => {
+      if (error) {
+        response.writeHead(500, {
           'Content-Type': 'text/plain',
         });
-        response.end('Incorrect Password');
+        response.end('Network Error');
+      } else {
+        // console.log(data);
+        response.writeHead(204, {
+          'Content-Type': 'text/plain',
+        });
+        response.end('Profile Updated Successfully');
       }
-    } else {
-      response.writeHead(401, {
-        'Content-Type': 'text/plain',
-      });
-      response.end('Invalid User');
-    }
-  } catch (error) {
-    response.writeHead(500, {
-      'Content-Type': 'text/plain',
     });
-    response.end('Network error');
-  }
-  return response;
-};
-
-// Get Contact Information
-const getCustomerCompleteProfile = async (request, response) => {
-  try {
-    const userID = getUserIdFromToken(request.cookies.cookie, request.cookies.userrole);
-    if (userID) {
-      const getCustomerCompleteProfileQuery = 'CALL getCustomerCompleteProfile(?)';
-
-      const connection = await mysqlConnection();
-      // eslint-disable-next-line no-unused-vars
-      const [results, fields] = await connection.query(getCustomerCompleteProfileQuery, userID);
-      connection.end();
-      console.log(results);
-
-      response.writeHead(200, {
-        'Content-Type': 'text/plain',
-      });
-      response.end(JSON.stringify(results));
-    } else {
-      response.writeHead(401, {
-        'Content-Type': 'text/plain',
-      });
-      response.end('Invalid User');
-    }
   } catch (error) {
     response.writeHead(401, {
       'Content-Type': 'text/plain',
@@ -434,27 +161,21 @@ const getCustomerCompleteProfile = async (request, response) => {
 
 const uploadCustomerProfilePic = async (req, res) => {
   try {
-    const userID = getUserIdFromToken(req.cookies.cookie, req.cookies.userrole);
-    if (userID) {
-      multipleUpload(req, res, function (err) {
-        if (err instanceof multer.MulterError) {
-          res.json({ status: 400, error: err.message });
-        } else if (err) {
-          res.json({ status: 400, error: err.message });
-        } else {
-          console.log(req.file.location);
-          res.writeHead(200, {
-            'Content-Type': 'text/plain',
-          });
-          res.end(req.file.location);
-        }
-      });
-    } else {
-      res.writeHead(401, {
-        'Content-Type': 'text/plain',
-      });
-      res.end('Invalid User');
-    }
+    // console.log(req.body);
+    multipleUpload(req, res, function (err) {
+      if (err instanceof multer.MulterError) {
+        res.json({ status: 400, error: err.message });
+      } else if (err) {
+        res.json({ status: 400, error: err.message });
+      } else {
+        // console.log(req.file.location);
+        res.writeHead(200, {
+          'Content-Type': 'text/plain',
+        });
+        // console.log('data:', data);
+        res.end(req.file.location);
+      }
+    });
   } catch (error) {
     res.writeHead(401, {
       'Content-Type': 'text/plain',
@@ -462,6 +183,73 @@ const uploadCustomerProfilePic = async (req, res) => {
     res.end('Network Error');
   }
   return res;
+};
+
+// Update Customer Contact Information
+const updateContactInfo = async (request, response) => {
+  const { Password, customerInfo } = request.body;
+
+  try {
+    const user = await UserSignup.findOne(
+      { _id: customerInfo.CustomerID },
+      { Password: 1, Role: 1 }
+    ).exec();
+    let token;
+    if (await bcrypt.compare(Password, user.Password)) {
+      if (customerInfo.NewEmail !== customerInfo.Email) {
+        const payload = {
+          _id: customerInfo.CustomerID,
+          userrole: user.Role,
+          email: customerInfo.NewEmail,
+        };
+
+        token = await jwt.sign(payload, process.env.SESSION_SECRET, {
+          expiresIn: 1008000,
+        });
+        UserSignup.updateOne(
+          { _id: customerInfo.CustomerID },
+          { Email: customerInfo.NewEmail },
+          async (error) => {
+            if (error) {
+              response.writeHead(500, {
+                'Content-Type': 'text/plain',
+              });
+              response.end('Network Error');
+            }
+          }
+        );
+      }
+      Customer.updateOne(
+        { CustomerID: customerInfo.CustomerID },
+        { PhoneNo: customerInfo.PhoneNo, Email: customerInfo.NewEmail },
+        async (error) => {
+          if (error) {
+            response.writeHead(500, {
+              'Content-Type': 'text/plain',
+            });
+            response.end('Network Error');
+          } else {
+            // console.log(data);
+            response.writeHead(200, {
+              'Content-Type': 'text/plain',
+            });
+            response.end(`JWT ${token}`);
+          }
+        }
+      );
+    } else {
+      response.writeHead(401, {
+        'Content-Type': 'text/plain',
+      });
+      response.end('Incorrect Password');
+    }
+  } catch (error) {
+    response.writeHead(500, {
+      'Content-Type': 'text/plain',
+    });
+    response.end('Network error');
+  }
+  return response;
 };
 
 const generateOrderMenuString = async (orderdCart) => {
@@ -744,12 +532,9 @@ const orderDetailsFetch = async (request, response) => {
 
 module.exports = {
   signup,
-  getBasicInfo,
-  getDataForCustomerUpdateProfile,
+  getCustomerInfo,
   updateProfile,
-  getContactInfo,
   updateContactInfo,
-  getCustomerCompleteProfile,
   uploadCustomerProfilePic,
   generateOrder,
   submitReview,

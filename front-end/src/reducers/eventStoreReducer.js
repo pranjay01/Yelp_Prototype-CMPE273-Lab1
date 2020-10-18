@@ -14,7 +14,6 @@ const defaultState = {
     PageCount: 0,
     sortValue: 'upcoming',
     selectedPage: 0,
-    // orderDetails: [],
   },
 };
 
