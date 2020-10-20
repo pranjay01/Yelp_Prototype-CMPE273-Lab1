@@ -33,30 +33,6 @@ class ReviewList extends Component {
 
   componentDidMount() {
     this.fetchReviews(0);
-    // axios
-    //   .get(serverUrl + 'biz/fetchReviews', {
-    //     params: {
-    //       selectedPage: 0,
-    //       RestaurantID: localStorage.getItem('userId'),
-    //     },
-    //     withCredentials: true,
-    //   })
-    //   .then((response) => {
-    //     console.log('Review list Fetched', response.data);
-    //     let Reviews = response.data.ReviewsList.map((Review) => {
-    //       return {
-    //         ...Review,
-    //         ReviewDate: new Date(Review.ReviewDate),
-    //       };
-    //     });
-
-    //     let payload = {
-    //       Reviews,
-    //       reviewCount: response.data.reviewCount,
-    //       PageCount: Math.ceil(response.data.reviewCount / 4),
-    //     };
-    //     this.props.updateReviewList(payload);
-    //   });
   }
 
   fetchReviews(pageNumber) {

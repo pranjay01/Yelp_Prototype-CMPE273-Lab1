@@ -28,6 +28,8 @@ const Customer = require('../Models/Customer');
 
 const Reviews = require('../Models/Review');
 
+const Orders = require('../Models/Order');
+
 const multipleUpload = multer({
   storage: multerS3({
     s3: s3Storage,
@@ -185,7 +187,7 @@ const uploadCustomerProfilePic = async (req, res) => {
   return res;
 };
 
-// Update Customer Contact Information
+// Update Customer Contact Information //MongoDB Implemented
 const updateContactInfo = async (request, response) => {
   const { Password, customerInfo } = request.body;
 
@@ -252,73 +254,28 @@ const updateContactInfo = async (request, response) => {
   return response;
 };
 
-const generateOrderMenuString = async (orderdCart) => {
-  let orderdString = '';
-  // eslint-disable-next-line no-restricted-syntax
-  for (const item of orderdCart) {
-    orderdString = orderdString.concat(item.ID);
-    orderdString = orderdString.concat(':');
-    switch (item.MenuCategory) {
-      case 'APPETIZERS':
-        orderdString = orderdString.concat('1');
-        break;
-      case 'DESSERTS':
-        orderdString = orderdString.concat('3');
-        break;
-      case 'BEVERAGES':
-        orderdString = orderdString.concat('4');
-        break;
-      case 'MAIN_COURSE':
-        orderdString = orderdString.concat('5');
-        break;
-      case 'SALADS':
-        orderdString = orderdString.concat('2');
-        break;
-      default:
-        break;
-    }
-    orderdString = orderdString.concat(':');
-    orderdString = orderdString.concat(item.Quantity);
-    orderdString = orderdString.concat(';');
-  }
-  orderdString = orderdString.substring(0, orderdString.length - 1);
-  return orderdString;
-};
-
-// Generate Order
+// Generate Order // MongoDB Implemented
 const generateOrder = async (request, response) => {
-  const { RestroId, Price, foodCart, address, deliveryMode, token, userrole } = request.body;
+  // const { RestroId, Price, foodCart, address, deliveryMode, token, userrole } = request.body;
 
   try {
-    const cusID = getUserIdFromToken(token, userrole);
-    if (cusID) {
-      const generateOrderQuery = 'CALL generateOrder(?,?,?,?,?,?)';
-
-      const connection = await mysqlConnection();
-      const deliveryType = deliveryMode === 'Delivery' ? 1 : 2;
-      const orderdMenu = await generateOrderMenuString(foodCart);
-
-      // eslint-disable-next-line no-unused-vars
-      const [results, fields] = await connection.query(generateOrderQuery, [
-        RestroId,
-        cusID,
-        deliveryType,
-        orderdMenu,
-        Price,
-        address,
-      ]);
-      connection.end();
-      console.log(results);
-      response.writeHead(200, {
-        'Content-Type': 'text/plain',
-      });
-      response.end('Order Created Successfully');
-    } else {
-      response.writeHead(401, {
-        'Content-Type': 'text/plain',
-      });
-      response.end('Invalid User');
-    }
+    const newOrder = new Orders({
+      ...request.body,
+    });
+    newOrder.save((err, result) => {
+      if (err) {
+        response.writeHead(500, {
+          'Content-Type': 'text/plain',
+        });
+        response.end('Network Error');
+      } else {
+        response.writeHead(201, {
+          'Content-Type': 'text/plain',
+        });
+        response.end('Order Created Successfully');
+        console.log(result);
+      }
+    });
   } catch (error) {
     response.writeHead(500, {
       'Content-Type': 'text/plain',
@@ -330,34 +287,24 @@ const generateOrder = async (request, response) => {
 
 // Submit Review
 const submitReview = async (request, response) => {
-  const { RestroId, review, rating, token, userrole } = request.body;
-
   try {
-    const cusID = getUserIdFromToken(token, userrole);
-    if (cusID) {
-      const submitReviewQuery = 'CALL submitReview(?,?,?,?)';
-
-      const connection = await mysqlConnection();
-
-      // eslint-disable-next-line no-unused-vars
-      const [results, fields] = await connection.query(submitReviewQuery, [
-        rating,
-        RestroId,
-        cusID,
-        review,
-      ]);
-      connection.end();
-      console.log(results);
-      response.writeHead(200, {
-        'Content-Type': 'text/plain',
-      });
-      response.end('Review Created Successfully');
-    } else {
-      response.writeHead(401, {
-        'Content-Type': 'text/plain',
-      });
-      response.end('Invalid User');
-    }
+    const newReview = new Reviews({
+      ...request.body,
+    });
+    newReview.save((err, result) => {
+      if (err) {
+        response.writeHead(500, {
+          'Content-Type': 'text/plain',
+        });
+        response.end('Network Error');
+      } else {
+        response.writeHead(201, {
+          'Content-Type': 'text/plain',
+        });
+        response.end(JSON.stringify(result));
+        console.log(result);
+      }
+    });
   } catch (error) {
     response.writeHead(500, {
       'Content-Type': 'text/plain',
@@ -401,7 +348,7 @@ const getEventList = async (request, response) => {
   return response;
 };
 
-// Submit Review
+// Submit Review //MongoDB IMplemented
 const registerForEvent = async (request, response) => {
   const { eventId, token, userrole } = request.body;
 

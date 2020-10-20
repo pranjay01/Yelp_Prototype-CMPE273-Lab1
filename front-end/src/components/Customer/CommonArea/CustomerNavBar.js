@@ -12,13 +12,15 @@ import {
   updateSearchStrings,
 } from '../../../constants/action-types';
 import { connect } from 'react-redux';
-import { history } from '../../../App';
+// import { history } from '../../../App';
+// import { Redirect } from 'react-router';
 import SuggestedNames from '../Home/SuggestedNames';
 
 class CustomerNavBar extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      // openRestaurantList: false,
       SearchFilters: [
         { ID: 1, Value: 'Restaurant Name' },
         { ID: 2, Value: 'Food Items' },
@@ -28,6 +30,8 @@ class CustomerNavBar extends Component {
     };
   }
   componentDidMount() {
+    const payload = { serchedString: '' };
+    this.props.updateSearchedString(payload);
     axios
       .get(
         serverUrl + 'static/getSearchStrings',
@@ -35,32 +39,27 @@ class CustomerNavBar extends Component {
         { withCredentials: true }
       )
       .then((response) => {
-        let RestaurantNameStrings = response.data[0].map((strings) => {
-          return strings.Name;
+        let RestaurantNameStrings = response.data.NameLocation.map((restro) => {
+          return restro.Name;
         });
-        let FoodItemsStrings = response.data[1].map((strings) => {
-          return strings.Name;
-        });
-        let CuisinesStrings = response.data[2].map((strings) => {
-          return strings.Name;
-        });
-        let LocationStrings = response.data[3].map((strings) => {
-          return strings.Name;
+        let LocationStrings = response.data.NameLocation.map((restro) => {
+          return restro.location;
         });
 
-        console.log(response.data);
+        let FoodItemsStrings = response.data.FoodItemsStrings.map((food) => {
+          return food.FoodName;
+        });
+        let CuisinesStrings = response.data.FoodItemsStrings.map((food) => {
+          return food.Cuisine;
+        });
         let payload = {
-          RestaurantNameStrings,
-          FoodItemsStrings,
-          CuisinesStrings,
-          LocationStrings,
+          RestaurantNameStrings: Array.from(new Set(RestaurantNameStrings)),
+          FoodItemsStrings: Array.from(new Set(FoodItemsStrings)),
+          CuisinesStrings: Array.from(new Set(CuisinesStrings)),
+          LocationStrings: Array.from(new Set(LocationStrings)),
         };
         this.props.updateSeprateStrings(payload);
       });
-
-    // localStorage.setItem('SearchedString', '');
-    // localStorage.setItem('SearchFilter', '');
-    //localStorage.setItem('SearchedString', '');
   }
 
   onChangeselectedFilter = (event) => {
@@ -102,25 +101,22 @@ class CustomerNavBar extends Component {
 
   openRestroListPage = (string) => {
     localStorage.setItem('SearchedString', string);
-    console.log(string);
     const payload = { serchedString: string };
     this.props.updateSearchedString(payload);
-    history.push('/RestaurantList');
-    //window.location.reload(false);
   };
 
   getRestaurants = (event) => {
-    //history.push('/RestaurantList');
-
-    //window.location.reload(false);
-    //history.push('/RestaurantList');
-    //event.preventDefault();
     this.openRestroListPage(this.props.searchTabInfo.serchedString);
   };
 
   render() {
+    // let redirectVar = null;
+    // if (this.state.openRestaurantList) {
+    //   redirectVar = <Redirect to="/RestaurantList" />;
+    // }
     return (
       <div className="lemon--div__09f24__1mboc sticky-wrapper__09f24__3Aajw pageHeader__09f24__Ey1v7 border-color--default__09f24__R1nRO">
+        {/*redirectVar*/}
         <div className="lemon--div__09f24__1mboc consumer-header-container__09f24__2iDVS border--bottom__09f24__2FjZW border-color--default__09f24__R1nRO background-color--white__09f24__2jFAt">
           <div className="lemon--div__09f24__1mboc consumer-header__09f24__5vTsM border-color--default__09f24__R1nRO">
             <div className="lemon--div__09f24__1mboc arrange__09f24__AiSIM vertical-align-middle__09f24__zNCcM border-color--default__09f24__R1nRO">

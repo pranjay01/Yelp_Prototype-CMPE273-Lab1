@@ -1,9 +1,17 @@
+/* eslint-disable no-underscore-dangle */
 const url = require('url');
-const mysqlConnection = require('../mysqlConnection');
+// const mysqlConnection = require('../mysqlConnection');
 const Country = require('../Models/Country');
 const State = require('../Models/State');
 const Gender = require('../Models/Gender');
 const Cusinie = require('../Models/Cusinie');
+const Restaurant = require('../Models/Restaurant');
+const Appetizer = require('../Models/Appetizer');
+const Beverage = require('../Models/Beverage');
+const Dessert = require('../Models/Dessert');
+const MainCourse = require('../Models/MainCourse');
+const Salad = require('../Models/Salad');
+const Review = require('../Models/Review');
 require('dotenv').config();
 
 // MongoDb Implemented
@@ -137,25 +145,7 @@ const getSignupMasterData = async (response) => {
   return results;
 };
 
-/*
-const getSignupMasterDataCustomer = async (response) => {
-  const getMasterData = 'CALL getSignupMasterDataCustomer()';
-  // 1 is for enum value customer
-  const connection = await mysqlConnection();
-  // eslint-disable-next-line no-unused-vars
-  const [results, fields] = await connection.query(getMasterData);
-
-  connection.end();
-  response.writeHead(200, {
-    'Content-Type': 'application/json',
-  });
-  // eslint-disable-next-line no-console
-  console.log('SignupMaster for Customer : ', JSON.stringify(results));
-  response.end(JSON.stringify(results));
-  return response;
-};
-*/
-
+// MongoDbImplemented
 const getCusinesForMenu = async (response) => {
   try {
     Cusinie.find(await {}, async (error, cuisine) => {
@@ -179,32 +169,36 @@ const getCusinesForMenu = async (response) => {
   return response;
 };
 
-const getDeliverStatus = async (response) => {
-  const getDeliverStatusQuery = 'CALL getDeliverStatus()';
-  // 1 is for enum value customer
-  const connection = await mysqlConnection();
-  // eslint-disable-next-line no-unused-vars
-  const [results, fields] = await connection.query(getDeliverStatusQuery);
-
-  connection.end();
-  response.writeHead(200, {
-    'Content-Type': 'application/json',
-  });
-  // eslint-disable-next-line no-console
-  console.log('Delivery statuses of orders : ', JSON.stringify(results));
-  response.end(JSON.stringify(results));
-  return response;
-};
-
+// MongoDbImplemented
 const getSearchStrings = async (request, response) => {
   try {
-    const fetchSTringsForSearchQuery = 'CALL fetchSTringsForSearch()';
+    const NameLocation = await Restaurant.aggregate([
+      {
+        $addFields: {
+          location: {
+            $concat: ['$StateName', ', ', '$City', ', ', '$Street'],
+          },
+        },
+      },
+      {
+        $project: { location: 1, Name: 1, _id: 0 },
+      },
+    ]);
 
-    const connection = await mysqlConnection();
-    // eslint-disable-next-line no-unused-vars
-    const [results, fields] = await connection.query(fetchSTringsForSearchQuery);
-    connection.end();
-    // console.log(results);
+    // const RestaurantNameStrings = await Restaurant.distinct('Name');
+    const Appetizers = await Appetizer.find({}, { FoodName: 1, Cuisine: 1, _id: 0 });
+    const Beverages = await Beverage.find({}, { FoodName: 1, Cuisine: 1, _id: 0 });
+    const Desserts = await Dessert.find({}, { FoodName: 1, Cuisine: 1, _id: 0 });
+    const Salads = await Salad.find({}, { FoodName: 1, Cuisine: 1, _id: 0 });
+    const MainCourses = await MainCourse.find({}, { FoodName: 1, Cuisine: 1, _id: 0 });
+
+    // const FoodItemsStrings = [];
+    const FoodItemsStrings = [...Appetizers, ...Beverages, ...Desserts, ...Salads, ...MainCourses];
+
+    const results = {
+      NameLocation,
+      FoodItemsStrings,
+    };
 
     response.writeHead(200, {
       'Content-Type': 'text/plain',
@@ -219,21 +213,222 @@ const getSearchStrings = async (request, response) => {
   return response;
 };
 
-// get restuarant result on basis of searched string and filter criteria
+// get restuarant result on basis of searched string and filter criteria // MongoDbImplemented
 const fetchRestaurantResults = async (req, res) => {
-  const { filter, searchString } = url.parse(req.url, true).query;
+  const { filter, searchString, selectedPage } = url.parse(req.url, true).query;
   try {
-    const fetchRestaurantResultsQuery = 'CALL fetchRestaurantResults(?,?)';
+    let restaurantList = [];
+    let restaurantCount = 0;
+    switch (filter) {
+      case '1': {
+        restaurantList = await Restaurant.find({
+          Name: { $regex: `${searchString}`, $options: 'i' },
+        })
+          .skip(selectedPage * 2)
+          .limit(2)
+          .exec();
+        restaurantCount = await Restaurant.find({
+          Name: { $regex: `${searchString}`, $options: 'i' },
+        }).countDocuments();
+        break;
+      }
+      case '2': {
+        const concernedAppetizersIds = await Appetizer.find(
+          {
+            FoodName: { $regex: `${searchString}`, $options: 'i' },
+          },
+          { _id: 0, RestaurantID: 1 }
+        ).exec();
+        const concernedSaladsIds = await Salad.find(
+          {
+            FoodName: { $regex: `${searchString}`, $options: 'i' },
+          },
+          { _id: 0, RestaurantID: 1 }
+        ).exec();
+        const concernedBeveragesIds = await Beverage.find(
+          {
+            FoodName: { $regex: `${searchString}`, $options: 'i' },
+          },
+          { _id: 0, RestaurantID: 1 }
+        ).exec();
+        const concernedMainCourseIds = await MainCourse.find(
+          {
+            FoodName: { $regex: `${searchString}`, $options: 'i' },
+          },
+          { _id: 0, RestaurantID: 1 }
+        ).exec();
+        const concernedDessertsIds = await Dessert.find(
+          {
+            FoodName: { $regex: `${searchString}`, $options: 'i' },
+          },
+          { _id: 0, RestaurantID: 1 }
+        ).exec();
+        const concernedIdsA = concernedAppetizersIds.map((result) => {
+          return result.RestaurantID;
+        });
+        const concernedIdsS = concernedSaladsIds.map((result) => {
+          return result.RestaurantID;
+        });
+        const concernedIdsB = concernedBeveragesIds.map((result) => {
+          return result.RestaurantID;
+        });
+        const concernedIdsM = concernedMainCourseIds.map((result) => {
+          return result.RestaurantID;
+        });
+        const concernedIdsD = concernedDessertsIds.map((result) => {
+          return result.RestaurantID;
+        });
+        restaurantList = await Restaurant.find({
+          RestaurantID: {
+            $in: [
+              ...concernedIdsA,
+              ...concernedIdsS,
+              ...concernedIdsB,
+              ...concernedIdsM,
+              ...concernedIdsD,
+            ],
+          },
+        })
+          .skip(selectedPage * 2)
+          .limit(2)
+          .exec();
+        restaurantCount = await Restaurant.find({
+          RestaurantID: {
+            $in: [
+              ...concernedIdsA,
+              ...concernedIdsS,
+              ...concernedIdsB,
+              ...concernedIdsM,
+              ...concernedIdsD,
+            ],
+          },
+        }).countDocuments();
+        break;
+      }
+      case '3': {
+        const concernedAppetizersIds = await Appetizer.find(
+          {
+            Cuisine: { $regex: `${searchString}`, $options: 'i' },
+          },
+          { _id: 0, RestaurantID: 1 }
+        ).exec();
+        const concernedSaladsIds = await Salad.find(
+          {
+            Cuisine: { $regex: `${searchString}`, $options: 'i' },
+          },
+          { _id: 0, RestaurantID: 1 }
+        ).exec();
+        const concernedBeveragesIds = await Beverage.find(
+          {
+            Cuisine: { $regex: `${searchString}`, $options: 'i' },
+          },
+          { _id: 0, RestaurantID: 1 }
+        ).exec();
+        const concernedMainCourseIds = await MainCourse.find(
+          {
+            Cuisine: { $regex: `${searchString}`, $options: 'i' },
+          },
+          { _id: 0, RestaurantID: 1 }
+        ).exec();
+        const concernedDessertsIds = await Dessert.find(
+          {
+            Cuisine: { $regex: `${searchString}`, $options: 'i' },
+          },
+          { _id: 0, RestaurantID: 1 }
+        ).exec();
+        const concernedIdsA = concernedAppetizersIds.map((result) => {
+          return result.RestaurantID;
+        });
+        const concernedIdsS = concernedSaladsIds.map((result) => {
+          return result.RestaurantID;
+        });
+        const concernedIdsB = concernedBeveragesIds.map((result) => {
+          return result.RestaurantID;
+        });
+        const concernedIdsM = concernedMainCourseIds.map((result) => {
+          return result.RestaurantID;
+        });
+        const concernedIdsD = concernedDessertsIds.map((result) => {
+          return result.RestaurantID;
+        });
+        restaurantList = await Restaurant.find({
+          RestaurantID: {
+            $in: [
+              ...concernedIdsA,
+              ...concernedIdsS,
+              ...concernedIdsB,
+              ...concernedIdsM,
+              ...concernedIdsD,
+            ],
+          },
+        })
+          .skip(selectedPage * 2)
+          .limit(2)
+          .exec();
+        restaurantCount = await Restaurant.find({
+          RestaurantID: {
+            $in: [
+              ...concernedIdsA,
+              ...concernedIdsS,
+              ...concernedIdsB,
+              ...concernedIdsM,
+              ...concernedIdsD,
+            ],
+          },
+        }).countDocuments();
+        break;
+      }
+      default: {
+        restaurantList = await Restaurant.aggregate([
+          {
+            $addFields: {
+              location: {
+                $concat: ['$StateName', ', ', '$City', ', ', '$Street'],
+              },
+            },
+          },
+          //     { $limit: 2 },
 
-    const connection = await mysqlConnection();
-    // eslint-disable-next-line no-unused-vars
-    const [results, fields] = await connection.query(fetchRestaurantResultsQuery, [
-      filter,
-      searchString,
-    ]);
-    connection.end();
-    // console.log(results);
+          {
+            $match: {
+              location: {
+                $regex: `${searchString}`,
+                $options: 'i',
+              },
+            },
+          },
+        ])
+          .skip(selectedPage * 2)
+          .limit(2);
+        restaurantCount = await Restaurant.aggregate([
+          {
+            $addFields: {
+              location: {
+                $concat: ['$StateName', ', ', '$City', ', ', '$Street'],
+              },
+            },
+          },
+          {
+            $match: {
+              location: {
+                $regex: `${searchString}`,
+                $options: 'i',
+              },
+            },
+          },
+          {
+            $count: 'restaurantCount',
+          },
+        ]);
+        restaurantCount = restaurantCount[0].restaurantCount;
+        break;
+      }
+    }
 
+    const results = {
+      restaurantList,
+      restaurantCount,
+    };
     res.writeHead(200, {
       'Content-Type': 'text/plain',
     });
@@ -247,71 +442,23 @@ const fetchRestaurantResults = async (req, res) => {
   return res;
 };
 
-// get restuarant result on basis of searched string and filter criteria
-const fetchReviews = async (req, res) => {
-  const { restroId } = url.parse(req.url, true).query;
-  try {
-    const fetchReviewsQuery = 'CALL fetchReviews(?)';
-
-    const connection = await mysqlConnection();
-    // eslint-disable-next-line no-unused-vars
-    const [results, fields] = await connection.query(fetchReviewsQuery, restroId);
-    connection.end();
-    // console.log(results);
-
-    res.writeHead(200, {
-      'Content-Type': 'text/plain',
-    });
-    res.end(JSON.stringify(results));
-  } catch (error) {
-    res.writeHead(401, {
-      'Content-Type': 'text/plain',
-    });
-    res.end('Network Error');
-  }
-  return res;
-};
-
-// get restuarant result on basis of searched string and filter criteria
-const menuFetch = async (req, res) => {
-  const { restroId } = url.parse(req.url, true).query;
-  try {
-    const menuFetchForOrderQuery = 'CALL menuFetchForOrder(?)';
-
-    const connection = await mysqlConnection();
-    // eslint-disable-next-line no-unused-vars
-    const [results, fields] = await connection.query(menuFetchForOrderQuery, restroId);
-    connection.end();
-    // console.log(results);
-
-    res.writeHead(200, {
-      'Content-Type': 'text/plain',
-    });
-    res.end(JSON.stringify(results));
-  } catch (error) {
-    res.writeHead(401, {
-      'Content-Type': 'text/plain',
-    });
-    res.end('Network Error');
-  }
-  return res;
-};
-
-// get restuarant result on basis of searched string and filter criteria
+// get restuarant result on basis of searched string and filter criteria //mongodb Implemented
 const fetchRestaurantProfileForCustomer = async (req, res) => {
   const { restroId } = url.parse(req.url, true).query;
   try {
-    const fetchRestaurantProfileForCustomerQuery = 'CALL fetchRestaurantProfileForCustomer(?)';
-
-    const connection = await mysqlConnection();
-    // eslint-disable-next-line no-unused-vars
-    const [results, fields] = await connection.query(
-      fetchRestaurantProfileForCustomerQuery,
-      restroId
-    );
-    connection.end();
+    const RestaurantProfile = await Restaurant.findOne({ RestaurantID: restroId });
+    const AvgRating = await Review.aggregate([
+      { $group: { _id: '$RestaurantID', avgRating: { $avg: '$Rating' } } },
+      { $match: { _id: restroId } },
+    ]);
+    const ReviewList = await Review.find({ RestaurantID: restroId });
+    // {$match:{_id:}}
+    const results = {
+      RestaurantProfile,
+      AvgRating: Math.round(AvgRating[0].avgRating),
+      ReviewList,
+    };
     // console.log(results);
-
     res.writeHead(200, {
       'Content-Type': 'text/plain',
     });
@@ -324,6 +471,7 @@ const fetchRestaurantProfileForCustomer = async (req, res) => {
   }
   return res;
 };
+
 module.exports = {
   uploadCountryData,
   uploadGenderData,
@@ -331,11 +479,9 @@ module.exports = {
   uploadCuisineData,
   getSignupMasterData,
   getCusinesForMenu,
-  getDeliverStatus,
   getSearchStrings,
   fetchRestaurantResults,
-  fetchReviews,
-  menuFetch,
+
   fetchRestaurantProfileForCustomer,
 };
 // results = await getMasterData(res);

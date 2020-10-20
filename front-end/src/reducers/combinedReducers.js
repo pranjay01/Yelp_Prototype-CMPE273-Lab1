@@ -10,6 +10,7 @@ import restaurntFoodMenuReducer from './restaurntFoodMenuReducer';
 import reviewStoreReducer from './reviewStoreReducer';
 import orderStoreReducer from './orderStoreReducer';
 import eventStoreReducer from './eventStoreReducer';
+import searchedRestaurantReducer from './searchedRestaurantReducer';
 import { combineReducers } from 'redux';
 
 const finalReducers = combineReducers({
@@ -25,6 +26,7 @@ const finalReducers = combineReducers({
   reviewStoreReducer: reviewStoreReducer,
   orderStoreReducer: orderStoreReducer,
   eventStoreReducer: eventStoreReducer,
+  searchedRestaurantReducer: searchedRestaurantReducer,
 });
 
 export default finalReducers;

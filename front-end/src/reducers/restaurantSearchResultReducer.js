@@ -2,7 +2,11 @@ import { updateRestaurantArray } from '../constants/action-types';
 
 const defaultState = {
   restaurantArray: {
+    BackupRestaurantsList: [],
     restaurantSearchResults: [],
+    selectedPage: 0,
+    restaurantCount: 0,
+    pageCount: 0,
   },
 };
 const restaurantSearchResultReducer = (state = defaultState, action) => {

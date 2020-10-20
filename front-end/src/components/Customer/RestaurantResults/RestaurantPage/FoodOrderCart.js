@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import serverUrl from '../../../../config';
+import { updateSnackbarData, updateRestaurantFoodStore } from '../../../../constants/action-types';
+import { connect } from 'react-redux';
+import ReactPaginate from 'react-paginate';
+
 // import FoodInfo from './FoodInfo';
 class FoodOrderCart extends Component {
   constructor(props) {
@@ -9,105 +13,81 @@ class FoodOrderCart extends Component {
       totalPrice: 0,
       openedCategory: '',
       foodCart: [],
-      APPETIZERS: [],
-      BEVERAGES: [],
-      DESSERTS: [],
-      MAIN_COURSE: [],
-      SALADS: [],
+      selectedPage: 0,
     };
   }
 
-  componentDidMount() {
+  fromFoodCart(FoodID, MenuCategory) {
+    let index = this.state.foodCart.findIndex(
+      (x) => x.FoodID === FoodID && x.MenuCategory === MenuCategory
+    );
+    if (index >= 0) {
+      return this.state.foodCart[index].Quantity;
+    }
+    return 0;
+  }
+  commonFetch(category, selectedPage = 0) {
     axios
       .get(
         serverUrl + 'static/menuFetch',
 
         {
-          params: { restroId: localStorage.getItem('restaurantPageID') },
+          params: {
+            selectedPage,
+            category,
+            RestaurantID: localStorage.getItem('restaurantPageID'),
+          },
           withCredentials: true,
         }
       )
       .then((response) => {
-        console.log(response.data);
-        let allAppetizers = response.data[0].map((Appetizer) => {
+        let FoodMenu = response.data.allFoods.map((food) => {
           return {
-            ID: Appetizer.ID,
-            Name: Appetizer.Name,
-            Ingredients: Appetizer.Ingredients,
-            cuisine: Appetizer.cuisine,
-            Description: Appetizer.Description,
-            Price: Appetizer.Price,
+            ...food,
+            Quantity: this.fromFoodCart(food._id, category),
           };
         });
-        let allBeverages = response.data[1].map((Beverage) => {
-          return {
-            ID: Beverage.ID,
-            Name: Beverage.Name,
-            Ingredients: Beverage.Ingredients,
-            cuisine: Beverage.cuisine,
-            Description: Beverage.Description,
-            Price: Beverage.Price,
-          };
-        });
-        let allMainCourse = response.data[2].map((MainCourse) => {
-          return {
-            ID: MainCourse.ID,
-            Name: MainCourse.Name,
-            Ingredients: MainCourse.Ingredients,
-            cuisine: MainCourse.cuisine,
-            Description: MainCourse.Description,
-            Price: MainCourse.Price,
-          };
-        });
-        let allSalads = response.data[3].map((Salad) => {
-          return {
-            ID: Salad.ID,
-            Name: Salad.Name,
-            Ingredients: Salad.Ingredients,
-            cuisine: Salad.cuisine,
-            Description: Salad.Description,
-            Price: Salad.Price,
-          };
-        });
-        let allDesserts = response.data[4].map((Dessert) => {
-          return {
-            ID: Dessert.ID,
-            Name: Dessert.Name,
-            Ingredients: Dessert.Ingredients,
-            cuisine: Dessert.cuisine,
-            Description: Dessert.Description,
-            Price: Dessert.Price,
-          };
-        });
-
-        this.setState({
-          APPETIZERS: this.state.APPETIZERS.concat(allAppetizers),
-          BEVERAGES: this.state.BEVERAGES.concat(allBeverages),
-          MAIN_COURSE: this.state.MAIN_COURSE.concat(allMainCourse),
-          SALADS: this.state.SALADS.concat(allSalads),
-          DESSERTS: this.state.DESSERTS.concat(allDesserts),
-        });
+        // });
+        const payload = {
+          FoodMenu,
+          PageCount: Math.ceil(response.data.foodCount / 2),
+          FoodCount: response.data.foodCount,
+        };
+        this.props.updateRestaurantFoodStore(payload);
       });
   }
+
+  handlePageClick = (e) => {
+    this.commonFetch(this.state.openedCategory, e.selected);
+    this.setState({
+      selectedPage: e.selected,
+    });
+  };
+
   showMenuCategory = (category) => {
     if (category === this.state.openedCategory) {
+      const payload = {
+        FoodMenu: [],
+      };
+      this.props.updateRestaurantFoodStore(payload);
       this.setState({
         openedCategory: '',
       });
     } else {
+      this.commonFetch(category, 0);
       this.setState({
         openedCategory: category,
       });
     }
   };
 
-  onchangeUpdateCartHandler = (event, FoodId, Price) => {
-    console.log('Food cart befor any changes', this.state.foodCart);
+  onchangeUpdateCartHandler = (event, FoodID, Price, FoodName) => {
+    // console.log('Food cart befor any changes', this.state.foodCart);
     /**Check if input value is 0 or empty */
     if (event.target.value === '' || event.target.value === 0) {
       // Check if that item was present in food cart
       let index = this.state.foodCart.findIndex(
-        (x) => x.ID === FoodId && x.MenuCategory === this.state.openedCategory
+        (x) => x.FoodID === FoodID && x.MenuCategory === this.state.openedCategory
       );
       // get item details from food cart, and remove it from the food cart
       if (index >= 0) {
@@ -115,7 +95,6 @@ class FoodOrderCart extends Component {
         let reducedPrice = item.Quantity * Price;
         let foodCart = [...this.state.foodCart];
         foodCart.splice(index, 1);
-        console.log('Food cart after removing item any changes', foodCart);
         let total_Price = (this.state.totalPrice - reducedPrice).toFixed(2);
         const totalPrice = +total_Price;
         this.setState({
@@ -125,7 +104,7 @@ class FoodOrderCart extends Component {
       }
     } else {
       let index = this.state.foodCart.findIndex(
-        (x) => x.ID === FoodId && x.MenuCategory === this.state.openedCategory
+        (x) => x.FoodID === FoodID && x.MenuCategory === this.state.openedCategory
       );
       // check if item already present in food cart
       if (index >= 0) {
@@ -135,14 +114,14 @@ class FoodOrderCart extends Component {
         let changeInPrice = (event.target.value - oldCount) * Price;
         item.Quantity = event.target.value;
         foodCart[index] = item;
-        console.log('Food cart after updating item quantity', foodCart);
         let total_Price = (this.state.totalPrice + changeInPrice).toFixed(2);
         const totalPrice = +total_Price;
         this.setState({ foodCart, totalPrice });
         //fetch old item, and udate the count
       } else {
         let item = {
-          ID: FoodId,
+          FoodID,
+          FoodName,
           MenuCategory: this.state.openedCategory,
           Price: Price,
           Quantity: event.target.value,
@@ -155,62 +134,17 @@ class FoodOrderCart extends Component {
           totalPrice,
         });
       }
-      console.log('Food cart after adding new item', this.state.foodCart);
     }
 
-    let index = null;
-    let foodItem = null;
-    switch (this.state.openedCategory) {
-      case 'APPETIZERS':
-        console.log('Appetizers before quantity addition', this.state.APPETIZERS);
-        index = this.state.APPETIZERS.findIndex((x) => x.ID === FoodId);
-        let APPETIZERS = [...this.state.APPETIZERS];
-        foodItem = { ...APPETIZERS[index] };
-        foodItem.Quantity = event.target.value;
-        APPETIZERS[index] = foodItem;
-        this.setState({ APPETIZERS });
-        console.log('Appetizers after quantity addition', this.state.APPETIZERS);
-        break;
-      case 'DESSERTS':
-        console.log('DESSERTS before quantity addition', this.state.DESSERTS);
-        index = this.state.DESSERTS.findIndex((x) => x.ID === FoodId);
-        let DESSERTS = [...this.state.DESSERTS];
-        foodItem = { ...DESSERTS[index] };
-        foodItem.Quantity = event.target.value;
-        DESSERTS[index] = foodItem;
-        this.setState({ DESSERTS });
-        console.log('DESSERTS after quantity addition', this.state.DESSERTS);
-        break;
-      case 'BEVERAGES':
-        console.log('BEVERAGES before quantity addition', this.state.BEVERAGES);
-        index = this.state.BEVERAGES.findIndex((x) => x.ID === FoodId);
-        let BEVERAGES = [...this.state.BEVERAGES];
-        foodItem = { ...BEVERAGES[index] };
-        foodItem.Quantity = event.target.value;
-        BEVERAGES[index] = foodItem;
-        this.setState({ BEVERAGES });
-        console.log('BEVERAGES after quantity addition', this.state.BEVERAGES);
-        break;
-      case 'MAIN_COURSE':
-        index = this.state.MAIN_COURSE.findIndex((x) => x.ID === FoodId);
-        let MAIN_COURSE = [...this.state.MAIN_COURSE];
-        foodItem = { ...MAIN_COURSE[index] };
-        foodItem.Quantity = event.target.value;
-        MAIN_COURSE[index] = foodItem;
-        this.setState({ MAIN_COURSE });
-        break;
-      case 'SALADS':
-        index = this.state.SALADS.findIndex((x) => x.ID === FoodId);
-        let SALADS = [...this.state.SALADS];
-        foodItem = { ...SALADS[index] };
-        foodItem.Quantity = event.target.value;
-        SALADS[index] = foodItem;
-        this.setState({ SALADS });
-        break;
-
-      default:
-        break;
-    }
+    const index = this.props.RestaurantFoodMenuStore.FoodMenu.findIndex((x) => x._id === FoodID);
+    let FoodMenu = [...this.props.RestaurantFoodMenuStore.FoodMenu];
+    const foodItem = { ...FoodMenu[index] };
+    foodItem.Quantity = event.target.value;
+    FoodMenu[index] = foodItem;
+    const payload = {
+      FoodMenu,
+    };
+    this.props.updateRestaurantFoodStore(payload);
   };
 
   render() {
@@ -247,15 +181,14 @@ class FoodOrderCart extends Component {
             </div>
             <button
               onClick={() => this.props.orderFood(this.state.foodCart, this.state.totalPrice)}
-              class="button__373c0__3lYgT primary__373c0__2ZWOb full__373c0__1AgIz"
+              className="button__373c0__3lYgT primary__373c0__2ZWOb full__373c0__1AgIz"
               // style="--mousedown-x:0px;--mousedown-y:0px;--button-width:0px"
               // type="submit"
               // value="submit"
               style={{ width: '20%', cursor: 'pointer' }}
             >
-              {' '}
-              <div class="lemon--div__373c0__1mboc button-content__373c0__1QNtB border-color--default__373c0__3-ifU">
-                <span class="lemon--span__373c0__3997G text__373c0__2Kxyz button-content-text__373c0__Z-7FO text-color--inherit__373c0__1lczC text-align--center__373c0__3VrfZ text-weight--semibold__373c0__2l0fe text-size--large__373c0__3t60B text--truncated__373c0__3sLaf">
+              <div className="lemon--div__373c0__1mboc button-content__373c0__1QNtB border-color--default__373c0__3-ifU">
+                <span className="lemon--span__373c0__3997G text__373c0__2Kxyz button-content-text__373c0__Z-7FO text-color--inherit__373c0__1lczC text-align--center__373c0__3VrfZ text-weight--semibold__373c0__2l0fe text-size--large__373c0__3t60B text--truncated__373c0__3sLaf">
                   Submit Order
                 </span>
               </div>
@@ -285,38 +218,65 @@ class FoodOrderCart extends Component {
 
             {/**Appetizers */}
             {this.state.openedCategory === 'APPETIZERS' && (
-              <table id="customers">
-                <tbody>
-                  <tr>
-                    <th>Food Item</th>
-                    <th>cuisine</th>
-                    <th>Description</th>
-                    <th>Ingredients</th>
-                    <th>Price</th>
-                    <th>Select Quantity</th>
-                  </tr>
-                  {this.state.APPETIZERS.map((food) => (
+              <div>
+                <table id="customers">
+                  <tbody>
                     <tr>
-                      <td>{food.Name}</td>
-                      <td>{food.cuisine}</td>
-                      <td>{food.Description}</td>
-                      <td>{food.Ingredients}</td>
-                      <td>{food.Price}$</td>
-                      <td>
-                        <input
-                          value={food.Quantity}
-                          min="0"
-                          max="50"
-                          onChange={(event) => {
-                            this.onchangeUpdateCartHandler(event, food.ID, food.Price);
-                          }}
-                          type="number"
-                        />
-                      </td>
+                      <th>Image</th>
+                      <th>Food Item</th>
+                      <th>cuisine</th>
+                      <th>Description</th>
+                      <th>Ingredients</th>
+                      <th>Price</th>
+                      <th>Select Quantity</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                    {this.props.RestaurantFoodMenuStore.FoodMenu.map((food) => (
+                      <tr key={food._id}>
+                        <td>
+                          <img
+                            style={{ height: '100px', width: '100px' }}
+                            src={food.ImageUrl}
+                          ></img>
+                        </td>
+                        <td>{food.FoodName}</td>
+                        <td>{food.Cuisine}</td>
+                        <td>{food.Description}</td>
+                        <td>{food.MainIngredients}</td>
+                        <td>{food.Price}$</td>
+                        <td>
+                          <input
+                            value={food.Quantity}
+                            min="0"
+                            max="50"
+                            onChange={(event) => {
+                              this.onchangeUpdateCartHandler(
+                                event,
+                                food._id,
+                                food.Price,
+                                food.FoodName
+                              );
+                            }}
+                            type="number"
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <ReactPaginate
+                  previousLabel={'prev'}
+                  nextLabel={'next'}
+                  breakLabel={'...'}
+                  breakClassName={'break-me'}
+                  pageCount={this.props.RestaurantFoodMenuStore.PageCount}
+                  marginPagesDisplayed={2}
+                  pageRangeDisplayed={2}
+                  onPageChange={this.handlePageClick}
+                  containerClassName={'pagination'}
+                  subContainerClassName={'pages pagination'}
+                  activeClassName={'active'}
+                />
+              </div>
             )}
 
             <div
@@ -343,38 +303,65 @@ class FoodOrderCart extends Component {
 
             {/**MAIN_COURSE */}
             {this.state.openedCategory === 'MAIN_COURSE' && (
-              <table id="customers">
-                <tbody>
-                  <tr>
-                    <th>Food Item</th>
-                    <th>cuisine</th>
-                    <th>Description</th>
-                    <th>Ingredients</th>
-                    <th>Price</th>
-                    <th>Select Quantity</th>
-                  </tr>
-                  {this.state.MAIN_COURSE.map((food) => (
+              <div>
+                <table id="customers">
+                  <tbody>
                     <tr>
-                      <td>{food.Name}</td>
-                      <td>{food.cuisine}</td>
-                      <td>{food.Description}</td>
-                      <td>{food.Ingredients}</td>
-                      <td>{food.Price}$</td>
-                      <td>
-                        <input
-                          max="50"
-                          value={food.Quantity}
-                          min="0"
-                          onChange={(event) => {
-                            this.onchangeUpdateCartHandler(event, food.ID, food.Price);
-                          }}
-                          type="number"
-                        />
-                      </td>
+                      <th>Image</th>
+                      <th>Food Item</th>
+                      <th>cuisine</th>
+                      <th>Description</th>
+                      <th>Ingredients</th>
+                      <th>Price</th>
+                      <th>Select Quantity</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                    {this.props.RestaurantFoodMenuStore.FoodMenu.map((food) => (
+                      <tr key={food._id}>
+                        <td>
+                          <img
+                            style={{ height: '100px', width: '100px' }}
+                            src={food.ImageUrl}
+                          ></img>
+                        </td>
+                        <td>{food.FoodName}</td>
+                        <td>{food.Cuisine}</td>
+                        <td>{food.Description}</td>
+                        <td>{food.MainIngredients}</td>
+                        <td>{food.Price}$</td>
+                        <td>
+                          <input
+                            max="50"
+                            value={food.Quantity}
+                            min="0"
+                            onChange={(event) => {
+                              this.onchangeUpdateCartHandler(
+                                event,
+                                food._id,
+                                food.Price,
+                                food.FoodName
+                              );
+                            }}
+                            type="number"
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <ReactPaginate
+                  previousLabel={'prev'}
+                  nextLabel={'next'}
+                  breakLabel={'...'}
+                  breakClassName={'break-me'}
+                  pageCount={this.props.RestaurantFoodMenuStore.PageCount}
+                  marginPagesDisplayed={2}
+                  pageRangeDisplayed={2}
+                  onPageChange={this.handlePageClick}
+                  containerClassName={'pagination'}
+                  subContainerClassName={'pages pagination'}
+                  activeClassName={'active'}
+                />
+              </div>
             )}
 
             <div
@@ -401,38 +388,65 @@ class FoodOrderCart extends Component {
 
             {/**SALADS */}
             {this.state.openedCategory === 'SALADS' && (
-              <table id="customers">
-                <tbody>
-                  <tr>
-                    <th>Food Item</th>
-                    <th>cuisine</th>
-                    <th>Description</th>
-                    <th>Ingredients</th>
-                    <th>Price</th>
-                    <th>Select Quantity</th>
-                  </tr>
-                  {this.state.SALADS.map((food) => (
+              <div>
+                <table id="customers">
+                  <tbody>
                     <tr>
-                      <td>{food.Name}</td>
-                      <td>{food.cuisine}</td>
-                      <td>{food.Description}</td>
-                      <td>{food.Ingredients}</td>
-                      <td>{food.Price}$</td>
-                      <td>
-                        <input
-                          value={food.Quantity}
-                          min="0"
-                          max="50"
-                          onChange={(event) => {
-                            this.onchangeUpdateCartHandler(event, food.ID, food.Price);
-                          }}
-                          type="number"
-                        />
-                      </td>
+                      <th>Image</th>
+                      <th>Food Item</th>
+                      <th>cuisine</th>
+                      <th>Description</th>
+                      <th>Ingredients</th>
+                      <th>Price</th>
+                      <th>Select Quantity</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                    {this.props.RestaurantFoodMenuStore.FoodMenu.map((food) => (
+                      <tr key={food._id}>
+                        <td>
+                          <img
+                            style={{ height: '100px', width: '100px' }}
+                            src={food.ImageUrl}
+                          ></img>
+                        </td>
+                        <td>{food.FoodName}</td>
+                        <td>{food.Cuisine}</td>
+                        <td>{food.Description}</td>
+                        <td>{food.MainIngredients}</td>
+                        <td>{food.Price}$</td>
+                        <td>
+                          <input
+                            value={food.Quantity}
+                            min="0"
+                            max="50"
+                            onChange={(event) => {
+                              this.onchangeUpdateCartHandler(
+                                event,
+                                food._id,
+                                food.Price,
+                                food.FoodName
+                              );
+                            }}
+                            type="number"
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <ReactPaginate
+                  previousLabel={'prev'}
+                  nextLabel={'next'}
+                  breakLabel={'...'}
+                  breakClassName={'break-me'}
+                  pageCount={this.props.RestaurantFoodMenuStore.PageCount}
+                  marginPagesDisplayed={2}
+                  pageRangeDisplayed={2}
+                  onPageChange={this.handlePageClick}
+                  containerClassName={'pagination'}
+                  subContainerClassName={'pages pagination'}
+                  activeClassName={'active'}
+                />
+              </div>
             )}
 
             <div
@@ -459,38 +473,65 @@ class FoodOrderCart extends Component {
 
             {/**BEVERAGES */}
             {this.state.openedCategory === 'BEVERAGES' && (
-              <table id="customers">
-                <tbody>
-                  <tr>
-                    <th>Food Item</th>
-                    <th>cuisine</th>
-                    <th>Description</th>
-                    <th>Ingredients</th>
-                    <th>Price</th>
-                    <th>Select Quantity</th>
-                  </tr>
-                  {this.state.BEVERAGES.map((food) => (
+              <div>
+                <table id="customers">
+                  <tbody>
                     <tr>
-                      <td>{food.Name}</td>
-                      <td>{food.cuisine}</td>
-                      <td>{food.Description}</td>
-                      <td>{food.Ingredients}</td>
-                      <td>{food.Price}$</td>
-                      <td>
-                        <input
-                          value={food.Quantity}
-                          min="0"
-                          max="50"
-                          onChange={(event) => {
-                            this.onchangeUpdateCartHandler(event, food.ID, food.Price);
-                          }}
-                          type="number"
-                        />
-                      </td>
+                      <th>Image</th>
+                      <th>Food Item</th>
+                      <th>cuisine</th>
+                      <th>Description</th>
+                      <th>Ingredients</th>
+                      <th>Price</th>
+                      <th>Select Quantity</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                    {this.props.RestaurantFoodMenuStore.FoodMenu.map((food) => (
+                      <tr key={food._id}>
+                        <td>
+                          <img
+                            style={{ height: '100px', width: '100px' }}
+                            src={food.ImageUrl}
+                          ></img>
+                        </td>
+                        <td>{food.FoodName}</td>
+                        <td>{food.Cuisine}</td>
+                        <td>{food.Description}</td>
+                        <td>{food.MainIngredients}</td>
+                        <td>{food.Price}$</td>
+                        <td>
+                          <input
+                            value={food.Quantity}
+                            min="0"
+                            max="50"
+                            onChange={(event) => {
+                              this.onchangeUpdateCartHandler(
+                                event,
+                                food._id,
+                                food.Price,
+                                food.FoodName
+                              );
+                            }}
+                            type="number"
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <ReactPaginate
+                  previousLabel={'prev'}
+                  nextLabel={'next'}
+                  breakLabel={'...'}
+                  breakClassName={'break-me'}
+                  pageCount={this.props.RestaurantFoodMenuStore.PageCount}
+                  marginPagesDisplayed={2}
+                  pageRangeDisplayed={2}
+                  onPageChange={this.handlePageClick}
+                  containerClassName={'pagination'}
+                  subContainerClassName={'pages pagination'}
+                  activeClassName={'active'}
+                />
+              </div>
             )}
             <div
               className=".job-form-section-group-styles__header--2Z5fi"
@@ -515,38 +556,65 @@ class FoodOrderCart extends Component {
             </div>
             {/**DESSERTS */}
             {this.state.openedCategory === 'DESSERTS' && (
-              <table id="customers">
-                <tbody>
-                  <tr>
-                    <th>Food Item</th>
-                    <th>cuisine</th>
-                    <th>Description</th>
-                    <th>Ingredients</th>
-                    <th>Price</th>
-                    <th>Select Quantity</th>
-                  </tr>
-                  {this.state.DESSERTS.map((food) => (
+              <div>
+                <table id="customers">
+                  <tbody>
                     <tr>
-                      <td>{food.Name}</td>
-                      <td>{food.cuisine}</td>
-                      <td>{food.Description}</td>
-                      <td>{food.Ingredients}</td>
-                      <td>{food.Price}$</td>
-                      <td>
-                        <input
-                          value={food.Quantity}
-                          min="0"
-                          max="50"
-                          onChange={(event) => {
-                            this.onchangeUpdateCartHandler(event, food.ID, food.Price);
-                          }}
-                          type="number"
-                        />
-                      </td>
+                      <th>Image</th>
+                      <th>Food Item</th>
+                      <th>cuisine</th>
+                      <th>Description</th>
+                      <th>Ingredients</th>
+                      <th>Price</th>
+                      <th>Select Quantity</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                    {this.props.RestaurantFoodMenuStore.FoodMenu.map((food) => (
+                      <tr key={food._id}>
+                        <td>
+                          <img
+                            style={{ height: '100px', width: '100px' }}
+                            src={food.ImageUrl}
+                          ></img>
+                        </td>
+                        <td>{food.FoodName}</td>
+                        <td>{food.Cuisine}</td>
+                        <td>{food.Description}</td>
+                        <td>{food.MainIngredients}</td>
+                        <td>{food.Price}$</td>
+                        <td>
+                          <input
+                            value={food.Quantity}
+                            min="0"
+                            max="50"
+                            onChange={(event) => {
+                              this.onchangeUpdateCartHandler(
+                                event,
+                                food._id,
+                                food.Price,
+                                food.FoodName
+                              );
+                            }}
+                            type="number"
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <ReactPaginate
+                  previousLabel={'prev'}
+                  nextLabel={'next'}
+                  breakLabel={'...'}
+                  breakClassName={'break-me'}
+                  pageCount={this.props.RestaurantFoodMenuStore.PageCount}
+                  marginPagesDisplayed={2}
+                  pageRangeDisplayed={2}
+                  onPageChange={this.handlePageClick}
+                  containerClassName={'pagination'}
+                  subContainerClassName={'pages pagination'}
+                  activeClassName={'active'}
+                />
+              </div>
             )}
           </div>
         </div>
@@ -555,4 +623,32 @@ class FoodOrderCart extends Component {
   }
 }
 
-export default FoodOrderCart;
+const mapStateToProps = (state) => {
+  const snackbarData = state.snackBarReducer;
+  const { RestaurantFoodMenuStore } = state.searchedRestaurantReducer;
+  return {
+    snackbarData: snackbarData,
+    RestaurantFoodMenuStore,
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    updateSnackbarData: (payload) => {
+      dispatch({
+        type: updateSnackbarData,
+        payload,
+      });
+    },
+    updateRestaurantFoodStore: (payload) => {
+      dispatch({
+        type: updateRestaurantFoodStore,
+        payload,
+      });
+    },
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(FoodOrderCart);
+
+// export default FoodOrderCart;

@@ -5,6 +5,7 @@ const { Schema } = mongoose;
 const orderSchema = new Schema(
   {
     CustomerID: { type: String, required: true },
+    Address: { type: String },
     CustomerName: { type: String, required: true },
     CustomerImageUrl: { type: String, required: true },
     RestaurantID: { type: String, required: true },
@@ -22,9 +23,9 @@ const orderSchema = new Schema(
         'Picked up',
         'Cancel Order',
       ],
-      required: true,
+      default: 'Order Received',
     },
-    DeliverStatusID: { type: Number },
+    DeliverStatusID: { type: Number, default: 1 },
     Bill: { type: Number, required: true },
     OrderCart: [
       {

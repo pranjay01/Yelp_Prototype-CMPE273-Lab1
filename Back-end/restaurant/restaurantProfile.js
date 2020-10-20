@@ -24,7 +24,7 @@ const Beverage = require('../Models/Beverage');
 const Dessert = require('../Models/Dessert');
 const MainCourse = require('../Models/MainCourse');
 const Salad = require('../Models/Salad');
-const key = require('./config');
+const { key } = require('./config');
 
 const geo = geocoder({
   key,
@@ -46,81 +46,11 @@ const multipleUpload = multer({
     // eslint-disable-next-line func-names
     // eslint-disable-next-line object-shorthand
     key: function (req, file, cb) {
-      // console.log(req.body);
       const folderName = 'yelpPrototype-restaurant-';
-      // console.log('Multer Called', folderName);
       cb(null, `${folderName}/${Date.now().toString()}${file.originalname}`);
     },
   }),
 }).single('file');
-/*
-const getOrderList = async (_order, _appetizers, _desserts, _beverages, _salads, _mainCourse) => {
-  const results = [];
-  // eslint-disable-next-line no-restricted-syntax
-  for (const item of _order) {
-    // console.log('item: ', item);
-    const itemInformation = item.split(':');
-    if (itemInformation[1] === '1') {
-      // console.log('_appetizers:', _appetizers);
-      const index = _appetizers.findIndex((x) => x.ID === Number(itemInformation[0]));
-      // console.log('Index: ', index, '_appetizers[index] ', _appetizers[index]);
-      const tmpObj = {
-        Name: _appetizers[index].Name,
-        Count: Number(itemInformation[2]),
-        PPrice: _appetizers[index].Price,
-        TPrice: _appetizers[index].Price * Number(itemInformation[2]),
-      };
-      results.push(tmpObj);
-    } else if (itemInformation[1] === '2') {
-      // console.log('_salads:', _salads);
-      const index = _salads.findIndex((x) => x.ID === Number(itemInformation[0]));
-      // console.log('Index: ', index, '_salads[index] ', _salads[index]);
-      const tmpObj = {
-        Name: _salads[index].Name,
-        Count: Number(itemInformation[2]),
-        PPrice: _salads[index].Price,
-        TPrice: _salads[index].Price * Number(itemInformation[2]),
-      };
-      results.push(tmpObj);
-    } else if (itemInformation[1] === '3') {
-      // console.log('_desserts:', _desserts);
-      const index = _desserts.findIndex((x) => x.ID === Number(itemInformation[0]));
-      // console.log('Index: ', index, '_desserts[index] ', _desserts[index]);
-      const tmpObj = {
-        Name: _desserts[index].Name,
-        Count: Number(itemInformation[2]),
-        PPrice: _desserts[index].Price,
-        TPrice: _desserts[index].Price * Number(itemInformation[2]),
-      };
-      results.push(tmpObj);
-    } else if (itemInformation[1] === '4') {
-      // console.log('_beverages:', _beverages);
-      const index = _beverages.findIndex((x) => x.ID === Number(itemInformation[0]));
-      // console.log('Index: ', index, '_beverages[index] ', _beverages[index]);
-      const tmpObj = {
-        Name: _beverages[index].Name,
-        Count: Number(itemInformation[2]),
-        PPrice: _beverages[index].Price,
-        TPrice: _beverages[index].Price * Number(itemInformation[2]),
-      };
-      results.push(tmpObj);
-    } else if (itemInformation[1] === '5') {
-      // console.log('_mainCourse:', _mainCourse);
-      const index = _mainCourse.findIndex((x) => x.ID === Number(itemInformation[0]));
-      // console.log('Index: ', index, '_mainCourse[index] ', _mainCourse[index]);
-      const tmpObj = {
-        Name: _mainCourse[index].Name,
-        Count: Number(itemInformation[2]),
-        PPrice: _mainCourse[index].Price,
-        TPrice: _mainCourse[index].Price * Number(itemInformation[2]),
-      };
-      results.push(tmpObj);
-    }
-  }
-  return results;
-};
-
-*/
 
 // Function to create new restaurant // mongoDbAdded
 const signup = async (restaurant, response) => {
@@ -140,14 +70,7 @@ const signup = async (restaurant, response) => {
         let Location = restaurant.Street.concat(', ');
         Location = Location.concat(restaurant.Zip);
         geo.find(Location, async function (err1, res) {
-          if (res.length === 0) {
-            response.writeHead(500, {
-              'Content-Type': 'text/plain',
-            });
-            response.end('Incorrect Location');
-          } else {
-            // console.log(res[0].location.lat);
-            // console.log(res[0].location.lng);
+          if (await res) {
             const latitude = res[0].location.lat;
             const longitude = res[0].location.lng;
             const hashedPassword = await bcrypt.hash(restaurant.Password, 10);
@@ -181,7 +104,6 @@ const signup = async (restaurant, response) => {
                       'Content-Type': 'text/plain',
                     });
                     response.end('User Created');
-                    // console.log(result);
                   }
                 });
               }
@@ -192,6 +114,11 @@ const signup = async (restaurant, response) => {
               });
               response.end('Incorrect Location');
             }
+          } else {
+            response.writeHead(500, {
+              'Content-Type': 'text/plain',
+            });
+            response.end('Incorrect Location');
           }
         });
       }
@@ -244,7 +171,6 @@ const updateRestaurantProfile = async (restaurant, response) => {
           });
           response.end('Network Error');
         } else {
-          // console.log(data);
           response.writeHead(200, {
             'Content-Type': 'text/plain',
           });
@@ -264,14 +190,12 @@ const updateRestaurantProfile = async (restaurant, response) => {
 // upload restaurant profile to s3 bucket // mongoDbAdded
 const uploadRestaurantProfilePic = async (req, res) => {
   try {
-    // console.log(req.body);
     multipleUpload(req, res, function (err) {
       if (err instanceof multer.MulterError) {
         res.json({ status: 400, error: err.message });
       } else if (err) {
         res.json({ status: 400, error: err.message });
       } else {
-        // console.log(req.file.location);
         Restaurant.updateOne(
           { RestaurantID: req.body },
           { ImageURL: req.file.location },
@@ -285,7 +209,6 @@ const uploadRestaurantProfilePic = async (req, res) => {
               res.writeHead(200, {
                 'Content-Type': 'text/plain',
               });
-              // console.log('data:', data);
               res.end(req.file.location);
             }
           }
@@ -634,43 +557,6 @@ const getOrderDetails = async (request, response) => {
   return response;
 };
 
-/*
-// Fetch details of particular order
-const orderFetch = async (request, response) => {
-  const { orderID } = url.parse(request.url, true).query;
-  const userID = getUserIdFromToken(request.cookies.cookie, request.cookies.userrole);
-  if (userID) {
-    const orderFetchQuery = 'CALL orderFetch(?,?)';
-
-    const connection = await mysqlConnection();
-    // eslint-disable-next-line no-unused-vars
-    const [results, fields] = await connection.query(orderFetchQuery, [userID, orderID]);
-    let order = results[0][0].Ordered_Dishes;
-    order = order.split(';');
-    const appetizers = results[1];
-    const beverages = results[2];
-    const salads = results[3];
-    const desserts = results[4];
-    const mainCourse = results[5];
-    const orders = await getOrderList(order, appetizers, desserts, beverages, salads, mainCourse);
-
-    // console.log(orders);
-
-    connection.end();
-    response.writeHead(200, {
-      'Content-Type': 'text/plain',
-    });
-    response.end(JSON.stringify(orders));
-  } else {
-    response.writeHead(401, {
-      'Content-Type': 'text/plain',
-    });
-    response.end('Invalid User');
-  }
-  return response;
-};
-*/
-
 // Update Deliver Status // MongoDb Implemented
 const updateDeliveryStatus = async (request, response) => {
   try {
@@ -809,7 +695,6 @@ const getCustomerCompleteProfileForRestaurant = async (request, response) => {
       // eslint-disable-next-line no-unused-vars
       const [results, fields] = await connection.query(getCustomerCompleteProfileQuery, cusID);
       connection.end();
-      // console.log(results);
 
       response.writeHead(200, {
         'Content-Type': 'text/plain',

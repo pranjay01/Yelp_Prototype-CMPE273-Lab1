@@ -35,7 +35,7 @@ class menuBlock extends Component {
         let customerProfile = {
           ...response.data.customer,
           JoinDate: JoinDate.format('LL'),
-          DOB: DOB.format('LL'),
+          DOB: DOB.format('YYYY-MM-DD'),
           NewEmail: response.data.customer.Email,
           // DOB: new Date(response.data.customer.DOB),
         };

@@ -9,42 +9,9 @@ import { connect } from 'react-redux';
 class AboutMe extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      // NickName: '',
-      // DOB: '',
-      // Address1: '',
-      // Address2: '',
-      // Headline: '',
-      // ILove: '',
-      // FMI: '',
-      // JoinDate: '',
-      // Website: '',
-      // ImageURL: '',
-    };
+    this.state = {};
   }
-  // componentDidMount() {
-  //   axios
-  //     .get(
-  //       serverUrl + 'customer/getCustomerCompleteProfile',
 
-  //       { withCredentials: true }
-  //     )
-  //     .then((response) => {
-  //       console.log(response.data);
-  //       this.setState({
-  //         NickName: response.data[0][0].NickName,
-  //         DOB: response.data[0][0].DOB,
-  //         Address1: response.data[0][0].Address1,
-  //         Address2: response.data[0][0].Address2,
-  //         Headline: response.data[0][0].Headline,
-  //         ILove: response.data[0][0].ILove,
-  //         FMI: response.data[0][0].FMI,
-  //         JoinDate: response.data[0][0].JoinDate,
-  //         Website: response.data[0][0].Website,
-  //         ImageURL: response.data[0][0].ImageURL,
-  //       });
-  //     });
-  // }
   render() {
     let redirectVar = null;
     if (!localStorage.getItem('token')) {

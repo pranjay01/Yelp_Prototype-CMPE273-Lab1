@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import './LeftPannel.css';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { history } from '../../../App';
+import { Redirect } from 'react-router';
 
 class LeftPannel extends Component {
   constructor(props) {
@@ -14,15 +14,23 @@ class LeftPannel extends Component {
     let eventsTabIsActive = false;
     let ordersTabIsActive = false;
 
-    // if (this.props.location.pathname === '/AboutMe') {
-    //   profileIsActive = true;
-    // } else if (this.props.location.pathname === '/Events') {
-    //   eventsTabIsActive = true;
-    // } else if (this.props.location.pathname === '/OrdersList') {
-    //   ordersTabIsActive = true;
+    let redirectVar = null;
+    if (!localStorage.getItem('token')) {
+      // console.log('cookie not found');
+      redirectVar = <Redirect to="/customerLogin" />;
+    } else {
+      if (localStorage.getItem('userrole') === 'Customer') {
+        redirectVar = null;
+      } else if (localStorage.getItem('userrole') === 'Restaurant') {
+        redirectVar = <Redirect to="/restaurantHome" />;
+      } else {
+        redirectVar = <Redirect to="/customerLogin" />;
+      }
+    }
     // }
     return (
       <div className="column column-alpha user-details_sidebar">
+        {redirectVar}
         <div className="ysection">
           <div className="titled-nav js-titled-nav">
             <input

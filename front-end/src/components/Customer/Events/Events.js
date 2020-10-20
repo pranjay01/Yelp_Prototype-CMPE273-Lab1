@@ -139,13 +139,13 @@ class Events extends Component {
 
   render() {
     let redirectVar = null;
-    if (!cookie.load('cookie')) {
-      console.log('cookie not found');
+    if (!localStorage.getItem('token')) {
+      // console.log('cookie not found');
       redirectVar = <Redirect to="/customerLogin" />;
     } else {
-      if (cookie.load('userrole') === 'Customer') {
+      if (localStorage.getItem('userrole') === 'Customer') {
         redirectVar = null;
-      } else if (cookie.load('userrole') === 'Restaurant') {
+      } else if (localStorage.getItem('userrole') === 'Restaurant') {
         redirectVar = <Redirect to="/restaurantHome" />;
       } else {
         redirectVar = <Redirect to="/customerLogin" />;

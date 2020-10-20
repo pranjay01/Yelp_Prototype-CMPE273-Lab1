@@ -396,7 +396,7 @@ class UpdateProfile extends Component {
                       value={this.state.time}
                       placeholder="Date"
                       onChange={this.onChangeDate}
-                      value={this.props.customerInfo.customerProfile.DOB}
+                      value={this.props.customerInfo.customerProfile.DOB.format('YYYY-MM-DD')}
                     />
                     <button
                       disabled={

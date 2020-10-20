@@ -14,7 +14,6 @@ const reviewSchema = new Schema(
     Description: { type: String, required: true },
     ImageUrl: { type: String },
     ReviewDate: { type: String },
-    CustomerReviewCount: { type: Number, default: 0 },
   },
   { versionKey: false }
 );

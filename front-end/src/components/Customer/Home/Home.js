@@ -21,6 +21,7 @@ class Home extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      openRestaurantList: false,
       SearchFilters: [
         { ID: 1, Value: 'Restaurant Name' },
         { ID: 2, Value: 'Food Items' },
@@ -31,6 +32,7 @@ class Home extends Component {
   }
 
   componentDidMount() {
+    localStorage.setItem('restaurantPageID', '');
     axios
       .get(
         serverUrl + 'static/getSearchStrings',
@@ -38,25 +40,24 @@ class Home extends Component {
         { withCredentials: true }
       )
       .then((response) => {
-        let RestaurantNameStrings = response.data[0].map((strings) => {
-          return strings.Name;
+        let RestaurantNameStrings = response.data.NameLocation.map((restro) => {
+          return restro.Name;
         });
-        let FoodItemsStrings = response.data[1].map((strings) => {
-          return strings.Name;
-        });
-        let CuisinesStrings = response.data[2].map((strings) => {
-          return strings.Name;
-        });
-        let LocationStrings = response.data[3].map((strings) => {
-          return strings.Name;
+        let LocationStrings = response.data.NameLocation.map((restro) => {
+          return restro.location;
         });
 
-        console.log(response.data);
+        let FoodItemsStrings = response.data.FoodItemsStrings.map((food) => {
+          return food.FoodName;
+        });
+        let CuisinesStrings = response.data.FoodItemsStrings.map((food) => {
+          return food.Cuisine;
+        });
         let payload = {
-          RestaurantNameStrings,
-          FoodItemsStrings,
-          CuisinesStrings,
-          LocationStrings,
+          RestaurantNameStrings: Array.from(new Set(RestaurantNameStrings)),
+          FoodItemsStrings: Array.from(new Set(FoodItemsStrings)),
+          CuisinesStrings: Array.from(new Set(CuisinesStrings)),
+          LocationStrings: Array.from(new Set(LocationStrings)),
         };
         this.props.updateSeprateStrings(payload);
       });
@@ -105,25 +106,38 @@ class Home extends Component {
 
   openRestroListPage = (string) => {
     localStorage.setItem('SearchedString', string);
-    console.log(string);
-    const payload = { serchedString: string };
-    this.props.updateSearchedString(payload);
-    history.push('/RestaurantList');
-    window.location.reload(false);
+    // console.log(string);
+    // const payload = { serchedString: '' };
+    // this.props.updateSearchedString(payload);
+    this.setState({
+      openRestaurantList: true,
+    });
+
+    // window.location.reload(false);
   };
 
   getRestaurants = (event) => {
-    history.push('/RestaurantList');
+    this.setState({
+      openRestaurantList: true,
+    });
   };
 
   render() {
     let redirectVar = null;
     // let block = null;
     if (!localStorage.getItem('token')) {
-      redirectVar = null;
+      if (this.state.openRestaurantList) {
+        redirectVar = <Redirect to="/RestaurantList" />;
+      } else {
+        redirectVar = null;
+      }
     } else {
       if (localStorage.getItem('userrole') === 'Customer') {
-        redirectVar = null;
+        if (this.state.openRestaurantList) {
+          redirectVar = <Redirect to="/RestaurantList" />;
+        } else {
+          redirectVar = null;
+        }
       } else if (localStorage.getItem('userrole') === 'Restaurant') {
         redirectVar = <Redirect to="/restaurantHome" />;
       } else {

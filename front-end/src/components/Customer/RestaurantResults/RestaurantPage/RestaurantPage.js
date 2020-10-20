@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import CustomerNavBar from '../../CommonArea/CustomerNavBar';
 import RestaurantLeftReviewPart from './RestaurantLeftReviewPart';
 import RestaurantRightPart from './RestaurantRightPart';
+import { Redirect } from 'react-router';
 import './RestaurantPage.css';
 
 class RestaurantPage extends Component {
@@ -10,16 +11,19 @@ class RestaurantPage extends Component {
     this.state = {};
   }
   render() {
+    let redirectVar = null;
+    if (!localStorage.getItem('restaurantPageID')) {
+      redirectVar = <Redirect to="/home" />;
+    }
     return (
       <div>
-        {' '}
-        {<CustomerNavBar />}
+        {redirectVar} {<CustomerNavBar />}
         <div className="main-content-wrap main-content-wrap--full">
           <div>
             <div className="lemon--div__373c0__1mboc margin-t3__373c0__1l90z margin-b6__373c0__2Azj6 border-color--default__373c0__3-ifU">
               <div className="lemon--div__373c0__1mboc biz-details-page-container-outer__373c0___byUp border-color--default__373c0__3-ifU">
                 <div className="lemon--div__373c0__1mboc biz-details-page-container-inner__373c0__2fjQF border-color--default__373c0__3-ifU">
-                  <div class="lemon--div__373c0__1mboc margin-b3__373c0__q1DuY border-color--default__373c0__3-ifU"></div>
+                  <div className="lemon--div__373c0__1mboc margin-b3__373c0__q1DuY border-color--default__373c0__3-ifU"></div>
                   <div className="lemon--div__373c0__1mboc margin-b6__373c0__2Azj6 border-color--default__373c0__3-ifU">
                     <div className="lemon--div__373c0__1mboc border-color--default__373c0__3-ifU">
                       <div className="lemon--div__373c0__1mboc border-color--default__373c0__3-ifU">

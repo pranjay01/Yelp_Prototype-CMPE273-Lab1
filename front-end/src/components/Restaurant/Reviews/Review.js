@@ -99,30 +99,7 @@ class Review extends Component {
                       </div>
                     </div>
                     <div className="lemon--div__373c0__1mboc user-passport-stats__373c0__2LjLz border-color--default__373c0__3-ifU">
-                      <div className="lemon--div__373c0__1mboc margin-r1__373c0__zyKmV border-color--default__373c0__3-ifU">
-                        <span
-                          className="lemon--span__373c0__3997G icon__373c0__ehCWV icon--18-review icon--orange-dark__373c0__1e8sK"
-                          aria-hidden="true"
-                          style={{ width: '18px', height: '18px', fill: '#f15c00' }}
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="18"
-                            height="18"
-                            viewBox="0 0 18 18"
-                            className="icon_svg"
-                          >
-                            <path d="M13 3H5c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1.505 9.643l-2.526-1.55L6.526 12.7 7 9.934 5 7.977l2.766-.404L8.97 4.7l1.264 2.873L13 7.977l-2 1.957.495 2.71z"></path>
-                          </svg>
-                        </span>
-                        <span className="lemon--span__373c0__3997G display--inline__373c0__3JqBP padding-l0-5__373c0__3fXBk border-color--default__373c0__3-ifU">
-                          <span className="lemon--span__373c0__3997G text__373c0__2Kxyz text-color--normal__373c0__3xep9 text-align--left__373c0__2XGa- text-size--small__373c0__3NVWO">
-                            <span className="lemon--span__373c0__3997G">
-                              <b>{this.props.review.CustomerReviewCount}</b> reviews
-                            </span>
-                          </span>
-                        </span>
-                      </div>
+                      <div className="lemon--div__373c0__1mboc margin-r1__373c0__zyKmV border-color--default__373c0__3-ifU"></div>
                     </div>
                   </div>
                 </div>
