@@ -10,7 +10,7 @@ const orderSchema = new Schema(
     CustomerImageUrl: { type: String, required: true },
     RestaurantID: { type: String, required: true },
     RestaurantName: { type: String, required: true },
-    OrderedDate: { type: String, required: true },
+    OrderedDate: { type: Date, required: true },
     OrderType: { type: String, enum: ['Delivery', 'Pick_up'], required: true },
     DeliveryStatus: {
       type: String,

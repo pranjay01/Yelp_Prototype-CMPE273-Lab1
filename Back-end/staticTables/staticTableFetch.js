@@ -447,15 +447,15 @@ const fetchRestaurantProfileForCustomer = async (req, res) => {
   const { restroId } = url.parse(req.url, true).query;
   try {
     const RestaurantProfile = await Restaurant.findOne({ RestaurantID: restroId });
-    const AvgRating = await Review.aggregate([
-      { $group: { _id: '$RestaurantID', avgRating: { $avg: '$Rating' } } },
-      { $match: { _id: restroId } },
-    ]);
+    // const AvgRating = await Review.aggregate([
+    //   { $group: { _id: '$RestaurantID', avgRating: { $avg: '$Rating' } } },
+    //   { $match: { _id: restroId } },
+    // ]);
     const ReviewList = await Review.find({ RestaurantID: restroId });
     // {$match:{_id:}}
     const results = {
       RestaurantProfile,
-      AvgRating: Math.round(AvgRating[0].avgRating),
+      // AvgRating: Math.round(AvgRating[0].avgRating),
       ReviewList,
     };
     // console.log(results);

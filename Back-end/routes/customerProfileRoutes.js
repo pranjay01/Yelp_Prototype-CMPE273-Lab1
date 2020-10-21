@@ -14,7 +14,6 @@ const {
   registerForEvent,
   getRegisteredEventIds,
   getAllOrders,
-  orderDetailsFetch,
 } = require('../customer/customerProfile');
 const { validateUser } = require('../Utils/passport');
 const { login } = require('../common/loginLogout');
@@ -118,10 +117,4 @@ Router.get('/getAllOrders', validateUser, async (req, res) => {
   return results;
 });
 
-Router.get('/orderDetailsFetch', validateUser, async (req, res) => {
-  console.log('orderDetailsFetch');
-  let results = null;
-  results = await orderDetailsFetch(req, res);
-  return results;
-});
 module.exports = Router;

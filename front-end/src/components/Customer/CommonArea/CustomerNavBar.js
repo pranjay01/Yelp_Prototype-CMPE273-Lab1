@@ -12,15 +12,15 @@ import {
   updateSearchStrings,
 } from '../../../constants/action-types';
 import { connect } from 'react-redux';
-// import { history } from '../../../App';
-// import { Redirect } from 'react-router';
+import { history } from '../../../App';
+import { Redirect } from 'react-router';
 import SuggestedNames from '../Home/SuggestedNames';
 
 class CustomerNavBar extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      // openRestaurantList: false,
+      restaurantSearched: false,
       SearchFilters: [
         { ID: 1, Value: 'Restaurant Name' },
         { ID: 2, Value: 'Food Items' },
@@ -103,6 +103,12 @@ class CustomerNavBar extends Component {
     localStorage.setItem('SearchedString', string);
     const payload = { serchedString: string };
     this.props.updateSearchedString(payload);
+    history.push('/RestaurantList');
+    this.setState({ restaurantSearched: true });
+    // this.setState({
+    //   openRestaurantList: true,
+    // });
+    //window.location.reload(false);
   };
 
   getRestaurants = (event) => {
@@ -116,7 +122,7 @@ class CustomerNavBar extends Component {
     // }
     return (
       <div className="lemon--div__09f24__1mboc sticky-wrapper__09f24__3Aajw pageHeader__09f24__Ey1v7 border-color--default__09f24__R1nRO">
-        {/*redirectVar*/}
+        {this.state.restaurantSearched ? <Redirect to="/RestaurantList" /> : null}
         <div className="lemon--div__09f24__1mboc consumer-header-container__09f24__2iDVS border--bottom__09f24__2FjZW border-color--default__09f24__R1nRO background-color--white__09f24__2jFAt">
           <div className="lemon--div__09f24__1mboc consumer-header__09f24__5vTsM border-color--default__09f24__R1nRO">
             <div className="lemon--div__09f24__1mboc arrange__09f24__AiSIM vertical-align-middle__09f24__zNCcM border-color--default__09f24__R1nRO">

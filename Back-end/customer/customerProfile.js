@@ -20,8 +20,6 @@ const s3Storage = new AWS.S3({
 });
 require('dotenv').config();
 
-const { getOrderList } = require('../restaurant/restaurantProfile');
-
 const UserSignup = require('../Models/UserSignup');
 
 const Customer = require('../Models/Customer');
@@ -29,6 +27,8 @@ const Customer = require('../Models/Customer');
 const Reviews = require('../Models/Review');
 
 const Orders = require('../Models/Order');
+
+const Restaurant = require('../Models/Restaurant');
 
 const multipleUpload = multer({
   storage: multerS3({
@@ -291,6 +291,10 @@ const submitReview = async (request, response) => {
     const newReview = new Reviews({
       ...request.body,
     });
+    await Restaurant.updateOne(
+      { RestaurantID: request.body.RestaurantID },
+      { ReviewCounts: request.body.ReviewCounts, TotalRating: request.body.TotalRating }
+    ).exec();
     newReview.save((err, result) => {
       if (err) {
         response.writeHead(500, {
@@ -415,24 +419,41 @@ const getRegisteredEventIds = async (request, response) => {
 // fetch events fased on filter
 const getAllOrders = async (request, response) => {
   try {
-    const userID = getUserIdFromToken(request.cookies.cookie, request.cookies.userrole);
-    if (userID) {
-      const getAllOrdersPlacedByCustomerQuery = 'CALL getAllOrdersPlacedByCustomer(?)';
-
-      const connection = await mysqlConnection();
-      // eslint-disable-next-line no-unused-vars
-      const [results, fields] = await connection.query(getAllOrdersPlacedByCustomerQuery, userID);
-      connection.end();
-      response.writeHead(200, {
-        'Content-Type': 'text/plain',
-      });
-      response.end(JSON.stringify(results));
+    const { CustomerID, selectedPage, sortOrder, filter1, filter2 } = url.parse(
+      request.url,
+      true
+    ).query;
+    let OrderList = [];
+    let orderCount = 0;
+    if (filter1 !== 'All') {
+      OrderList = await Orders.find({ CustomerID, OrderType: filter1, DeliveryStatus: filter2 })
+        .sort({ OrderedDate: sortOrder })
+        .skip(selectedPage * 3)
+        .limit(3)
+        .exec();
+      orderCount = await Orders.find({
+        CustomerID,
+        OrderType: filter1,
+        DeliveryStatus: filter2,
+      }).countDocuments();
     } else {
-      response.writeHead(401, {
-        'Content-Type': 'text/plain',
-      });
-      response.end('Invalid User');
+      OrderList = await Orders.find({ CustomerID })
+        .sort({ OrderedDate: sortOrder })
+        .skip(selectedPage * 3)
+        .limit(3)
+        .exec();
+      orderCount = await Orders.find({ CustomerID }).countDocuments();
     }
+
+    response.writeHead(200, {
+      'Content-Type': 'text/plain',
+    });
+    console.log(OrderList);
+    const results = {
+      OrderList,
+      orderCount,
+    };
+    response.end(JSON.stringify(results));
   } catch (error) {
     response.writeHead(500, {
       'Content-Type': 'text/plain',
@@ -443,39 +464,6 @@ const getAllOrders = async (request, response) => {
 };
 
 // Fetch details of particular order
-const orderDetailsFetch = async (request, response) => {
-  const { orderID, restroId } = url.parse(request.url, true).query;
-  const userID = getUserIdFromToken(request.cookies.cookie, request.cookies.userrole);
-  if (userID) {
-    const orderFetchQuery = 'CALL orderFetch(?,?)';
-
-    const connection = await mysqlConnection();
-    // eslint-disable-next-line no-unused-vars
-    const [results, fields] = await connection.query(orderFetchQuery, [restroId, orderID]);
-    let order = results[0][0].Ordered_Dishes;
-    order = order.split(';');
-    const appetizers = results[1];
-    const beverages = results[2];
-    const salads = results[3];
-    const desserts = results[4];
-    const mainCourse = results[5];
-    const orders = await getOrderList(order, appetizers, desserts, beverages, salads, mainCourse);
-
-    console.log(orders);
-
-    connection.end();
-    response.writeHead(200, {
-      'Content-Type': 'text/plain',
-    });
-    response.end(JSON.stringify(orders));
-  } else {
-    response.writeHead(401, {
-      'Content-Type': 'text/plain',
-    });
-    response.end('Invalid User');
-  }
-  return response;
-};
 
 module.exports = {
   signup,
@@ -489,5 +477,4 @@ module.exports = {
   registerForEvent,
   getRegisteredEventIds,
   getAllOrders,
-  orderDetailsFetch,
 };

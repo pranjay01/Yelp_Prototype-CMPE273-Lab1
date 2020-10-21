@@ -39,6 +39,9 @@ class RestaurantLeftReviewPart extends Component {
     let ReviewDate = moment.utc();
     const data = {
       RestaurantID: localStorage.getItem('restaurantPageID'),
+      ReviewCounts: Number(this.props.restaurantProfileStore.RestaurantProfile.ReviewCounts) + 1,
+      TotalRating:
+        Number(this.props.restaurantProfileStore.RestaurantProfile.TotalRating) + Number(rating),
       Description: review,
       Rating: rating,
       CustomerID: localStorage.getItem('userId'),
@@ -73,8 +76,16 @@ class RestaurantLeftReviewPart extends Component {
           this.props.updateSnackbarData(payload);
         }
         const ReviewList = [...this.props.restaurantProfileStore.ReviewList, response.data];
+        // const ReviewCount
         const payload = {
           ReviewList,
+          RestaurantProfile: {
+            ...this.props.restaurantProfileStore.RestaurantProfile,
+            ReviewCounts: this.props.restaurantProfileStore.RestaurantProfile.ReviewCounts + 1,
+            TotalRating:
+              Number(this.props.restaurantProfileStore.RestaurantProfile.TotalRating) +
+              Number(rating),
+          },
         };
         this.props.updateSearchedRestaurant(payload);
       },
@@ -107,24 +118,32 @@ class RestaurantLeftReviewPart extends Component {
       <path d="M13.41 12l5.3-5.29a1.004 1.004 0 10-1.42-1.42L12 10.59l-5.29-5.3a1.004 1.004 0 00-1.42 1.42l5.3 5.29-5.3 5.29a1 1 0 000 1.42 1 1 0 001.42 0l5.29-5.3 5.29 5.3a1 1 0 001.42 0 1 1 0 000-1.42L13.41 12z"></path>
     );
     let rating = { backgroundPosition: '0 0' };
-    switch (this.props.restaurantProfileStore.AvgRating) {
-      case 1:
-        rating = { backgroundPosition: '0 -64px' };
-        break;
-      case 2:
-        rating = { backgroundPosition: '0 -128px' };
-        break;
-      case 3:
-        rating = { backgroundPosition: '0 -192px' };
-        break;
-      case 4:
-        rating = { backgroundPosition: '0 -256px' };
-        break;
-      case 5:
-        rating = { backgroundPosition: '0 -288px' };
-        break;
-      default:
-        break;
+
+    if (this.props.restaurantProfileStore.RestaurantProfile.ReviewCounts > 0) {
+      const AvgRating = Math.round(
+        this.props.restaurantProfileStore.RestaurantProfile.TotalRating /
+          this.props.restaurantProfileStore.RestaurantProfile.ReviewCounts
+      );
+      switch (AvgRating) {
+        case 1:
+          rating = { backgroundPosition: '0 -64px' };
+          break;
+        case 2:
+          rating = { backgroundPosition: '0 -128px' };
+          break;
+        case 3:
+          rating = { backgroundPosition: '0 -192px' };
+          break;
+        case 4:
+          rating = { backgroundPosition: '0 -256px' };
+
+          break;
+        case 5:
+          rating = { backgroundPosition: '0 -288px' };
+          break;
+        default:
+          break;
+      }
     }
     return (
       <div className="lemon--div__373c0__1mboc arrange-unit__373c0__o3tjT arrange-unit-grid-column--8__373c0__2dUx_ padding-r6__373c0__2Qlev border-color--default__373c0__3-ifU">
@@ -146,7 +165,7 @@ class RestaurantLeftReviewPart extends Component {
                       className="lemon--div__373c0__1mboc i-stars__373c0__1T6rz i-stars--large-5__373c0__1GcGD border-color--default__373c0__3-ifU overflow--hidden__373c0__2y4YK"
                       aria-label="5 star rating"
                       role="img"
-                      style={{ rating }}
+                      style={rating}
                     >
                       <img
                         className="lemon--img__373c0__3GQUb offscreen__373c0__1KofL"

@@ -27,22 +27,28 @@ class Restaurant extends Component {
       'https://s3-media0.fl.yelpcdn.com/assets/srv0/yelp_styleguide/bf5ff8a79310/assets/img/default_avatars/user_medium_square.png';
 
     let rating = { backgroundPosition: '0 -320px' };
-    switch (this.props.restaurant.AvgRating) {
-      case '1':
-        rating = { backgroundPosition: '0 -360px' };
-        break;
-      case '2':
-        rating = { backgroundPosition: '0 -400px' };
-        break;
-      case '3':
-        rating = { backgroundPosition: '0 -440px' };
-        break;
-      case '4':
-        rating = { backgroundPosition: '0 -480px' };
-        break;
-      case '5':
-        rating = { backgroundPosition: '0 -500px' };
-        break;
+    if (this.props.restaurant.ReviewCounts > 0) {
+      const AvgRating = Math.round(
+        this.props.restaurant.TotalRating / this.props.restaurant.ReviewCounts
+      );
+      console.log(' AvgRating:', AvgRating);
+      switch (AvgRating) {
+        case 1:
+          rating = { backgroundPosition: '0 -360px' };
+          break;
+        case 2:
+          rating = { backgroundPosition: '0 -400px' };
+          break;
+        case 3:
+          rating = { backgroundPosition: '0 -440px' };
+          break;
+        case 4:
+          rating = { backgroundPosition: '0 -480px' };
+          break;
+        case 5:
+          rating = { backgroundPosition: '0 -500px' };
+          break;
+      }
     }
     return (
       <li className="lemon--li__09f24__1r9wz border-color--default__09f24__R1nRO">

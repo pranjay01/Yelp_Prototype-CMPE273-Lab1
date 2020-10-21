@@ -3,7 +3,6 @@ import { updateSearchedRestaurant, updateRestaurantFoodStore } from '../constant
 const defaultState = {
   restaurantProfileStore: {
     RestaurantProfile: {},
-    AvgRating: 0,
     ReviewList: [],
   },
   RestaurantFoodMenuStore: {
