@@ -29,13 +29,13 @@ class Event extends Component {
                   </span>
                   <span className="lemon--span__373c0__3997G text__373c0__2Kxyz text-color--mid__373c0__jCeOG text-align--left__373c0__2XGa-">
                     <span>
-                      {' '}
+                      {this.props.event.EventDate}
                       {/*this.props.event.EventDate.toLocaleDateString()*/}
-                      {new Intl.DateTimeFormat('en-US', {
+                      {/*new Intl.DateTimeFormat('en-US', {
                         year: 'numeric',
                         month: 'long',
                         day: '2-digit',
-                      }).format(this.props.event.EventDate)}
+                      }).format(this.props.event.EventDate)*/}
                     </span>
                     <span style={{ marginLeft: '20px' }}>
                       {moment(this.props.event.StartTime, 'hh:mm:ss').format('h:mm a')}-

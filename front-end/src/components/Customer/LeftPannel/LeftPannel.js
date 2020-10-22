@@ -10,10 +10,6 @@ class LeftPannel extends Component {
     this.state = {};
   }
   render() {
-    let profileIsActive = false;
-    let eventsTabIsActive = false;
-    let ordersTabIsActive = false;
-
     let redirectVar = null;
     if (!localStorage.getItem('token')) {
       // console.log('cookie not found');
@@ -92,7 +88,9 @@ class LeftPannel extends Component {
                   <li className="titled-nav_item">
                     <Link
                       to="/AboutMe"
-                      className={`titled-nav_link ${profileIsActive && 'is - active'}`}
+                      className={`titled-nav_link ${
+                        this.props.LeftPannelStore.profileIsActive && 'is-active'
+                      }`}
                       href="#"
                     >
                       <div className="titled-nav_link-content arrange arrange--middle arrange--6">
@@ -148,7 +146,9 @@ class LeftPannel extends Component {
                   <li className="titled-nav_item">
                     <Link
                       to="/Events"
-                      className={`titled-nav_link ${eventsTabIsActive && 'is - active'}`}
+                      className={`titled-nav_link ${
+                        this.props.LeftPannelStore.eventsTabIsActive && 'is-active'
+                      }`}
                       href="#"
                     >
                       <div className="titled-nav_link-content arrange arrange--middle arrange--6">
@@ -176,7 +176,9 @@ class LeftPannel extends Component {
                   <li className="titled-nav_item">
                     <Link
                       to="/OrdersList"
-                      className={`titled-nav_link ${ordersTabIsActive && 'is - active'}`}
+                      className={`titled-nav_link ${
+                        this.props.LeftPannelStore.ordersTabIsActive && 'is-active'
+                      }`}
                       // className="titled-nav_link"
                       href="#"
                     >
@@ -215,8 +217,10 @@ class LeftPannel extends Component {
 
 const mapStateToProps = (state) => {
   const { customerInfo } = state.customerBasicInfoReducer;
+  const { LeftPannelStore } = state.leftPannelReducer;
   return {
-    customerInfo: customerInfo,
+    customerInfo,
+    LeftPannelStore,
   };
 };
 

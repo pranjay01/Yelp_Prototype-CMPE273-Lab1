@@ -8,7 +8,7 @@ import OrderForCustomer from './OrderForCustomer';
 import axios from 'axios';
 import serverUrl from '../../../config';
 import OrderDetails from '../../Restaurant/Orders/OrderDetails';
-import { updateOrderStore } from '../../../constants/action-types';
+import { updateOrderStore, updateLeftPannelHighlight } from '../../../constants/action-types';
 import { connect } from 'react-redux';
 import ReactPaginate from 'react-paginate';
 
@@ -67,6 +67,8 @@ class OrdersList extends Component {
   };
 
   componentDidMount() {
+    let payload = { profileIsActive: false, eventsTabIsActive: false, ordersTabIsActive: true };
+    this.props.updateLeftPannelHighlight(payload);
     this.commonFetch(0, -1, 'All', '');
   }
 
@@ -372,6 +374,12 @@ const mapDispatchToProps = (dispatch) => {
     updateOrderStore: (payload) => {
       dispatch({
         type: updateOrderStore,
+        payload,
+      });
+    },
+    updateLeftPannelHighlight: (payload) => {
+      dispatch({
+        type: updateLeftPannelHighlight,
         payload,
       });
     },

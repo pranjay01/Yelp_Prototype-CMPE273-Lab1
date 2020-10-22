@@ -139,6 +139,7 @@ class EventList extends Component {
             message: 'Event Created Successfully!',
           };
           this.props.updateSnackbarData(payload);
+          this.commonFetch(this.props.eventStore.sortValue, this.props.eventStore.selectedPage);
         }
       },
       (error) => {

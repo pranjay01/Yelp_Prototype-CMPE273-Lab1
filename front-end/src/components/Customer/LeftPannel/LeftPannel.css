@@ -45,3 +45,7 @@ textarea {
   margin: 0;
   font-weight: normal;
 }
+
+is-active {
+  background: #33333321;
+}

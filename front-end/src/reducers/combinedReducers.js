@@ -11,6 +11,8 @@ import reviewStoreReducer from './reviewStoreReducer';
 import orderStoreReducer from './orderStoreReducer';
 import eventStoreReducer from './eventStoreReducer';
 import searchedRestaurantReducer from './searchedRestaurantReducer';
+import customerEventReducer from './customerEventReducer';
+import leftPannelReducer from './leftPannelReducer';
 import { combineReducers } from 'redux';
 
 const finalReducers = combineReducers({
@@ -27,6 +29,8 @@ const finalReducers = combineReducers({
   orderStoreReducer: orderStoreReducer,
   eventStoreReducer: eventStoreReducer,
   searchedRestaurantReducer: searchedRestaurantReducer,
+  customerEventReducer: customerEventReducer,
+  leftPannelReducer: leftPannelReducer,
 });
 
 export default finalReducers;

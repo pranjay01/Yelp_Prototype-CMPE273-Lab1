@@ -3,6 +3,8 @@ import CustomerNavBar from '../CommonArea/CustomerNavBar';
 import GreyArea from '../../Customer/CommonArea/GreyArea';
 import { Redirect } from 'react-router';
 import LeftPannel from '../LeftPannel/LeftPannel';
+import { updateLeftPannelHighlight } from '../../../constants/action-types';
+
 import './AboutMe.css';
 import { connect } from 'react-redux';
 
@@ -11,7 +13,10 @@ class AboutMe extends Component {
     super(props);
     this.state = {};
   }
-
+  componentDidMount() {
+    let payload = { profileIsActive: true, eventsTabIsActive: false, ordersTabIsActive: false };
+    this.props.updateLeftPannelHighlight(payload);
+  }
   render() {
     let redirectVar = null;
     if (!localStorage.getItem('token')) {
@@ -148,6 +153,17 @@ class AboutMe extends Component {
   }
 }
 
+const mapDispatchToProps = (dispatch) => {
+  return {
+    updateLeftPannelHighlight: (payload) => {
+      dispatch({
+        type: updateLeftPannelHighlight,
+        payload,
+      });
+    },
+  };
+};
+
 // export default AboutMe;
 const mapStateToProps = (state) => {
   const { customerInfo } = state.customerBasicInfoReducer;
@@ -156,4 +172,4 @@ const mapStateToProps = (state) => {
   };
 };
 
-export default connect(mapStateToProps, null)(AboutMe);
+export default connect(mapStateToProps, mapDispatchToProps)(AboutMe);

@@ -10,8 +10,8 @@ const url = require('url');
 const jwt = require('jsonwebtoken');
 
 const moment = require('moment');
-const { getUserIdFromToken } = require('../common/loginLogout');
-const mysqlConnection = require('../mysqlConnection');
+// const { getUserIdFromToken } = require('../common/loginLogout');
+// const mysqlConnection = require('../mysqlConnection');
 
 const { BUCKET_NAME } = process.env;
 const s3Storage = new AWS.S3({
@@ -29,6 +29,8 @@ const Reviews = require('../Models/Review');
 const Orders = require('../Models/Order');
 
 const Restaurant = require('../Models/Restaurant');
+
+const Event = require('../Models/Event');
 
 const multipleUpload = multer({
   storage: multerS3({
@@ -114,7 +116,7 @@ const getCustomerInfo = async (request, response) => {
   try {
     const { _id } = url.parse(request.url, true).query;
 
-    const customer = await Customer.findOne({ CustomerID: _id }, { RegisteredEvents: 0 }).exec();
+    const customer = await Customer.findOne({ CustomerID: _id }).exec();
 
     const reviewCount = await Reviews.find({ CustomerID: _id }).countDocuments();
     const results = {
@@ -285,7 +287,7 @@ const generateOrder = async (request, response) => {
   return response;
 };
 
-// Submit Review
+// Submit Review //MongoDB Implemented
 const submitReview = async (request, response) => {
   try {
     const newReview = new Reviews({
@@ -321,28 +323,56 @@ const submitReview = async (request, response) => {
 // fetch events fased on filter
 const getEventList = async (request, response) => {
   try {
-    const { sortValue } = url.parse(request.url, true).query;
-    const userID = getUserIdFromToken(request.cookies.cookie, request.cookies.userrole);
-    if (userID) {
-      const getEventListForCustomerQuery = 'CALL getEventListForCustomer(?,?)';
-
-      const connection = await mysqlConnection();
-      // eslint-disable-next-line no-unused-vars
-      const [results, fields] = await connection.query(getEventListForCustomerQuery, [
-        userID,
-        sortValue,
-      ]);
-      connection.end();
-      response.writeHead(200, {
-        'Content-Type': 'text/plain',
-      });
-      response.end(JSON.stringify(results));
-    } else {
-      response.writeHead(401, {
-        'Content-Type': 'text/plain',
-      });
-      response.end('Invalid User');
+    const { sortValue, selectedPage, sortOrder, CustomerID } = url.parse(request.url, true).query;
+    let EventList = [];
+    let eventCount = 0;
+    switch (sortValue) {
+      case 'upcoming':
+        EventList = await Event.find({ EventDate: { $gte: new Date() } })
+          .sort({ EventDate: sortOrder })
+          .skip(selectedPage * 3)
+          .limit(3)
+          .exec();
+        eventCount = await Event.find({ EventDate: { $gte: new Date() } }).countDocuments();
+        break;
+      case 'registered':
+        EventList = await Event.find({
+          'RegisteredCustomers.CustomerID': CustomerID,
+          EventDate: { $gte: new Date() },
+        })
+          .sort({ EventDate: sortOrder })
+          .skip(selectedPage * 3)
+          .limit(3)
+          .exec();
+        eventCount = await Event.find({
+          'RegisteredCustomers.CustomerID': CustomerID,
+          EventDate: { $gte: new Date() },
+        }).countDocuments();
+        break;
+      default:
+        EventList = await Event.find({
+          EventName: { $regex: `${sortValue}`, $options: 'i' },
+        })
+          .sort({ EventDate: sortOrder })
+          .skip(selectedPage * 3)
+          .limit(3)
+          .exec();
+        eventCount = await Event.find({
+          EventName: { $regex: `${sortValue}`, $options: 'i' },
+        }).countDocuments();
+        break;
     }
+
+    const results = {
+      EventList,
+      eventCount,
+    };
+
+    response.writeHead(200, {
+      'Content-Type': 'text/plain',
+    });
+    console.log(results);
+    response.end(JSON.stringify(results));
   } catch (error) {
     response.writeHead(500, {
       'Content-Type': 'text/plain',
@@ -354,29 +384,21 @@ const getEventList = async (request, response) => {
 
 // Submit Review //MongoDB IMplemented
 const registerForEvent = async (request, response) => {
-  const { eventId, token, userrole } = request.body;
+  const { eventId, RegisteredCustomer } = request.body;
 
   try {
-    const cusID = getUserIdFromToken(token, userrole);
-    if (cusID) {
-      const registerForEventQuery = 'CALL registerForEvent(?,?)';
-
-      const connection = await mysqlConnection();
-
-      // eslint-disable-next-line no-unused-vars
-      const [results, fields] = await connection.query(registerForEventQuery, [cusID, eventId]);
-      connection.end();
-      console.log(results);
-      response.writeHead(200, {
-        'Content-Type': 'text/plain',
-      });
-      response.end('Review Created Successfully');
-    } else {
-      response.writeHead(401, {
-        'Content-Type': 'text/plain',
-      });
-      response.end('Invalid User');
-    }
+    await Event.updateOne(
+      { _id: eventId },
+      { $push: { RegisteredCustomers: RegisteredCustomer } }
+    ).exec();
+    await Customer.updateOne(
+      { CustomerID: RegisteredCustomer.CustomerID },
+      { $push: { RegisteredEvents: eventId } }
+    ).exec();
+    response.writeHead(200, {
+      'Content-Type': 'text/plain',
+    });
+    response.end('Event Registered Succesfully');
   } catch (error) {
     response.writeHead(500, {
       'Content-Type': 'text/plain',
@@ -385,7 +407,7 @@ const registerForEvent = async (request, response) => {
   }
   return response;
 };
-
+/*
 // fetch events fased on filter
 const getRegisteredEventIds = async (request, response) => {
   try {
@@ -415,8 +437,8 @@ const getRegisteredEventIds = async (request, response) => {
   }
   return response;
 };
-
-// fetch events fased on filter
+*/
+// fetch events fased on filter //MongoDB Implemented
 const getAllOrders = async (request, response) => {
   try {
     const { CustomerID, selectedPage, sortOrder, filter1, filter2 } = url.parse(
@@ -475,6 +497,6 @@ module.exports = {
   submitReview,
   getEventList,
   registerForEvent,
-  getRegisteredEventIds,
+  // getRegisteredEventIds,
   getAllOrders,
 };
