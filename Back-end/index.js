@@ -12,6 +12,9 @@ const bodyParser = require('body-parser');
 // const mongoose = require('mongoose');
 const config = require('./config');
 
+const { auth } = require('./Utils/passport');
+
+auth();
 // const mysqlConnection = require("./mysqlConnection");
 // const cors = require('cors');
 const bizProfile = require('./routes/bizProfileRoutes');

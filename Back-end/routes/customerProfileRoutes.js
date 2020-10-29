@@ -15,7 +15,7 @@ const s3Storage = new AWS.S3({
   secretAccessKey: process.env.SECRET_ACCESS_KEY,
 });
 require('dotenv').config();
-const { validateUser } = require('../Utils/passport');
+const { auth } = require('../Utils/passport');
 
 const multipleUpload = multer({
   storage: multerS3({
@@ -33,6 +33,8 @@ const multipleUpload = multer({
     },
   }),
 }).single('file');
+
+const { checkAuth } = require('../Utils/passport');
 
 // Customer signup // kafka Implemented
 Router.post('/signup', async (req, res) => {
@@ -63,6 +65,7 @@ Router.post('/signup', async (req, res) => {
 
 // Customer Login // kafka Implemented
 Router.post('/login', async (req, res) => {
+  auth();
   console.log('Login if correct credential');
   const data = {
     api: 'login',
@@ -106,7 +109,7 @@ Router.post('/logout', async (req, res) => {
 });
 
 // kafka Implemented
-Router.get('/getCustomerInfo', validateUser, async (req, res) => {
+Router.get('/getCustomerInfo', checkAuth, async (req, res) => {
   console.log('Get basic Customer Profile');
   const data = {
     api: 'getCustomerInfo',
@@ -136,7 +139,7 @@ Router.get('/getCustomerInfo', validateUser, async (req, res) => {
   // return results;
 });
 // kafka Implemented
-Router.put('/updateProfile', validateUser, async (req, res) => {
+Router.put('/updateProfile', checkAuth, async (req, res) => {
   console.log('updateProfile');
   const data = {
     api: 'updateProfile',
@@ -165,7 +168,7 @@ Router.put('/updateProfile', validateUser, async (req, res) => {
   // return results;
 });
 // kafka Implemented
-Router.post('/updateContactInfo', validateUser, async (req, res) => {
+Router.post('/updateContactInfo', checkAuth, async (req, res) => {
   console.log('updateContactInfo');
   const data = {
     api: 'updateContactInfo',
@@ -195,7 +198,7 @@ Router.post('/updateContactInfo', validateUser, async (req, res) => {
 });
 
 // Upload profile pic to s3 bucket // kafka Implemented
-Router.post('/uploadCustomerProfilePic', validateUser, async (req, res) => {
+Router.post('/uploadCustomerProfilePic', checkAuth, async (req, res) => {
   try {
     // console.log(req.body);
     multipleUpload(req, res, function (err) {
@@ -221,7 +224,7 @@ Router.post('/uploadCustomerProfilePic', validateUser, async (req, res) => {
   return res;
 });
 // kafka Implemented
-Router.post('/generateOrder', validateUser, async (req, res) => {
+Router.post('/generateOrder', checkAuth, async (req, res) => {
   console.log('generateOrder');
   const data = {
     api: 'generateOrder',
@@ -250,7 +253,7 @@ Router.post('/generateOrder', validateUser, async (req, res) => {
   // return results;
 });
 // kafka Implemented
-Router.post('/submitReview', validateUser, async (req, res) => {
+Router.post('/submitReview', checkAuth, async (req, res) => {
   console.log('submitReview');
   const data = {
     api: 'submitReview',
@@ -280,7 +283,7 @@ Router.post('/submitReview', validateUser, async (req, res) => {
 });
 
 // Fetch Events // kafka Implemented
-Router.get('/getEventList', validateUser, async (req, res) => {
+Router.get('/getEventList', checkAuth, async (req, res) => {
   console.log('Fetch Events');
   const data = {
     api: 'getEventList',
@@ -308,8 +311,9 @@ Router.get('/getEventList', validateUser, async (req, res) => {
   // results = await getEventList(req, res);
   // return results;
 });
+
 // kafka Implemented
-Router.post('/registerForEvent', validateUser, async (req, res) => {
+Router.post('/registerForEvent', checkAuth, async (req, res) => {
   console.log('registerForEvent');
   const data = {
     api: 'registerForEvent',
@@ -338,7 +342,7 @@ Router.post('/registerForEvent', validateUser, async (req, res) => {
   // return results;
 });
 // kafka Implemented
-Router.get('/getAllOrders', validateUser, async (req, res) => {
+Router.get('/getAllOrders', checkAuth, async (req, res) => {
   console.log('getAllOrders');
   const data = {
     api: 'getAllOrders',

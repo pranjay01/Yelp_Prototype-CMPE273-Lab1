@@ -2,7 +2,7 @@
 /* eslint-disable consistent-return */
 const JwtStrategy = require('passport-jwt').Strategy;
 const { ExtractJwt } = require('passport-jwt');
-const passport = require('passport');
+const { Passport } = require('passport');
 // const { secret } = require('./config');
 const kafka = require('../kafka/client');
 const config = require('../config');
@@ -11,11 +11,15 @@ if (process.env.NODE_ENV !== 'production') {
   // eslint-disable-next-line global-require
   require('dotenv').config();
 }
+
+const passport = new Passport();
+
 // Setup work and export for the JWT passport strategy
-async function auth() {
+function auth() {
   const opts = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme('jwt'),
-    secretOrKey: process.env.SESSION_SECRET,
+    // secretOrKey: process.env.SESSION_SECRET,
+    secretOrKey: config.SESSION_SECRET,
   };
   passport.use(
     new JwtStrategy(opts, (jwtPayload, callback) => {
@@ -43,4 +47,4 @@ async function auth() {
 }
 
 exports.auth = auth;
-exports.validateUser = passport.authenticate('jwt', { session: false });
+exports.checkAuth = passport.authenticate('jwt', { session: false });

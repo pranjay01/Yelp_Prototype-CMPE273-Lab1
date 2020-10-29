@@ -5,7 +5,7 @@ const express = require('express');
 const AWS = require('aws-sdk');
 const multer = require('multer');
 const multerS3 = require('multer-s3');
-const { validateUser } = require('../Utils/passportold');
+const { checkAuth } = require('../Utils/passport');
 
 const Router = express.Router();
 const kafka = require('../kafka/client');
@@ -17,6 +17,7 @@ const s3Storage = new AWS.S3({
   secretAccessKey: process.env.SECRET_ACCESS_KEY,
 });
 require('dotenv').config();
+const { auth } = require('../Utils/passport');
 
 const multipleUpload = multer({
   storage: multerS3({
@@ -62,6 +63,7 @@ Router.post('/signup', async (req, res) => {
 
 // Restaurant Login //Kafka Implemented
 Router.post('/login', async (req, res) => {
+  auth();
   console.log('Login if correct credential');
   const data = {
     api: 'login',
@@ -103,7 +105,7 @@ Router.post('/logout', async (req, res) => {
 });
 
 // Restaurant get Profile Info for Home page //Kafka Implemented
-Router.get('/homeProfile', validateUser, async (req, res) => {
+Router.get('/homeProfile', checkAuth, async (req, res) => {
   console.log('Get basic Restaurant Profile');
   const data = {
     api: 'homeProfile',
@@ -133,7 +135,7 @@ Router.get('/homeProfile', validateUser, async (req, res) => {
 });
 
 // Restaurant Update Profile //Kafka Implemented
-Router.post('/updateRestaurantProfile', validateUser, async (req, res) => {
+Router.post('/updateRestaurantProfile', checkAuth, async (req, res) => {
   console.log('Update Restaurant Profile');
   const data = {
     api: 'updateRestaurantProfile',
@@ -161,7 +163,7 @@ Router.post('/updateRestaurantProfile', validateUser, async (req, res) => {
   // return results;
 });
 
-Router.post('/uploadRestaurantProfilePic', validateUser, async (req, res) => {
+Router.post('/uploadRestaurantProfilePic', checkAuth, async (req, res) => {
   console.log('uploadRestaurantProfilePic');
   await multipleUpload(req, res, function (err) {
     if (err instanceof multer.MulterError) {
@@ -221,7 +223,7 @@ Router.post('/uploadRestaurantProfilePic', validateUser, async (req, res) => {
   // return results;
 });
 
-Router.post('/uploadPicToMulter', validateUser, async (req, res) => {
+Router.post('/uploadPicToMulter', checkAuth, async (req, res) => {
   try {
     // console.log(req.body);
     multipleUpload(req, res, function (err) {
@@ -248,7 +250,7 @@ Router.post('/uploadPicToMulter', validateUser, async (req, res) => {
 });
 
 // Fetch menu of asked category //Kafka Implemented
-Router.get('/menuFetch', validateUser, async (req, res) => {
+Router.get('/menuFetch', checkAuth, async (req, res) => {
   console.log('Fetch Menu');
   const data = {
     api: 'menuFetch',
@@ -277,7 +279,7 @@ Router.get('/menuFetch', validateUser, async (req, res) => {
   // return results;
 });
 
-Router.post('/uploadFoodImage', validateUser, async (req, res) => {
+Router.post('/uploadFoodImage', checkAuth, async (req, res) => {
   try {
     multipleUpload(req, res, function (err) {
       if (err instanceof multer.MulterError) {
@@ -303,7 +305,7 @@ Router.post('/uploadFoodImage', validateUser, async (req, res) => {
 });
 
 // nsert New Food Item //Kafka Implemented
-Router.post('/insertFood', validateUser, async (req, res) => {
+Router.post('/insertFood', checkAuth, async (req, res) => {
   console.log('Insert New Food Item');
   const data = {
     api: 'insertFood',
@@ -331,7 +333,7 @@ Router.post('/insertFood', validateUser, async (req, res) => {
 });
 
 // Delete Food Item //Kafka Implemented
-Router.post('/deleteFoodItem', validateUser, async (req, res) => {
+Router.post('/deleteFoodItem', checkAuth, async (req, res) => {
   console.log('Delete Food Item');
   const data = {
     api: 'deleteFoodItem',
@@ -360,7 +362,7 @@ Router.post('/deleteFoodItem', validateUser, async (req, res) => {
 });
 
 // Update Food Item //Kafka Implemented
-Router.post('/updateFoodItem', validateUser, async (req, res) => {
+Router.post('/updateFoodItem', checkAuth, async (req, res) => {
   console.log('Update Food Item');
   const data = {
     api: 'updateFoodItem',
@@ -389,7 +391,7 @@ Router.post('/updateFoodItem', validateUser, async (req, res) => {
 });
 
 // Fetch reviews //Kafka Implemented
-Router.get('/fetchReviews', validateUser, async (req, res) => {
+Router.get('/fetchReviews', checkAuth, async (req, res) => {
   console.log('fetchReviews');
   const data = {
     api: 'fetchReviews',
@@ -418,7 +420,7 @@ Router.get('/fetchReviews', validateUser, async (req, res) => {
 });
 
 // Fetch Orders //Kafka Implemented
-Router.get('/getOrderDetails', validateUser, async (req, res) => {
+Router.get('/getOrderDetails', checkAuth, async (req, res) => {
   console.log('Fetch Orders');
   const data = {
     api: 'getOrderDetails',
@@ -447,7 +449,7 @@ Router.get('/getOrderDetails', validateUser, async (req, res) => {
 });
 
 // Update Delivery Status //Kafka Implemented
-Router.post('/updateDeliveryStatus', validateUser, async (req, res) => {
+Router.post('/updateDeliveryStatus', checkAuth, async (req, res) => {
   console.log('Update Delivery Status');
   const data = {
     api: 'updateDeliveryStatus',
@@ -476,7 +478,7 @@ Router.post('/updateDeliveryStatus', validateUser, async (req, res) => {
 });
 
 // Update Delivery Status //Kafka Implemented
-Router.post('/createNewEvent', validateUser, async (req, res) => {
+Router.post('/createNewEvent', checkAuth, async (req, res) => {
   console.log('Create new Event');
   const data = {
     api: 'createNewEvent',
@@ -505,7 +507,7 @@ Router.post('/createNewEvent', validateUser, async (req, res) => {
 });
 
 // Fetch Events //Kafka Implemented
-Router.get('/getEventList', validateUser, async (req, res) => {
+Router.get('/getEventList', checkAuth, async (req, res) => {
   console.log('Fetch Events');
   const data = {
     api: 'getEventList',
@@ -534,7 +536,7 @@ Router.get('/getEventList', validateUser, async (req, res) => {
 });
 
 // Get Customer Register to event //Kafka Implemented
-Router.get('/getCustomerList', validateUser, async (req, res) => {
+Router.get('/getCustomerList', checkAuth, async (req, res) => {
   console.log('Fetch Events');
   const data = {
     api: 'getCustomerList',
@@ -563,7 +565,7 @@ Router.get('/getCustomerList', validateUser, async (req, res) => {
 });
 
 // Kafka Implemented
-Router.get('/getCustomerCompleteProfile', validateUser, async (req, res) => {
+Router.get('/getCustomerCompleteProfile', checkAuth, async (req, res) => {
   console.log('getContactInfo');
   const data = {
     api: 'getCustomerCompleteProfile',

@@ -9,7 +9,6 @@ import { updateSnackbarData, getCustomerBasicInfo } from '../../../constants/act
 // import {  } from '../../../constants/action-types';
 
 import { connect } from 'react-redux';
-import Moment from 'moment';
 
 class UpdateProfile extends Component {
   constructor(props) {
@@ -405,7 +404,6 @@ class UpdateProfile extends Component {
                         this.state.errors.dateError.length !== 0
                       }
                       type="submit"
-                      value="submit"
                       className="ybtn ybtn--primary ybtn-full-responsive-small"
                     >
                       <span>Save Changes</span>

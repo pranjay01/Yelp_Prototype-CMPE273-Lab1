@@ -5,15 +5,15 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const UserSignup = require('../Models/UserSignup');
+const config = require('../../Back-end/config');
 
 if (process.env.NODE_ENV !== 'production') {
   // eslint-disable-next-line global-require
   require('dotenv').config();
 }
-const { auth } = require('../../Back-end/Utils/passportold');
+const { auth } = require('../../Back-end/Utils/passport');
 
 auth();
-
 async function handle_request(msg, callback) {
   switch (msg.api) {
     case 'login': {
@@ -26,7 +26,8 @@ async function handle_request(msg, callback) {
         }
         if (user && (await bcrypt.compare(msg.data.Password, user.Password))) {
           const payload = { _id: user._id, userrole: user.Role, email: user.Email };
-          const token = jwt.sign(payload, process.env.SESSION_SECRET, {
+          // const token = jwt.sign(payload, process.env.SESSION_SECRET, {
+          const token = jwt.sign(payload, config.SESSION_SECRET, {
             expiresIn: 1008000,
           });
           response.status = 200;
