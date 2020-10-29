@@ -8,7 +8,7 @@ const multer = require('multer');
 const multerS3 = require('multer-s3');
 const url = require('url');
 const geocoder = require('google-geocoder');
-const { getUserIdFromToken } = require('../common/loginLogout');
+// const { getUserIdFromToken } = require('../common/loginLogout');
 
 const mysqlConnection = require('../mysqlConnection');
 const UserSignup = require('../Models/UserSignup');
@@ -24,6 +24,7 @@ const Beverage = require('../Models/Beverage');
 const Dessert = require('../Models/Dessert');
 const MainCourse = require('../Models/MainCourse');
 const Salad = require('../Models/Salad');
+const Customer = require('../Models/Customer');
 const { key } = require('./config');
 
 const geo = geocoder({
@@ -685,27 +686,19 @@ const getCustomerList = async (request, response) => {
 
 // Get Contact Information
 const getCustomerCompleteProfileForRestaurant = async (request, response) => {
-  const { cusID } = url.parse(request.url, true).query;
+  const { CustomerID } = url.parse(request.url, true).query;
   try {
-    const userID = getUserIdFromToken(request.cookies.cookie, request.cookies.userrole);
-    if (userID) {
-      const getCustomerCompleteProfileQuery = 'CALL getCustomerCompleteProfile(?)';
-
-      const connection = await mysqlConnection();
-      // eslint-disable-next-line no-unused-vars
-      const [results, fields] = await connection.query(getCustomerCompleteProfileQuery, cusID);
-      connection.end();
-
-      response.writeHead(200, {
-        'Content-Type': 'text/plain',
-      });
-      response.end(JSON.stringify(results));
-    } else {
-      response.writeHead(401, {
-        'Content-Type': 'text/plain',
-      });
-      response.end('Invalid User');
-    }
+    const customer = await Customer.findOne(
+      { CustomerID },
+      { RegisteredEvents: 0, ReviewCount: 0 }
+    );
+    const results = {
+      customer,
+    };
+    response.writeHead(200, {
+      'Content-Type': 'text/plain',
+    });
+    response.end(JSON.stringify(results));
   } catch (error) {
     response.writeHead(401, {
       'Content-Type': 'text/plain',
@@ -725,7 +718,6 @@ module.exports = {
   updateFoodItem,
   fetchReviews,
   getOrderDetails,
-  // orderFetch,
   updateDeliveryStatus,
   createNewEvent,
   getEventList,
@@ -733,6 +725,5 @@ module.exports = {
   uploadRestaurantProfilePic,
   uploadPicToMulter,
   uploadFoodImage,
-  // getOrderList,
   getCustomerCompleteProfileForRestaurant,
 };

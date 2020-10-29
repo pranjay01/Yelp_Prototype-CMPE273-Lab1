@@ -43,7 +43,6 @@ class EventList extends Component {
         let EventList = response.data.EventList.map((event) => {
           return {
             ...event,
-            EventDate: new Date(event.EventDate),
           };
         });
 

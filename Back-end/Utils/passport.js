@@ -1,11 +1,18 @@
+/* eslint-disable func-names */
+/* eslint-disable consistent-return */
 const JwtStrategy = require('passport-jwt').Strategy;
 const { ExtractJwt } = require('passport-jwt');
 const passport = require('passport');
 // const { secret } = require('./config');
-const UserSignup = require('../Models/UserSignup');
+const kafka = require('../kafka/client');
+const config = require('../config');
 
+if (process.env.NODE_ENV !== 'production') {
+  // eslint-disable-next-line global-require
+  require('dotenv').config();
+}
 // Setup work and export for the JWT passport strategy
-function auth() {
+async function auth() {
   const opts = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme('jwt'),
     secretOrKey: process.env.SESSION_SECRET,
@@ -17,7 +24,11 @@ function auth() {
       const role = jwtPayload.userrole;
       const { email } = jwtPayload;
       // eslint-disable-next-line consistent-return
-      UserSignup.findOne({ _id: userId, Role: role, Email: email }, (err, results) => {
+      const data = {
+        api: 'validate',
+        data: { userId, role, email },
+      };
+      kafka.make_request(config.kafkacommontopic, data, function (err, results) {
         if (err) {
           return callback(err, false);
         }

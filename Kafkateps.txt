@@ -1,0 +1,15 @@
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+sh bin/zookeeper-server-start.sh config/zookeeper.properties
+
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+sh bin/kafka-server-start.sh config/server.properties
+
+
+
+
+sh bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic Customer-requests
+sh bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic Common-requests
+sh bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic Static-requests
+sh bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic Restaurant-requests
+
+sh bin/kafka-topics.sh --list --zookeeper localhost:2181

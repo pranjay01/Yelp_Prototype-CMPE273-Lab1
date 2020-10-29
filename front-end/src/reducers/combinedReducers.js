@@ -13,6 +13,7 @@ import eventStoreReducer from './eventStoreReducer';
 import searchedRestaurantReducer from './searchedRestaurantReducer';
 import customerEventReducer from './customerEventReducer';
 import leftPannelReducer from './leftPannelReducer';
+import customerForProfileReducer from './customerForProfileReducer';
 import { combineReducers } from 'redux';
 
 const finalReducers = combineReducers({
@@ -31,6 +32,7 @@ const finalReducers = combineReducers({
   searchedRestaurantReducer: searchedRestaurantReducer,
   customerEventReducer: customerEventReducer,
   leftPannelReducer: leftPannelReducer,
+  customerForProfileReducer: customerForProfileReducer,
 });
 
 export default finalReducers;

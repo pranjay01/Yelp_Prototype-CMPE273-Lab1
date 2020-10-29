@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import axios from 'axios';
-import serverUrl from '../../../../config';
+
 class WriteAReview extends Component {
   constructor(props) {
     super(props);

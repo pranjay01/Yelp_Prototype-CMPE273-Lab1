@@ -3,3 +3,6 @@ node_modules
 ../Database/SQLCredentials.txt
 Models/config.js
 restaurant/config.js
+
+../KafkaInstallation
+config.js

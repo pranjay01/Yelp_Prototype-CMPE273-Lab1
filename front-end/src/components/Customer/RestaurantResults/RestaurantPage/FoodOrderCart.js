@@ -27,6 +27,7 @@ class FoodOrderCart extends Component {
     return 0;
   }
   commonFetch(category, selectedPage = 0) {
+    axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
     axios
       .get(
         serverUrl + 'static/menuFetch',

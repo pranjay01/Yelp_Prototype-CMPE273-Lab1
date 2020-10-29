@@ -8,7 +8,11 @@ import axios from 'axios';
 import serverUrl from '../../../config';
 import CustomerStaticProfile from '../CommonComponent/CustomerStaticProfile';
 import { connect } from 'react-redux';
-import { updateOrderStore, updateSnackbarData } from '../../../constants/action-types';
+import {
+  updateOrderStore,
+  updateSnackbarData,
+  updateCustomerForRestaurant,
+} from '../../../constants/action-types';
 import ReactPaginate from 'react-paginate';
 
 class ordersList extends Component {
@@ -24,20 +28,6 @@ class ordersList extends Component {
         { key: 6, value: 'Picked up' },
         { key: 7, value: 'Canceled' },
       ],
-      staticProfileSeen: false,
-      customerProfile: {
-        Name: '',
-        NickName: '',
-        DOB: '',
-        Address1: '',
-        Address2: '',
-        Headline: '',
-        ILove: '',
-        FMI: '',
-        JoinDate: '',
-        Website: '',
-        ImageUrl: '',
-      },
     };
   }
 
@@ -81,10 +71,6 @@ class ordersList extends Component {
     // let newOrdersList = [];
     event.preventDefault();
     this.commonFetch(sortValue);
-    // let payload = {
-    //   selectedPage: 0,
-    // };
-    // this.props.updateOrderStore(payload);
   }
 
   componentDidMount() {
@@ -167,42 +153,31 @@ class ordersList extends Component {
     );
   };
 
-  openStaticProfile = (event, cusID) => {
-    if (this.state.staticProfileSeen) {
-      this.setState({
-        staticProfileSeen: !this.state.staticProfileSeen,
-      });
+  openStaticProfile = (event, CustomerID) => {
+    if (this.props.customerInfo.staticProfileSeen) {
+      let payload = {
+        customerProfile: {},
+        staticProfileSeen: false,
+      };
+      this.props.updateCustomerForRestaurant(payload);
     } else {
       event.preventDefault();
       axios
         .get(
           serverUrl + 'biz/getCustomerCompleteProfile',
 
-          { params: { cusID }, withCredentials: true }
+          { params: { CustomerID }, withCredentials: true }
         )
         .then((response) => {
           console.log(response.data);
-          let customerProfile = {
-            Name: response.data[0][0].Name,
-            NickName: response.data[0][0].NickName,
-            DOB: response.data[0][0].DOB,
-            Address1: response.data[0][0].Address1,
-            Address2: response.data[0][0].Address2,
-            Headline: response.data[0][0].Headline,
-            ILove: response.data[0][0].ILove,
-            FMI: response.data[0][0].FMI,
-            JoinDate: response.data[0][0].JoinDate,
-            Website: response.data[0][0].Website,
-            ImageUrl: response.data[0][0].ImageURL,
+
+          let payload = {
+            customerProfile: response.data.customer,
+            staticProfileSeen: true,
           };
-          this.setState({
-            staticProfileSeen: !this.state.staticProfileSeen,
-            customerProfile,
-          });
+          this.props.updateCustomerForRestaurant(payload);
         });
     }
-
-    //console.log('fetching food details');
   };
   render() {
     return (
@@ -240,11 +215,9 @@ class ordersList extends Component {
             {/*navLogin*/}
           </div>
         </nav>
-        {this.state.staticProfileSeen ? (
+        {this.props.customerInfo.staticProfileSeen ? (
           <CustomerStaticProfile
-            customerProfile={this.state.customerProfile}
-            //  modeTop={'10%'}
-            //  orderDetails={this.state.orderDetails}
+            customerProfile={this.props.customerInfo.customerProfile}
             openStaticProfile={(event) => this.openStaticProfile(event, '')}
           />
         ) : null}
@@ -260,7 +233,7 @@ class ordersList extends Component {
                 openOrderDetails={() => this.openOrderDetails(order._id)}
                 onSave={() => this.updateStatus(order._id)}
                 onStatusChangeHandler={(value) => this.onStatusChangeHandler(value, order._id)}
-                openStaticProfile={(event) => this.openStaticProfile(event, order.CustomerId)}
+                openStaticProfile={(event) => this.openStaticProfile(event, order.CustomerID)}
 
                 //   }
               />
@@ -290,8 +263,11 @@ class ordersList extends Component {
 
 const mapStateToProps = (state) => {
   const { orderStore } = state.orderStoreReducer;
+  const { customerInfo } = state.customerForProfileReducer;
+
   return {
     orderStore,
+    customerInfo,
   };
 };
 
@@ -306,6 +282,12 @@ const mapDispatchToProps = (dispatch) => {
     updateSnackbarData: (payload) => {
       dispatch({
         type: updateSnackbarData,
+        payload,
+      });
+    },
+    updateCustomerForRestaurant: (payload) => {
+      dispatch({
+        type: updateCustomerForRestaurant,
         payload,
       });
     },

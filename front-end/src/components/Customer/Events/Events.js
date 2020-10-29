@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import CustomerNavBar from '../CommonArea/CustomerNavBar';
-import cookie from 'react-cookies';
 import { Redirect } from 'react-router';
 import LeftPannel from '../LeftPannel/LeftPannel';
 import GreyArea from '../CommonArea/GreyArea';
@@ -11,7 +10,7 @@ import serverUrl from '../../../config';
 import {
   updateSnackbarData,
   updateEventStoreForCustomer,
-  updateLeftPannelHighlight,
+  updateLeftPannelHighlight,getCustomerBasicInfo
 } from '../../../constants/action-types';
 import { connect } from 'react-redux';
 import moment from 'moment';
@@ -24,6 +23,7 @@ class Events extends Component {
   }
 
   commonFetch(sortValue = 'upcoming', selectedPage = 0, sortOrder = 1) {
+    axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
     axios
       .get(
         serverUrl + 'customer/getEventList',
@@ -94,6 +94,7 @@ class Events extends Component {
         Email: this.props.customerInfo.customerProfile.Email,
       },
     };
+    axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
     axios.defaults.withCredentials = true;
     //make a post request with the user data
     axios.post(serverUrl + 'customer/registerForEvent', data).then(
@@ -105,6 +106,12 @@ class Events extends Component {
             message: 'Registeration Successfull!',
           };
           this.props.updateSnackbarData(payload);
+          let customerProfile = this.props.customerInfo.customerProfile;
+          let RegisteredEvents = customerProfile.RegisteredEvents;
+          customerProfile.RegisteredEvents = RegisteredEvents;
+          RegisteredEvents.push(eventId);
+          let payload2 = { customerProfile };
+          this.props.getCustomerBasicInfo(payload2);
         }
       },
       (error) => {
@@ -297,6 +304,12 @@ const mapDispatchToProps = (dispatch) => {
     updateLeftPannelHighlight: (payload) => {
       dispatch({
         type: updateLeftPannelHighlight,
+        payload,
+      });
+    },
+    getCustomerBasicInfo: (payload) => {
+      dispatch({
+        type: getCustomerBasicInfo,
         payload,
       });
     },

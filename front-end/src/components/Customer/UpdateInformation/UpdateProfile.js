@@ -112,6 +112,7 @@ class UpdateProfile extends Component {
       ...this.props.customerInfo.customerProfile,
       CustomerID: localStorage.getItem('userId'),
     };
+    axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
     axios.defaults.withCredentials = true;
     //make a post request with the user data
     axios.put(serverUrl + 'customer/updateProfile', data).then(
@@ -396,7 +397,7 @@ class UpdateProfile extends Component {
                       value={this.state.time}
                       placeholder="Date"
                       onChange={this.onChangeDate}
-                      value={this.props.customerInfo.customerProfile.DOB.format('YYYY-MM-DD')}
+                      value={this.props.customerInfo.customerProfile.DOB}
                     />
                     <button
                       disabled={

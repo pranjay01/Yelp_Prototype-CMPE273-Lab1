@@ -3,6 +3,7 @@ import axios from 'axios';
 import serverUrl from '../../../config';
 import CustomerStaticProfile from '../CommonComponent/CustomerStaticProfile';
 import { connect } from 'react-redux';
+import { updateCustomerForRestaurant } from '../../../constants/action-types';
 import ReactPaginate from 'react-paginate';
 
 import './RegisteredCustomers.css';
@@ -10,60 +11,33 @@ import './RegisteredCustomers.css';
 class RegisteredCustomers extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      staticProfileSeen: false,
-      customerProfile: {
-        Name: '',
-        NickName: '',
-        DOB: '',
-        Address1: '',
-        Address2: '',
-        Headline: '',
-        ILove: '',
-        FMI: '',
-        JoinDate: '',
-        Website: '',
-        ImageUrl: '',
-      },
-    };
+    this.state = {};
   }
-  openStaticProfile = (event, cusID) => {
-    if (this.state.staticProfileSeen) {
-      this.setState({
-        staticProfileSeen: !this.state.staticProfileSeen,
-        //orderDetails: [],
-      });
+  openStaticProfile = (event, CustomerID) => {
+    if (this.props.customerInfo.staticProfileSeen) {
+      let payload = {
+        customerProfile: {},
+        staticProfileSeen: false,
+      };
+      this.props.updateCustomerForRestaurant(payload);
     } else {
       event.preventDefault();
       axios
         .get(
           serverUrl + 'biz/getCustomerCompleteProfile',
 
-          { params: { cusID }, withCredentials: true }
+          { params: { CustomerID }, withCredentials: true }
         )
         .then((response) => {
           console.log(response.data);
-          let customerProfile = {
-            Name: response.data[0][0].Name,
-            NickName: response.data[0][0].NickName,
-            DOB: response.data[0][0].DOB,
-            Address1: response.data[0][0].Address1,
-            Address2: response.data[0][0].Address2,
-            Headline: response.data[0][0].Headline,
-            ILove: response.data[0][0].ILove,
-            FMI: response.data[0][0].FMI,
-            JoinDate: response.data[0][0].JoinDate,
-            Website: response.data[0][0].Website,
-            ImageUrl: response.data[0][0].ImageURL,
+
+          let payload = {
+            customerProfile: response.data.customer,
+            staticProfileSeen: true,
           };
-          this.setState({
-            staticProfileSeen: !this.state.staticProfileSeen,
-            customerProfile,
-          });
+          this.props.updateCustomerForRestaurant(payload);
         });
     }
-
-    //console.log('fetching food details');
   };
   handleClick = () => {
     this.props.toggle();
@@ -88,18 +62,19 @@ class RegisteredCustomers extends Component {
                 <th>Customer Name</th>
                 <th>Email</th>
               </tr>
-              {this.state.staticProfileSeen ? (
+              {this.props.customerInfo.staticProfileSeen ? (
                 <CustomerStaticProfile
-                  customerProfile={this.state.customerProfile}
-                  //  modeTop={'10%'}
-                  //  orderDetails={this.state.orderDetails}
+                  customerProfile={this.props.customerInfo.customerProfile}
                   openStaticProfile={(event) => this.openStaticProfile(event, '')}
                 />
               ) : null}
               {this.props.registrationStore.RegisteredCustomers.map((customer) => (
                 <tr key={customer.CustomerID}>
                   <td>
-                    <a href="#" onClick={(event) => this.openStaticProfile(event, customer.ID)}>
+                    <a
+                      href="#"
+                      onClick={(event) => this.openStaticProfile(event, customer.CustomerID)}
+                    >
                       {customer.CustomerName}
                     </a>
                   </td>
@@ -133,13 +108,25 @@ class RegisteredCustomers extends Component {
 const mapStateToProps = (state) => {
   const snackbarData = state.snackBarReducer;
   const { eventStore, registrationStore } = state.eventStoreReducer;
+  const { customerInfo } = state.customerForProfileReducer;
   return {
     snackbarData: snackbarData,
     eventStore,
     registrationStore,
+    customerInfo,
+  };
+};
+const mapDispatchToProps = (dispatch) => {
+  return {
+    updateCustomerForRestaurant: (payload) => {
+      dispatch({
+        type: updateCustomerForRestaurant,
+        payload,
+      });
+    },
   };
 };
 
-export default connect(mapStateToProps, null)(RegisteredCustomers);
+export default connect(mapStateToProps, mapDispatchToProps)(RegisteredCustomers);
 
 // export default RegisteredCustomers;

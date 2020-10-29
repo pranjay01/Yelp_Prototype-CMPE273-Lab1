@@ -1,12 +1,18 @@
 /* eslint-disable func-names */
+
+if (process.env.NODE_ENV !== 'production') {
+  // eslint-disable-next-line global-require
+  require('dotenv').config();
+}
 const express = require('express');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 
 const bodyParser = require('body-parser');
+// const mongoose = require('mongoose');
+const config = require('./config');
 
 // const mysqlConnection = require("./mysqlConnection");
-const mongoose = require('mongoose');
 // const cors = require('cors');
 const bizProfile = require('./routes/bizProfileRoutes');
 const custProfile = require('./routes/customerProfileRoutes');
@@ -29,7 +35,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 // app.use(upload.array());
 app.use(function (req, res, next) {
-  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+  res.setHeader('Access-Control-Allow-Origin', config.frontEndUrl);
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,POST,PUT,DELETE,OPTIONS');
   res.setHeader(
@@ -40,22 +46,22 @@ app.use(function (req, res, next) {
   next();
 });
 // app.options('GET,HEAD,POST,PUT,DELETE,OPTIONS', cors());
-const options = {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  poolSize: 500,
-  bufferMaxEntries: 0,
-};
+// const options = {
+//   useNewUrlParser: true,
+//   useUnifiedTopology: true,
+//   poolSize: 500,
+//   bufferMaxEntries: 0,
+// };
 
-const { mongoDB } = require('./Models/config');
+// const { mongoDB } = require('./Models/config');
 
-mongoose.connect(mongoDB, options, (err, res) => {
-  if (err) {
-    console.log('MongoDB connection Failesd', err);
-  } else {
-    console.log('MongoDB Connected Succesfully', res);
-  }
-});
+// mongoose.connect(mongoDB, options, (err, res) => {
+//   if (err) {
+//     console.log('MongoDB connection Failesd', err);
+//   } else {
+//     console.log('MongoDB Connected Succesfully', res);
+//   }
+// });
 
 app.use('/biz', bizProfile);
 app.use('/customer', custProfile);

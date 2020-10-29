@@ -9,19 +9,7 @@ class CustomerStaticProfile extends Component {
   render() {
     const defaultImage =
       'https://s3-media0.fl.yelpcdn.com/assets/srv0/yelp_styleguide/bf5ff8a79310/assets/img/default_avatars/user_medium_square.png';
-    //let redirectVar = null;
-    // if (!cookie.load('cookie')) {
-    //   console.log('cookie not found');
-    //   redirectVar = <Redirect to="/RestaurantLogin" />;
-    // } else {
-    //   if (cookie.load('userrole') === 'Restaurant') {
-    //     redirectVar = null;
-    //   } else if (cookie.load('userrole') === 'Customer') {
-    //     redirectVar = <Redirect to="/home" />;
-    //   } else {
-    //     redirectVar = <Redirect to="/CustomerLogin" />;
-    //   }
-    // }
+
     return (
       <div className="modal" style={{ top: '0', left: '0', width: '100%', height: '100%' }}>
         <div
@@ -37,21 +25,21 @@ class CustomerStaticProfile extends Component {
           >
             <div className="column column-beta ">
               <div className="user-details-overview">
-                <div class="user-details-overview_sidebar">
-                  <div class="photo-box pb-m">
+                <div className="user-details-overview_sidebar">
+                  <div className="photo-box pb-m">
                     <a
-                      class="js-analytics-click"
+                      className="js-analytics-click"
                       data-analytics-label="user-photo"
                       href="/user_photos?return_url=%2Fprofile%3Freturn_url%3D%252Fuser_details%253Fuserid%253DSbr_JFt86Dss0N-hb9StQg"
                     >
                       <img
                         style={{ width: '150px', height: '120px' }}
                         alt=""
-                        class="photo-box-img"
+                        className="photo-box-img"
                         src={
-                          this.props.customerProfile.ImageUrl !== null &&
-                          this.props.customerProfile.ImageUrl.length > 0
-                            ? this.props.customerProfile.ImageUrl
+                          this.props.customerProfile.ImageURL !== null &&
+                          this.props.customerProfile.ImageURL.length > 0
+                            ? this.props.customerProfile.ImageURL
                             : defaultImage
                         }
                         // src="https://s3-media0.fl.yelpcdn.com/assets/srv0/yelp_styleguide/bf5ff8a79310/assets/img/default_avatars/user_medium_square.png"
@@ -62,7 +50,12 @@ class CustomerStaticProfile extends Component {
                   this.props.customerProfile.NickName.length > 0 ? (
                     <h3>About {this.props.customerProfile.NickName}</h3>
                   ) : (
-                    <h3>About {this.props.customerProfile.Name}</h3>
+                    <h3>
+                      About{' '}
+                      {this.props.customerProfile.FirstName +
+                        ' ' +
+                        this.props.customerProfile.LastName}
+                    </h3>
                   )}
                   {this.props.customerProfile.Headline != null &&
                   this.props.customerProfile.Headline.length > 0 ? (
@@ -70,15 +63,21 @@ class CustomerStaticProfile extends Component {
                   ) : null}
                   <br />
 
-                  <div class="ysection">
-                    <ul class="ylist">
-                      {this.props.customerProfile.Address1 != null &&
-                      this.props.customerProfile.Address1.length > 0 ? (
-                        <li>
-                          <h4>Lives at</h4>
-                          <p>{this.props.customerProfile.Address1}</p>
-                          <p>{this.props.customerProfile.Address2}</p>
-                        </li>
+                  <div className="ysection">
+                    <ul className="ylist">
+                      {this.props.customerProfile.City != null &&
+                      this.props.customerProfile.City.length > 0 &&
+                      this.props.customerProfile.StateName != null &&
+                      this.props.customerProfile.StateName.length > 0 ? (
+                        <div>
+                          {' '}
+                          <p>
+                            {this.props.customerProfile.City +
+                              ', ' +
+                              this.props.customerProfile.StateName}
+                          </p>
+                          <p>{this.props.customerProfile.Street}</p>
+                        </div>
                       ) : null}
                       {(this.props.customerProfile.DOB != null &&
                         this.props.customerProfile.DOB.length) > 0 ? (

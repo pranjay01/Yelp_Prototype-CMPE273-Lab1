@@ -1,6 +1,5 @@
 /* eslint-disable no-underscore-dangle */
 const url = require('url');
-// const mysqlConnection = require('../mysqlConnection');
 const Country = require('../Models/Country');
 const State = require('../Models/State');
 const Gender = require('../Models/Gender');

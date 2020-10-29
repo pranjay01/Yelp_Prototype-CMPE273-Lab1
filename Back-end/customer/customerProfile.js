@@ -10,8 +10,6 @@ const url = require('url');
 const jwt = require('jsonwebtoken');
 
 const moment = require('moment');
-// const { getUserIdFromToken } = require('../common/loginLogout');
-// const mysqlConnection = require('../mysqlConnection');
 
 const { BUCKET_NAME } = process.env;
 const s3Storage = new AWS.S3({
@@ -320,7 +318,7 @@ const submitReview = async (request, response) => {
   return response;
 };
 
-// fetch events fased on filter
+// fetch events fased on filter //MongoDB Implemented
 const getEventList = async (request, response) => {
   try {
     const { sortValue, selectedPage, sortOrder, CustomerID } = url.parse(request.url, true).query;
@@ -407,37 +405,7 @@ const registerForEvent = async (request, response) => {
   }
   return response;
 };
-/*
-// fetch events fased on filter
-const getRegisteredEventIds = async (request, response) => {
-  try {
-    const userID = getUserIdFromToken(request.cookies.cookie, request.cookies.userrole);
-    if (userID) {
-      const getRegisteredEventIdsQuery = 'CALL getRegisteredEventIds(?)';
 
-      const connection = await mysqlConnection();
-      // eslint-disable-next-line no-unused-vars
-      const [results, fields] = await connection.query(getRegisteredEventIdsQuery, [userID]);
-      connection.end();
-      response.writeHead(200, {
-        'Content-Type': 'text/plain',
-      });
-      response.end(JSON.stringify(results));
-    } else {
-      response.writeHead(401, {
-        'Content-Type': 'text/plain',
-      });
-      response.end('Invalid User');
-    }
-  } catch (error) {
-    response.writeHead(500, {
-      'Content-Type': 'text/plain',
-    });
-    response.end('Network error');
-  }
-  return response;
-};
-*/
 // fetch events fased on filter //MongoDB Implemented
 const getAllOrders = async (request, response) => {
   try {
@@ -485,8 +453,6 @@ const getAllOrders = async (request, response) => {
   return response;
 };
 
-// Fetch details of particular order
-
 module.exports = {
   signup,
   getCustomerInfo,
@@ -497,6 +463,5 @@ module.exports = {
   submitReview,
   getEventList,
   registerForEvent,
-  // getRegisteredEventIds,
   getAllOrders,
 };
