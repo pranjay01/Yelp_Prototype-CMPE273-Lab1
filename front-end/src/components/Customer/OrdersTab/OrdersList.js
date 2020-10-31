@@ -67,7 +67,12 @@ class OrdersList extends Component {
   };
 
   componentDidMount() {
-    let payload = { profileIsActive: false, eventsTabIsActive: false, ordersTabIsActive: true };
+    let payload = {
+      profileIsActive: false,
+      eventsTabIsActive: false,
+      ordersTabIsActive: true,
+      followingTabIsActive: false,
+    };
     this.props.updateLeftPannelHighlight(payload);
     this.commonFetch(0, -1, 'All', '');
   }

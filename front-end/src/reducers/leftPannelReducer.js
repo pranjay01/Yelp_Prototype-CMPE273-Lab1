@@ -5,6 +5,7 @@ const defaultState = {
     profileIsActive: true,
     eventsTabIsActive: false,
     ordersTabIsActive: false,
+    followingTabIsActive: false,
   },
 };
 const leftPannelReducer = (state = defaultState, action) => {

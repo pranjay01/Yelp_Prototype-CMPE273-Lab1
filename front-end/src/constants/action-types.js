@@ -21,6 +21,7 @@ export const updateRestaurantFoodStore = 'update-restaurant-foodStore';
 export const updateEventStoreForCustomer = 'update-event-store-for-customer';
 export const updateLeftPannelHighlight = 'update-left-pannel-highlight';
 export const updateCustomerForRestaurant = 'update-customer-for-restaurant';
+export const updateCustomerListStore = 'update-customer-list-store';
 export const SALADS = 'SALADS';
 export const APPETIZERS = 'APPETIZERS';
 export const MAIN_COURSE = 'MAIN_COURSE';

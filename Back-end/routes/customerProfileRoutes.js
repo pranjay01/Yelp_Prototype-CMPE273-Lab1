@@ -371,4 +371,57 @@ Router.get('/getAllOrders', checkAuth, async (req, res) => {
   // return results;
 });
 
+Router.get('/getCustomers', checkAuth, async (req, res) => {
+  console.log('getCustomers');
+  const data = {
+    api: 'getCustomers',
+    url: req.url,
+  };
+  kafka.make_request(config.kafkacustomertopic, data, function (err, results) {
+    if (err) {
+      console.log('Inside err');
+      res.status(500);
+      res.json({
+        status: 'error',
+        msg: 'System Error, Try Again.',
+      });
+      res.end();
+    } else {
+      console.log('inside else of request');
+
+      res.status(results.status);
+      // res.json(results.data);
+      res.end(results.data);
+    }
+    return res;
+  });
+});
+
+Router.post('/followUser', checkAuth, async (req, res) => {
+  console.log('followUser');
+  const data = {
+    api: 'followUser',
+    data: req.body,
+  };
+  kafka.make_request(config.kafkacustomertopic, data, function (err, results) {
+    if (err) {
+      console.log('Inside err');
+      res.status(500);
+      res.json({
+        status: 'error',
+        msg: 'System Error, Try Again.',
+      });
+      res.end();
+    } else {
+      console.log('inside else of request');
+
+      res.status(results.status);
+      // res.json(results.data);
+      res.end(results.data);
+    }
+    return res;
+  });
+});
+
 module.exports = Router;
+

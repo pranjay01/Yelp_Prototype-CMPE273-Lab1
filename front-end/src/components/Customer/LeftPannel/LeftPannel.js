@@ -115,34 +115,6 @@ class LeftPannel extends Component {
                     </Link>
                   </li>
 
-                  {/* <li className="titled-nav_item">
-                    <Link
-                      to="/Reviews"
-                      className="titled-nav_link"
-                      href="/user_details_reviews_self?userid=Sbr_JFt86Dss0N-hb9StQg"
-                    >
-                      <div className="titled-nav_link-content arrange arrange--middle arrange--6">
-                        <div className="arrange_unit">
-                          <span
-                            aria-hidden="true"
-                            style={{ width: '24px', height: '24px' }}
-                            className="icon icon--24-review icon--size-24 titled-nav_icon"
-                          >
-                            <svg role="img" className="icon_svg">
-                              <svg id="24x24_review" height="24" viewBox="0 0 24 24" width="24">
-                                <path d="M21 6a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3V6zm-5.88 10.428l-3.16-1.938-3.05 2.01.59-3.457L7 10.596l3.457-.505L11.96 6.5l1.582 3.59 3.458.506-2.5 2.447.62 3.385z"></path>
-                              </svg>
-                            </svg>
-                          </span>
-                        </div>
-
-                        <div className="arrange_unit arrange_unit--fill">
-                          <span className="titled-nav_link-label">Reviews</span>
-                        </div>
-                      </div>
-                    </Link>
-    </li>*/}
-
                   <li className="titled-nav_item">
                     <Link
                       to="/Events"
@@ -199,6 +171,36 @@ class LeftPannel extends Component {
 
                         <div className="arrange_unit arrange_unit--fill">
                           <span className="titled-nav_link-label">Order History</span>
+                        </div>
+                      </div>
+                    </Link>
+                  </li>
+
+                  <li className="titled-nav_item">
+                    <Link
+                      to="/Following"
+                      className={`titled-nav_link ${
+                        this.props.LeftPannelStore.followingTabIsActive && 'is-active'
+                      }`}
+                      href="#"
+                    >
+                      <div className="titled-nav_link-content arrange arrange--middle arrange--6">
+                        <div className="arrange_unit">
+                          <span
+                            aria-hidden="true"
+                            style={{ width: '24px', height: '24px' }}
+                            className="icon icon--24-review icon--size-24 titled-nav_icon"
+                          >
+                            <svg role="img" className="icon_svg">
+                              <svg id="24x24_review" height="24" viewBox="0 0 24 24" width="24">
+                                <path d="M21 6a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3V6zm-5.88 10.428l-3.16-1.938-3.05 2.01.59-3.457L7 10.596l3.457-.505L11.96 6.5l1.582 3.59 3.458.506-2.5 2.447.62 3.385z"></path>
+                              </svg>
+                            </svg>
+                          </span>
+                        </div>
+
+                        <div className="arrange_unit arrange_unit--fill">
+                          <span className="titled-nav_link-label">Following</span>
                         </div>
                       </div>
                     </Link>

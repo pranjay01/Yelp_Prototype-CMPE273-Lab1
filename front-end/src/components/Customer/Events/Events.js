@@ -10,7 +10,8 @@ import serverUrl from '../../../config';
 import {
   updateSnackbarData,
   updateEventStoreForCustomer,
-  updateLeftPannelHighlight,getCustomerBasicInfo
+  updateLeftPannelHighlight,
+  getCustomerBasicInfo,
 } from '../../../constants/action-types';
 import { connect } from 'react-redux';
 import moment from 'moment';
@@ -68,7 +69,12 @@ class Events extends Component {
   };
 
   componentDidMount() {
-    let payload = { profileIsActive: false, eventsTabIsActive: true, ordersTabIsActive: false };
+    let payload = {
+      profileIsActive: false,
+      eventsTabIsActive: true,
+      ordersTabIsActive: false,
+      followingTabIsActive: false,
+    };
     this.props.updateLeftPannelHighlight(payload);
     this.commonFetch();
   }

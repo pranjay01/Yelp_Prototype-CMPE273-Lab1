@@ -14,7 +14,12 @@ class AboutMe extends Component {
     this.state = {};
   }
   componentDidMount() {
-    let payload = { profileIsActive: true, eventsTabIsActive: false, ordersTabIsActive: false };
+    let payload = {
+      profileIsActive: true,
+      eventsTabIsActive: false,
+      ordersTabIsActive: false,
+      followingTabIsActive: false,
+    };
     this.props.updateLeftPannelHighlight(payload);
   }
   render() {

@@ -17,6 +17,7 @@ import Events from './Customer/Events/Events';
 import OrdersList from './Customer/OrdersTab/OrdersList';
 import CustomerStaticProfile from './Restaurant/CommonComponent/CustomerStaticProfile';
 import SnackBar from './CommonComponents/SnackBar';
+import Following from './Customer/Following/Following';
 import { connect } from 'react-redux';
 import { updateMasterData } from '../constants/action-types';
 
@@ -70,6 +71,7 @@ class Main extends Component {
           <Route path="/restaurantHome" component={RestaurantHome} />
           <Route path="/cus" component={CustomerNavBar} />
           <Route path="/AboutMe" component={AboutMe} />
+          <Route path="/Following" component={Following} />
           <Route path="/UpdateProfile" component={UpdateProfile} />
           <Route path="/UpdateContactInformation" component={UpdateContactInformation} />
           <Route path="/RestaurantList" component={RestaurantList} />

@@ -8,7 +8,7 @@ const customerSchema = new Schema(
     FirstName: { type: String, required: true },
     LastName: { type: String, required: true },
     Gender: { type: String, required: true },
-    NickName: { type: String },
+    NickName: { type: String, default: '' },
     DOB: { type: Date },
     Email: { type: String, required: true },
     CountryName: { type: String },
@@ -26,6 +26,7 @@ const customerSchema = new Schema(
     JoinDate: { type: Date },
     RegisteredEvents: [String],
     ReviewCount: { type: Number },
+    Following: [String],
   },
   { versionKey: false }
 );

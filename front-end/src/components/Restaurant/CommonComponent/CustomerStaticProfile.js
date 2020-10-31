@@ -11,7 +11,10 @@ class CustomerStaticProfile extends Component {
       'https://s3-media0.fl.yelpcdn.com/assets/srv0/yelp_styleguide/bf5ff8a79310/assets/img/default_avatars/user_medium_square.png';
 
     return (
-      <div className="modal" style={{ top: '0', left: '0', width: '100%', height: '100%' }}>
+      <div
+        className="modal"
+        style={{ top: '0', left: '0', width: '100%', height: '100%', zIndex: '1020' }}
+      >
         <div
           className="modal_content"
           style={{ top: '5%', left: '20%', width: '40%', height: '90%' }}
@@ -102,6 +105,28 @@ class CustomerStaticProfile extends Component {
                           <p>{this.props.customerProfile.Website}</p>
                         </li>
                       ) : null}
+                      {localStorage.getItem('userrole') === 'Customer' ? (
+                        <li> {this.props.alreadyFollowed?'Following!':
+                          <button
+                            onClick={(event) => this.props.FOllowUser(event)}
+                            data-ui="add-section"
+                            aria-describedby="education_label"
+                            class="_-_-shared-ui-atoms-button-base-___button__button _-_-shared-ui-atoms-button-base-___button__small _-_-shared-ui-atoms-button-secondary-___secondary__default "
+                          >
+                            Follow
+                          </button>}
+                        </li>
+                      ) : (
+                        <li>
+                          <button
+                            data-ui="add-section"
+                            aria-describedby="education_label"
+                            class="_-_-shared-ui-atoms-button-base-___button__button _-_-shared-ui-atoms-button-base-___button__small _-_-shared-ui-atoms-button-secondary-___secondary__default "
+                          >
+                            Message
+                          </button>
+                        </li>
+                      )}
                     </ul>
                   </div>
                 </div>

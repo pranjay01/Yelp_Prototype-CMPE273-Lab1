@@ -342,6 +342,213 @@ async function handle_request(msg, callback) {
       }
       break;
     }
+    case 'getCustomers': {
+      const { filterCriterea, selectedPage, location, CustomerID } = url.parse(msg.url, true).query;
+      try {
+        let results = {};
+        const filter = [];
+        if (location.length > 0) {
+          filter.push({ Zip: location });
+        }
+        switch (filterCriterea) {
+          case 'all': {
+            filter.push({ CustomerID: { $ne: CustomerID } });
+
+            const CustomerList = await Customer.find({ $and: filter })
+              .limit(5)
+              .skip(selectedPage * 5)
+              .exec();
+            const customerCount = await Customer.find({
+              $and: filter,
+            }).countDocuments();
+            results = {
+              CustomerList,
+              customerCount,
+            };
+            response.status = 200;
+            response.data = JSON.stringify(results);
+            callback(null, response);
+            break;
+          }
+          case 'following': {
+            const customerIDArray = await Customer.findOne(
+              { CustomerID },
+              { _id: 0, Following: 1 }
+            ).exec();
+            console.log(customerIDArray);
+            filter.push({
+              CustomerID: { $in: customerIDArray.Following },
+            });
+            const CustomerList = await Customer.find({ $and: filter })
+              .limit(5)
+              .skip(selectedPage * 5)
+              .exec();
+            const customerCount = await Customer.find({ $and: filter }).countDocuments();
+            results = {
+              CustomerList,
+              customerCount,
+            };
+            response.status = 200;
+            response.data = JSON.stringify(results);
+            callback(null, response);
+            break;
+          }
+          default: {
+            if (location.length > 0) {
+              const locationNumber = Number(location);
+              const CustomerList = await Customer.aggregate([
+                {
+                  $addFields: {
+                    name: {
+                      $concat: ['$FirstName', ', ', '$LastName', ', ', '$NickName'],
+                    },
+                  },
+                },
+
+                {
+                  $match: {
+                    $and: [
+                      { CustomerID: { $ne: CustomerID } },
+                      {
+                        Zip: { $gte: locationNumber },
+                      },
+                      {
+                        Zip: { $lte: locationNumber },
+                      },
+                      {
+                        name: {
+                          $regex: `${filterCriterea}`,
+                          $options: 'i',
+                        },
+                      },
+                    ],
+                    // CustomerID: { $ne: CustomerID },
+                    // Zip: { location },
+                    // name: {
+                    //   $regex: `${filterCriterea}`,
+                    //   $options: 'i',
+                    // },
+                  },
+                },
+              ])
+                .skip(selectedPage * 5)
+                .limit(5);
+              let customerCount = await Restaurant.aggregate([
+                {
+                  $addFields: {
+                    name: {
+                      $concat: ['$FirstName', ', ', '$LastName', ', ', '$NickName'],
+                    },
+                  },
+                },
+                {
+                  $match: {
+                    CustomerID: { $ne: CustomerID },
+                    name: {
+                      $regex: `${filterCriterea}`,
+                      $options: 'i',
+                    },
+                    Zip: location,
+                  },
+                },
+                {
+                  $count: 'customerCount',
+                },
+              ]);
+              if (customerCount.length > 0) {
+                customerCount = customerCount[0].customerCount;
+              } else {
+                customerCount = 0;
+              }
+
+              results = {
+                CustomerList,
+                customerCount,
+              };
+              response.status = 200;
+              response.data = JSON.stringify(results);
+              callback(null, response);
+            } else {
+              const CustomerList = await Customer.aggregate([
+                {
+                  $addFields: {
+                    name: {
+                      $concat: ['$FirstName', ', ', '$LastName', ',', '$NickName'],
+                    },
+                  },
+                },
+                //     { $limit: 2 },
+
+                {
+                  $match: {
+                    CustomerID: { $ne: CustomerID },
+                    name: {
+                      $regex: `${filterCriterea}`,
+                      $options: 'i',
+                    },
+                  },
+                },
+              ])
+                .skip(selectedPage * 5)
+                .limit(5);
+              let customerCount = await Restaurant.aggregate([
+                {
+                  $addFields: {
+                    name: {
+                      $concat: ['$FirstName', ', ', '$LastName', ', ', '$NickName'],
+                    },
+                  },
+                },
+                {
+                  $match: {
+                    CustomerID: { $ne: CustomerID },
+                    name: {
+                      $regex: `${filterCriterea}`,
+                      $options: 'i',
+                    },
+                  },
+                },
+                {
+                  $count: 'customerCount',
+                },
+              ]);
+              if (customerCount.length > 0) {
+                customerCount = customerCount[0].customerCount;
+              } else {
+                customerCount = 0;
+              }
+
+              results = {
+                CustomerList,
+                customerCount,
+              };
+              response.status = 200;
+              response.data = JSON.stringify(results);
+              callback(null, response);
+            }
+            break;
+          }
+        }
+      } catch (error) {
+        response.status = 500;
+        response.data = JSON.stringify(error);
+        callback(null, response);
+      }
+      break;
+    }
+    case 'followUser': {
+      const { ID, CustomerID } = msg.data;
+      try {
+        await Customer.updateOne({ CustomerID }, { $push: { Following: ID } }).exec();
+
+        response.status = 200;
+        response.data = 'SUccesfully Followed!';
+        callback(null, response);
+      } catch (error) {
+        callback(error, null);
+      }
+      break;
+    }
 
     default:
       break;

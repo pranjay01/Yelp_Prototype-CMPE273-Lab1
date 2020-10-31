@@ -25,15 +25,6 @@ const restaurantSchema = new Schema(
     // update while inserting new review
     ReviewCounts: { type: Number, default: 0 },
     TotalRating: { type: Number, default: 0 },
-    // Reviews: [
-    //   {
-    //     Rating: { type: String, min: 1, max: 5 },
-    //     CustomerID: { type: Number },
-    //     CustomerName: { type: String },
-    //     Description: { type: String },
-    //   },
-    // ],
-    Following: [{ ID: { type: Number }, Name: { type: String } }],
   },
   { versionKey: false }
 );
