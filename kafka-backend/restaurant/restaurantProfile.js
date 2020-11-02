@@ -20,6 +20,7 @@ const Dessert = require('../Models/Dessert');
 const MainCourse = require('../Models/MainCourse');
 const Salad = require('../Models/Salad');
 const Customer = require('../Models/Customer');
+const Message = require('../Models/Message');
 const { key } = require('./config');
 
 const geo = geocoder({
@@ -516,6 +517,97 @@ async function handle_request(msg, callback) {
           callback(null, response);
         }
       });
+      break;
+    }
+    case 'sendMessage': {
+      const { message, CustomerId, CustomerName, RestaurantId, RestaurantName } = msg.data;
+      // console.log('message', message);
+      await Message.findOne({ CustomerId, RestaurantId }, async (error, msgConnection) => {
+        if (error) {
+          response.status = 500;
+          response.data = error;
+          callback(null, response);
+        }
+        if (msgConnection) {
+          await Message.updateOne(
+            { CustomerId, RestaurantId },
+            { $push: { MessageArray: message } },
+            (error2, result) => {
+              if (error2) {
+                response.status = 500;
+                response.data = 'Network Error';
+                callback(null, response);
+              } else {
+                response.status = 200;
+                response.data = JSON.stringify(result);
+                callback(null, response);
+              }
+            }
+          );
+          // console.log(msgConnection);
+        } else {
+          // console.log('New Message Insertion');
+          const newMsgConnection = new Message({
+            CustomerId,
+            CustomerName,
+            RestaurantId,
+            RestaurantName,
+            MessageArray: [message],
+          });
+          newMsgConnection.save((err, result) => {
+            if (err) {
+              response.status = 500;
+              response.data = 'Network Error';
+              callback(null, response);
+            } else {
+              response.status = 200;
+              response.data = JSON.stringify(result);
+              callback(null, response);
+            }
+          });
+        }
+      });
+      break;
+    }
+    case 'getMessages': {
+      const { CustomerId, RestaurantId } = url.parse(msg.url, true).query;
+
+      await Message.findOne({ CustomerId, RestaurantId }, async (error, result) => {
+        if (error) {
+          response.status = 500;
+          response.data = error;
+          callback(null, response);
+        } else {
+          response.status = 200;
+          const message = result;
+          const msgArray = await message.MessageArray.sort((a, b) => b.SentTime - a.SentTime);
+          message.MessageArray = await msgArray;
+          response.data = JSON.stringify(message);
+          callback(null, response);
+        }
+      });
+      break;
+    }
+    case 'getAllMessages': {
+      const { RestaurantId, selectedPage } = url.parse(msg.url, true).query;
+      try {
+        const MessageList = await Message.find({ RestaurantId })
+          .limit(5)
+          .skip(selectedPage * 5)
+          .exec();
+        const messageCount = await Message.find({ RestaurantId }).countDocuments();
+        const results = {
+          MessageList,
+          messageCount,
+        };
+        response.status = 200;
+        response.data = JSON.stringify(results);
+        callback(null, response);
+      } catch (error) {
+        // response.status = 500;
+        // response.data = 'Review Fetch Failed';
+        callback(error, null);
+      }
       break;
     }
     default:

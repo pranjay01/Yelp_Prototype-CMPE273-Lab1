@@ -15,6 +15,7 @@ import customerEventReducer from './customerEventReducer';
 import leftPannelReducer from './leftPannelReducer';
 import customerForProfileReducer from './customerForProfileReducer';
 import customerListStoreReducer from './customerListStoreReducer';
+import messageStoreReducer from './messageStoreReducer';
 import { combineReducers } from 'redux';
 
 const finalReducers = combineReducers({
@@ -34,7 +35,7 @@ const finalReducers = combineReducers({
   customerEventReducer: customerEventReducer,
   leftPannelReducer: leftPannelReducer,
   customerForProfileReducer: customerForProfileReducer,
-  customerListStoreReducer: customerListStoreReducer,
+  customerListStoreReducer: customerListStoreReducer,messageStoreReducer:messageStoreReducer,
 });
 
 export default finalReducers;

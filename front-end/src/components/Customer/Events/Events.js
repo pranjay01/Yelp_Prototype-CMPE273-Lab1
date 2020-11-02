@@ -74,6 +74,7 @@ class Events extends Component {
       eventsTabIsActive: true,
       ordersTabIsActive: false,
       followingTabIsActive: false,
+      messageTabIsActive: false,
     };
     this.props.updateLeftPannelHighlight(payload);
     this.commonFetch();

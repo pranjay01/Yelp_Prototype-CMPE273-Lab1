@@ -3,10 +3,11 @@ import axios from 'axios';
 import serverUrl from '../../../config';
 import CustomerStaticProfile from '../CommonComponent/CustomerStaticProfile';
 import { connect } from 'react-redux';
-import { updateCustomerForRestaurant } from '../../../constants/action-types';
+import { updateCustomerForRestaurant, updateMessageStore } from '../../../constants/action-types';
 import ReactPaginate from 'react-paginate';
 
 import './RegisteredCustomers.css';
+import MessageBodyModal from '../../CommonComponents/MessageBodyModal';
 
 class RegisteredCustomers extends Component {
   constructor(props) {
@@ -46,6 +47,80 @@ class RegisteredCustomers extends Component {
     this.props.handlePageClickRegisteredCustomers(e);
   };
 
+  openMessageWindow = (event, customerID = null) => {
+    event.preventDefault();
+    if (this.props.messageStore.showMessageModal) {
+      let payload = {
+        Message: { MessageArray: [] },
+        showMessageModal: false,
+      };
+      this.props.updateMessageStore(payload);
+    } else {
+      axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
+      axios
+        .get(
+          serverUrl + 'biz/getMessages',
+
+          {
+            params: {
+              CustomerId: this.props.customerInfo.customerProfile.CustomerID,
+              RestaurantId: localStorage.getItem('userId'),
+            },
+            withCredentials: true,
+          }
+        )
+        .then((response) => {
+          console.log(response.data);
+          let payload = {
+            Message: response.data,
+            showMessageModal: true,
+          };
+          this.props.updateMessageStore(payload);
+        });
+    }
+  };
+
+  sendMessage = (event, message) => {
+    event.preventDefault();
+    console.log('befor data:', this.props.customerInfo.customerProfile);
+    const data = {
+      message: {
+        MessageInstance: message,
+        SentFrom: this.props.restaurantHome.Name,
+        SentTime: new Date(),
+      },
+      CustomerId: this.props.customerInfo.customerProfile.CustomerID,
+      CustomerName:
+        this.props.customerInfo.customerProfile.FirstName +
+        ' ' +
+        this.props.customerInfo.customerProfile.LastName,
+      RestaurantId: this.props.restaurantHome.RestaurantID,
+      RestaurantName: this.props.restaurantHome.Name,
+    };
+    axios.post(serverUrl + 'biz/sendMessage', data).then(
+      (response) => {
+        console.log('Status Code : ', response.status);
+        if (response.status === 200) {
+          console.log(response.data);
+          const msgInstance = {
+            MessageInstance: message,
+            SentFrom: this.props.restaurantHome.Name,
+            SentTime: new Date(),
+          };
+          const NewMessage = this.props.messageStore.Message;
+          NewMessage.MessageArray.unshift(msgInstance);
+          const payload = {
+            Message: NewMessage,
+          };
+          this.props.updateMessageStore(payload);
+        }
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
+  };
+
   render() {
     return (
       <div className="modal" style={{ top: '0', left: '0', width: '100%', height: '100%' }}>
@@ -62,8 +137,17 @@ class RegisteredCustomers extends Component {
                 <th>Customer Name</th>
                 <th>Email</th>
               </tr>
+              {this.props.messageStore.showMessageModal ? (
+                <MessageBodyModal
+                  sendMessage={(event, message) => this.sendMessage(event, message)}
+                  openMessageWindow={(event) => this.openMessageWindow(event, '')}
+                />
+              ) : null}
               {this.props.customerInfo.staticProfileSeen ? (
                 <CustomerStaticProfile
+                  openMessageWindow={(event, customerID) =>
+                    this.openMessageWindow(event, customerID)
+                  }
                   customerProfile={this.props.customerInfo.customerProfile}
                   openStaticProfile={(event) => this.openStaticProfile(event, '')}
                 />
@@ -109,11 +193,16 @@ const mapStateToProps = (state) => {
   const snackbarData = state.snackBarReducer;
   const { eventStore, registrationStore } = state.eventStoreReducer;
   const { customerInfo } = state.customerForProfileReducer;
+  const { messageStore } = state.messageStoreReducer;
+  const { restaurantHome } = state.restaurantHomePageReducer;
+
   return {
     snackbarData: snackbarData,
     eventStore,
     registrationStore,
     customerInfo,
+    messageStore,
+    restaurantHome,
   };
 };
 const mapDispatchToProps = (dispatch) => {
@@ -121,6 +210,12 @@ const mapDispatchToProps = (dispatch) => {
     updateCustomerForRestaurant: (payload) => {
       dispatch({
         type: updateCustomerForRestaurant,
+        payload,
+      });
+    },
+    updateMessageStore: (payload) => {
+      dispatch({
+        type: updateMessageStore,
         payload,
       });
     },

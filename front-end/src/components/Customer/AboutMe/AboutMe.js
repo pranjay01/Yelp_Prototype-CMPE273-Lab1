@@ -19,6 +19,7 @@ class AboutMe extends Component {
       eventsTabIsActive: false,
       ordersTabIsActive: false,
       followingTabIsActive: false,
+      messageTabIsActive: false,
     };
     this.props.updateLeftPannelHighlight(payload);
   }

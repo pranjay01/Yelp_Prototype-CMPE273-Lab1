@@ -11,7 +11,8 @@ import {
   updateSnackbarData,
   updateLeftPannelHighlight,
   updateCustomerListStore,
-  updateCustomerForRestaurant,getCustomerBasicInfo
+  updateCustomerForRestaurant,
+  getCustomerBasicInfo,
 } from '../../../constants/action-types';
 import { connect } from 'react-redux';
 import ReactPaginate from 'react-paginate';
@@ -21,7 +22,7 @@ import CustomerStaticProfile from '../../Restaurant/CommonComponent/CustomerStat
 class Following extends Component {
   constructor(props) {
     super(props);
-    this.state = {name:'',zip:''};
+    this.state = { name: '', zip: '' };
   }
 
   commonFetch(location, filterCriterea = 'all', selectedPage = 0) {
@@ -82,6 +83,7 @@ class Following extends Component {
       eventsTabIsActive: false,
       ordersTabIsActive: false,
       followingTabIsActive: true,
+      messageTabIsActive: false,
     };
     this.props.updateLeftPannelHighlight(payload);
     this.commonFetch(
@@ -135,14 +137,20 @@ class Following extends Component {
           // let customerProfile = this.props.customerProfile;
           // let Following = customerProfile.Following;
           // Following.push(CustomerID);
-                    console.log(' this.props.customerProfile.Following', this.props.customerProfile.Following);
+          console.log(
+            ' this.props.customerProfile.Following',
+            this.props.customerProfile.Following
+          );
 
           const customerProfile = this.props.customerProfile;
-            customerProfile.Following.push(CustomerID);
-          console.log(' this.props.customerProfile.Following.push(CustomerID)',customerProfile.Following);
+          customerProfile.Following.push(CustomerID);
+          console.log(
+            ' this.props.customerProfile.Following.push(CustomerID)',
+            customerProfile.Following
+          );
           let payload2 = {
-            customerProfile
-          }
+            customerProfile,
+          };
           this.props.getCustomerBasicInfo(payload2);
         }
       },
@@ -157,8 +165,8 @@ class Following extends Component {
 
   getUserList = (event, filterCriterea) => {
     event.preventDefault();
-    this.commonFetch( this.state.zip,filterCriterea,0)
-  }
+    this.commonFetch(this.state.zip, filterCriterea, 0);
+  };
   // getUserListForLocation = (event, location) => {
   //   event.preventDefault();
   //   this.commonFetch( location,this.props.customerListSTore.filterCriterea,0)
@@ -166,23 +174,21 @@ class Following extends Component {
 
   onCHangeNameHandler = (event) => {
     event.preventDefault();
-   
+
     this.setState({
-    name:event.target.value
-  })
- 
-  }
+      name: event.target.value,
+    });
+  };
 
   onChangeZipHandler = (event) => {
     event.preventDefault();
-      if (!/^\d+$/.test(event.target.value) && event.target.value.length > 0) {
+    if (!/^\d+$/.test(event.target.value) && event.target.value.length > 0) {
     } else {
-     
       this.setState({
-        zip:event.target.value
-     })
+        zip: event.target.value,
+      });
     }
-  }
+  };
   render() {
     let redirectVar = null;
     if (!localStorage.getItem('token')) {
@@ -198,11 +204,13 @@ class Following extends Component {
       }
     }
 
-    let activeSTyle = { width: '136px'}
-    if(  this.props.customerListSTore.filterCriterea !== 'all' &&
-      this.props.customerListSTore.filterCriterea !== 'following') {
-      activeSTyle={ width: '136px', backgroundColor:'#080808', color:'#fff'}
-                            }
+    let activeSTyle = { width: '136px' };
+    if (
+      this.props.customerListSTore.filterCriterea !== 'all' &&
+      this.props.customerListSTore.filterCriterea !== 'following'
+    ) {
+      activeSTyle = { width: '136px', backgroundColor: '#080808', color: '#fff' };
+    }
     return (
       <div style={{ background: 'white' }}>
         {this.props.customerInfo.staticProfileSeen ? (
@@ -281,18 +289,20 @@ class Following extends Component {
                           }
                         >
                           <input
-                            style={{ marginTop: '14px', width: '130px'}}
+                            style={{ marginTop: '14px', width: '130px' }}
                             type="text"
                             value={this.state.name}
-                            name='name'
+                            name="name"
                             onChange={this.onCHangeNameHandler}
                           ></input>
                         </li>
-                        <li    className={
+                        <li
+                          className={
                             this.props.customerListSTore.filterCriterea !== 'all' &&
                             this.props.customerListSTore.filterCriterea !== 'following' &&
                             'active'
-                          }>
+                          }
+                        >
                           <button
                             style={{ marginTop: '14px' }}
                             onClick={(event) => this.getUserList(event, this.state.name)}
@@ -300,13 +310,13 @@ class Following extends Component {
                             Name
                           </button>
                         </li>
-                        <li style={{ width: '136px', marginLeft:'10px' }} className="">
+                        <li style={{ width: '136px', marginLeft: '10px' }} className="">
                           <input
                             style={{ marginTop: '14px', width: '130px' }}
                             type="text"
-                            name='Zip'
-                            placeholder='Zip-Filter'
-                            maxLength='5'
+                            name="Zip"
+                            placeholder="Zip-Filter"
+                            maxLength="5"
                             value={this.state.zip}
                             onChange={this.onChangeZipHandler}
                           ></input>
@@ -405,7 +415,8 @@ const mapDispatchToProps = (dispatch) => {
         type: updateCustomerForRestaurant,
         payload,
       });
-    },  getCustomerBasicInfo: (payload) => {
+    },
+    getCustomerBasicInfo: (payload) => {
       dispatch({
         type: getCustomerBasicInfo,
         payload,

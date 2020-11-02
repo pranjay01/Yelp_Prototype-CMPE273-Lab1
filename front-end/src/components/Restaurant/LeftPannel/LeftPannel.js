@@ -267,13 +267,13 @@ class LeftPannel extends Component {
               rel=""
               role="link"
               onClick={() => {
-                this.props.onTabChangeHandler('Photos');
+                this.props.onTabChangeHandler('Messages');
               }}
               // onClick={() => this.changePageViewTo('Photos')}
             >
               <div
                 className={`lemon--div__06b83__1mboc nav-item-v2__06b83__vmJJv inactive__06b83__2ZtYV responsive-ui-enabled__06b83__2kOzB padding-t1__06b83__2aTOb padding-r1__06b83__1xqrz padding-b1__06b83__3erWW padding-l1__06b83__1UBqt border-color--default__06b83__3-ifU ${
-                  this.props.profileInfo.tabName === 'Photos' ? 'active__06b83__cBu5j' : ''
+                  this.props.profileInfo.tabName === 'Messages' ? 'active__06b83__cBu5j' : ''
                 }`}
               >
                 <div className="lemon--div__06b83__1mboc icon-v2__06b83__2Y6sR border-color--default__06b83__3-ifU text-align--center__06b83__2n2yQ">
@@ -290,7 +290,7 @@ class LeftPannel extends Component {
                 </div>
                 <div className="lemon--div__06b83__1mboc text-container__06b83__2z-fK collapsed-view__06b83__3VinO margin-l1-5__06b83__2lUKU border-color--default__06b83__3-ifU">
                   <p className="lemon--p__06b83__3Qnnj text__06b83__2Kxyz text-color--normal__06b83__3xep9 text-align--left__06b83__2XGa- text-weight--semibold__06b83__2l0fe">
-                    Photos and Videos
+                    Messages
                   </p>
                 </div>
               </div>

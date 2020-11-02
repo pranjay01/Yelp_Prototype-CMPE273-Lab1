@@ -30,6 +30,8 @@ const Restaurant = require('../Models/Restaurant');
 
 const Event = require('../Models/Event');
 
+const Message = require('../Models/Message');
+
 async function handle_request(msg, callback) {
   const response = {};
   switch (msg.api) {
@@ -545,6 +547,28 @@ async function handle_request(msg, callback) {
         response.data = 'SUccesfully Followed!';
         callback(null, response);
       } catch (error) {
+        callback(error, null);
+      }
+      break;
+    }
+    case 'getAllMessages': {
+      const { CustomerId, selectedPage } = url.parse(msg.url, true).query;
+      try {
+        const MessageList = await Message.find({ CustomerId })
+          .limit(5)
+          .skip(selectedPage * 5)
+          .exec();
+        const messageCount = await Message.find({ CustomerId }).countDocuments();
+        const results = {
+          MessageList,
+          messageCount,
+        };
+        response.status = 200;
+        response.data = JSON.stringify(results);
+        callback(null, response);
+      } catch (error) {
+        // response.status = 500;
+        // response.data = 'Review Fetch Failed';
         callback(error, null);
       }
       break;

@@ -12,6 +12,7 @@ import FoodMenu from './Menu/FoodMenu';
 import ReviewList from './Reviews/ReviewList';
 import OrdersList from './Orders/OrdersList';
 import EventList from './Events/EventsList';
+import MessageList from './MessageTab/MessageList';
 // import '../Login/Login.css';
 
 class RestaurantHome extends Component {
@@ -27,42 +28,6 @@ class RestaurantHome extends Component {
     };
   }
   onTabChangeHandler = (tabName) => {
-    // axios.get(serverUrl + 'biz/homeProfile', { withCredentials: true }).then(
-    //   (response) => {
-    //     if (response.status === 200) {
-    //       this.setState({
-    //         restroName: response.data.Name,
-    //         address:
-    //           response.data.Street +
-    //           ' ' +
-    //           response.data.City +
-    //           ' ' +
-    //           response.data.State +
-    //           ' ' +
-    //           response.data.Zip,
-    //         reviewCOunt: response.data[1].ReviewCount,
-    //       });
-    //       let payload = {
-    //         restaurantName: response.data.Name,
-    //         ImageURL: response.data.ImageURL,
-    //         restaurantAddress:
-    //           response.data.Street +
-    //           ' ' +
-    //           response.data.City +
-    //           ' ' +
-    //           response.data.State +
-    //           ' ' +
-    //           response.data.Zip,
-    //       };
-    //       this.props.updateHomeProfile(payload);
-    //       console.log(this.state);
-    //       console.log(response.data);
-    //     }
-    //   },
-    //   (error) => {
-    //     console.log(error.response.data);
-    //   }
-    // );
     this.setState({
       tabName,
     });
@@ -362,6 +327,8 @@ class RestaurantHome extends Component {
                       return <OrdersList />;
                     case 'Events':
                       return <EventList />;
+                    case 'Messages':
+                      return <MessageList />;
                     default:
                       return <DefaultHome />;
                   }

@@ -118,7 +118,8 @@ class CustomerStaticProfile extends Component {
                         </li>
                       ) : (
                         <li>
-                          <button
+                            <button
+                              onClick={(event)=>this.props.openMessageWindow(event,this.props.customerProfile.CustomerID)}
                             data-ui="add-section"
                             aria-describedby="education_label"
                             class="_-_-shared-ui-atoms-button-base-___button__button _-_-shared-ui-atoms-button-base-___button__small _-_-shared-ui-atoms-button-secondary-___secondary__default "

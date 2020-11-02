@@ -18,6 +18,7 @@ import OrdersList from './Customer/OrdersTab/OrdersList';
 import CustomerStaticProfile from './Restaurant/CommonComponent/CustomerStaticProfile';
 import SnackBar from './CommonComponents/SnackBar';
 import Following from './Customer/Following/Following';
+import MessageList from './Customer/MessageTab/MessageList';
 import { connect } from 'react-redux';
 import { updateMasterData } from '../constants/action-types';
 
@@ -79,6 +80,7 @@ class Main extends Component {
           <Route path="/FoodOrderCart" component={FoodOrderCart} />
           <Route path="/Events" component={Events} />
           <Route path="/OrdersList" component={OrdersList} />
+          <Route path="/Messages" component={MessageList} />
           <Route path="/CustomerStaticProfile" component={CustomerStaticProfile} />
           <Route exact path="/" component={Home} />
         </Switch>

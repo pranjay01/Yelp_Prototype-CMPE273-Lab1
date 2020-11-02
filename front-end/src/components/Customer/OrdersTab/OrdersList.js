@@ -21,20 +21,16 @@ class OrdersList extends Component {
   commonFetch(selectedPage = 0, sortOrder, filter1, filter2) {
     axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
     axios
-      .get(
-        serverUrl + 'customer/getAllOrders',
-
-        {
-          params: {
-            CustomerID: localStorage.getItem('userId'),
-            selectedPage,
-            sortOrder,
-            filter1,
-            filter2,
-          },
-          withCredentials: true,
-        }
-      )
+      .get(serverUrl + 'customer/getAllOrders', {
+        params: {
+          CustomerID: localStorage.getItem('userId'),
+          selectedPage,
+          sortOrder,
+          filter1,
+          filter2,
+        },
+        withCredentials: true,
+      })
       .then((response) => {
         console.log(response.data);
         let OrderList = response.data.OrderList.map((order) => {
@@ -72,6 +68,7 @@ class OrdersList extends Component {
       eventsTabIsActive: false,
       ordersTabIsActive: true,
       followingTabIsActive: false,
+      messageTabIsActive: false,
     };
     this.props.updateLeftPannelHighlight(payload);
     this.commonFetch(0, -1, 'All', '');

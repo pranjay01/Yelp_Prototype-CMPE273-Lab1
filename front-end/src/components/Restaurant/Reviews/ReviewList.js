@@ -5,8 +5,13 @@ import serverUrl from '../../../config';
 import './Reviews.css';
 import CustomerStaticProfile from '../CommonComponent/CustomerStaticProfile';
 import { connect } from 'react-redux';
-import { updateReviewList, updateCustomerForRestaurant } from '../../../constants/action-types';
+import {
+  updateReviewList,
+  updateCustomerForRestaurant,
+  updateMessageStore,
+} from '../../../constants/action-types';
 import ReactPaginate from 'react-paginate';
+import MessageBodyModal from '../../CommonComponents/MessageBodyModal';
 
 class ReviewList extends Component {
   constructor(props) {
@@ -78,11 +83,93 @@ class ReviewList extends Component {
         });
     }
   };
+
+  openMessageWindow = (event, customerID = null) => {
+    event.preventDefault();
+    if (this.props.messageStore.showMessageModal) {
+      let payload = {
+        Message: { MessageArray: [] },
+        showMessageModal: false,
+      };
+      this.props.updateMessageStore(payload);
+    } else {
+      axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
+      axios
+        .get(
+          serverUrl + 'biz/getMessages',
+
+          {
+            params: {
+              CustomerId: this.props.customerInfo.customerProfile.CustomerID,
+              RestaurantId: localStorage.getItem('userId'),
+            },
+            withCredentials: true,
+          }
+        )
+        .then((response) => {
+          console.log(response.data);
+          let payload = {
+            Message: response.data,
+            showMessageModal: true,
+          };
+          this.props.updateMessageStore(payload);
+        });
+    }
+  };
+
+  sendMessage = (event, message) => {
+    event.preventDefault();
+    console.log('befor data:', this.props.customerInfo.customerProfile);
+    const data = {
+      message: {
+        MessageInstance: message,
+        SentFrom: this.props.restaurantHome.Name,
+        SentTime: new Date(),
+      },
+      CustomerId: this.props.customerInfo.customerProfile.CustomerID,
+      CustomerName:
+        this.props.customerInfo.customerProfile.FirstName +
+        ' ' +
+        this.props.customerInfo.customerProfile.LastName,
+      RestaurantId: this.props.restaurantHome.RestaurantID,
+      RestaurantName: this.props.restaurantHome.Name,
+    };
+    axios.post(serverUrl + 'biz/sendMessage', data).then(
+      (response) => {
+        console.log('Status Code : ', response.status);
+        if (response.status === 200) {
+          console.log(response.data);
+          const msgInstance = {
+            MessageInstance: message,
+            SentFrom: this.props.restaurantHome.Name,
+            SentTime: new Date(),
+          };
+          const NewMessage = this.props.messageStore.Message;
+          NewMessage.MessageArray.unshift(msgInstance);
+          const payload = {
+            Message: NewMessage,
+          };
+          this.props.updateMessageStore(payload);
+        }
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
+  };
+
   render() {
     return (
       <div>
+        {this.props.messageStore.showMessageModal ? (
+          <MessageBodyModal
+            sendMessage={(event, message) => this.sendMessage(event, message)}
+            openMessageWindow={(event) => this.openMessageWindow(event, '')}
+          />
+        ) : null}
         {this.props.customerInfo.staticProfileSeen ? (
           <CustomerStaticProfile
+            openMessageWindow={(event, customerID) => this.openMessageWindow(event, customerID)}
             customerProfile={this.props.customerInfo.customerProfile}
             openStaticProfile={(event) => this.openStaticProfile(event, '')}
           />
@@ -121,10 +208,14 @@ class ReviewList extends Component {
 const mapStateToProps = (state) => {
   const { reviewStore } = state.reviewStoreReducer;
   const { customerInfo } = state.customerForProfileReducer;
+  const { messageStore } = state.messageStoreReducer;
+  const { restaurantHome } = state.restaurantHomePageReducer;
 
   return {
     reviewStore,
     customerInfo,
+    messageStore,
+    restaurantHome,
   };
 };
 
@@ -139,6 +230,12 @@ const mapDispatchToProps = (dispatch) => {
     updateCustomerForRestaurant: (payload) => {
       dispatch({
         type: updateCustomerForRestaurant,
+        payload,
+      });
+    },
+    updateMessageStore: (payload) => {
+      dispatch({
+        type: updateMessageStore,
         payload,
       });
     },

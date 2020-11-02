@@ -423,5 +423,29 @@ Router.post('/followUser', checkAuth, async (req, res) => {
   });
 });
 
-module.exports = Router;
+Router.get('/getAllMessages', checkAuth, async (req, res) => {
+  console.log('getAllMessages');
+  const data = {
+    api: 'getAllMessages',
+    url: req.url,
+  };
+  kafka.make_request(config.kafkacustomertopic, data, function (err, results) {
+    if (err) {
+      console.log('Inside err');
+      res.status(500);
+      res.json({
+        status: 'error',
+        msg: 'System Error, Try Again.',
+      });
+      res.end();
+    } else {
+      console.log('inside else of request');
 
+      res.status(results.status);
+      // res.json(results.data);
+      res.end(results.data);
+    }
+  });
+});
+
+module.exports = Router;

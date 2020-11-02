@@ -5,6 +5,7 @@ import serverUrl from '../../../config';
 import { getCustomerBasicInfo } from '../../../constants/action-types';
 import { connect } from 'react-redux';
 import moment from 'moment';
+
 class menuBlock extends Component {
   constructor(props) {
     super(props);

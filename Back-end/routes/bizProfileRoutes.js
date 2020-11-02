@@ -592,4 +592,81 @@ Router.get('/getCustomerCompleteProfile', checkAuth, async (req, res) => {
   // results = await getCustomerCompleteProfileForRestaurant(req, res);
   // return results;
 });
+
+// MessageSent
+Router.post('/sendMessage', checkAuth, async (req, res) => {
+  console.log('sendMessage');
+  const data = {
+    api: 'sendMessage',
+    data: req.body,
+  };
+  kafka.make_request(config.kafkaresturanttopic, data, function (err, results) {
+    if (err) {
+      console.log('Inside err');
+      res.status(500);
+      res.json({
+        status: 'error',
+        msg: 'System Error, Try Again.',
+      });
+      res.end();
+    } else {
+      console.log('inside else of request');
+
+      res.status(results.status);
+      // res.json(results.data);
+      res.end(results.data);
+    }
+  });
+});
+
+Router.get('/getMessages', checkAuth, async (req, res) => {
+  console.log('getMessages');
+  const data = {
+    api: 'getMessages',
+    url: req.url,
+  };
+  kafka.make_request(config.kafkaresturanttopic, data, function (err, results) {
+    if (err) {
+      console.log('Inside err');
+      res.status(500);
+      res.json({
+        status: 'error',
+        msg: 'System Error, Try Again.',
+      });
+      res.end();
+    } else {
+      console.log('inside else of request');
+
+      res.status(results.status);
+      // res.json(results.data);
+      res.end(results.data);
+    }
+  });
+});
+
+Router.get('/getAllMessages', checkAuth, async (req, res) => {
+  console.log('getAllMessages');
+  const data = {
+    api: 'getAllMessages',
+    url: req.url,
+  };
+  kafka.make_request(config.kafkaresturanttopic, data, function (err, results) {
+    if (err) {
+      console.log('Inside err');
+      res.status(500);
+      res.json({
+        status: 'error',
+        msg: 'System Error, Try Again.',
+      });
+      res.end();
+    } else {
+      console.log('inside else of request');
+
+      res.status(results.status);
+      // res.json(results.data);
+      res.end(results.data);
+    }
+  });
+});
+
 module.exports = Router;
