@@ -1,0 +1,4 @@
+[2020-10-26 20:00:35,667] INFO Accepted socket connection from /127.0.0.1:58274 (org.apache.zookeeper.server.NIOServerCnxnFactory)
+[2020-10-26 20:00:35,696] WARN Connection request from old client /127.0.0.1:58274; will be dropped if server is in r-o mode (org.apache.zookeeper.server.ZooKeeperServer)
+[2020-10-26 20:00:35,696] INFO Client attempting to establish new session at /127.0.0.1:58274 (org.apache.zookeeper.server.ZooKeeperServer)
+[2020-10-26 20:00:35,742] INFO Established session 0x17566cde0430041 with negotiated timeout 30000 for client /127.0.0.1:58274 (org.apache.zookeeper.server.ZooKeeperServer)
