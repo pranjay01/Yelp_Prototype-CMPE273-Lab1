@@ -600,6 +600,7 @@ Router.post('/sendMessage', checkAuth, async (req, res) => {
     api: 'sendMessage',
     data: req.body,
   };
+  console.log('data:,', req.body);
   kafka.make_request(config.kafkaresturanttopic, data, function (err, results) {
     if (err) {
       console.log('Inside err');

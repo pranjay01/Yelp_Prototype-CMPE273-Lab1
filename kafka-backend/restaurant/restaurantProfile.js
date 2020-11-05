@@ -522,14 +522,15 @@ async function handle_request(msg, callback) {
     case 'sendMessage': {
       const { message, CustomerId, CustomerName, RestaurantId, RestaurantName } = msg.data;
       // console.log('message', message);
-      await Message.findOne({ CustomerId, RestaurantId }, async (error, msgConnection) => {
+      Message.findOne({ CustomerId, RestaurantId }, async (error, msgConnection) => {
         if (error) {
           response.status = 500;
           response.data = error;
           callback(null, response);
         }
         if (msgConnection) {
-          await Message.updateOne(
+          // console.log('Inside Update Message:');
+          Message.updateOne(
             { CustomerId, RestaurantId },
             { $push: { MessageArray: message } },
             (error2, result) => {
@@ -538,6 +539,7 @@ async function handle_request(msg, callback) {
                 response.data = 'Network Error';
                 callback(null, response);
               } else {
+                console.log('message entered');
                 response.status = 200;
                 response.data = JSON.stringify(result);
                 callback(null, response);
@@ -580,8 +582,10 @@ async function handle_request(msg, callback) {
         } else {
           response.status = 200;
           const message = result;
-          const msgArray = await message.MessageArray.sort((a, b) => b.SentTime - a.SentTime);
-          message.MessageArray = await msgArray;
+          if (result) {
+            const msgArray = await message.MessageArray.sort((a, b) => b.SentTime - a.SentTime);
+            message.MessageArray = await msgArray;
+          }
           response.data = JSON.stringify(message);
           callback(null, response);
         }

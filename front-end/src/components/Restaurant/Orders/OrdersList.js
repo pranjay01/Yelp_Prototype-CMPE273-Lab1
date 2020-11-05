@@ -252,8 +252,15 @@ class ordersList extends Component {
             SentFrom: this.props.restaurantHome.Name,
             SentTime: new Date(),
           };
-          const NewMessage = this.props.messageStore.Message;
-          NewMessage.MessageArray.unshift(msgInstance);
+          let NewMessage = null;
+          if (!this.props.messageStore.Message) {
+            NewMessage = response.data;
+          } else {
+            NewMessage = this.props.messageStore.Message;
+
+            NewMessage.MessageArray.unshift(msgInstance);
+          }
+
           const payload = {
             Message: NewMessage,
           };
