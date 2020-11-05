@@ -125,7 +125,7 @@ async function handle_request(msg, callback) {
     case 'updateRestaurantProfile': {
       const restaurant = msg.data;
       try {
-        await Restaurant.updateOne(
+        Restaurant.updateOne(
           { RestaurantID: restaurant.RestaurantID },
           { ...restaurant },
           async (error) => {
@@ -574,7 +574,7 @@ async function handle_request(msg, callback) {
     case 'getMessages': {
       const { CustomerId, RestaurantId } = url.parse(msg.url, true).query;
 
-      await Message.findOne({ CustomerId, RestaurantId }, async (error, result) => {
+      Message.findOne({ CustomerId, RestaurantId }, async (error, result) => {
         if (error) {
           response.status = 500;
           response.data = error;
