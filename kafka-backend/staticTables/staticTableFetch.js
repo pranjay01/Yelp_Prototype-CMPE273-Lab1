@@ -318,7 +318,9 @@ async function handle_request(msg, callback) {
         response.data = JSON.stringify(results);
         callback(null, response);
       } catch (error) {
-        callback(error, null);
+        response.status = 500;
+        response.data = 'Network Error';
+        callback(response, null);
       }
       break;
     }

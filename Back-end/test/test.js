@@ -11,9 +11,11 @@ const apiPort = '3001';
 const apiUrl = `${apiHost}:${apiPort}`;
 const { expect } = chai;
 
-let token = '';
+const token =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1Zjg5ZmM1MDM4MWRiMzNkZjk4ODVhZmMiLCJ1c2Vycm9sZSI6IkN1c3RvbWVyIiwiZW1haWwiOiJwcmFuamF5LnNhZ2FyMDFAZ21haWwuY29tIiwiaWF0IjoxNjA0NjExNDk1LCJleHAiOjE2MDU2MTk0OTV9.N68-KKJtyMck57E36ohJq2YSFXYY1X3EupBikrbAuB0';
 
 it('Test Fetching Of Signup Master Data', function (done) {
+  this.timeout(1000);
   chai
     .request(apiUrl)
     .get('/static/signupMasterData')
@@ -26,6 +28,7 @@ it('Test Fetching Of Signup Master Data', function (done) {
 
 // InValid login
 it('Testing of invalid customer Login', function (done) {
+  this.timeout(1000);
   chai
     .request(apiUrl)
     .post('/customer/login')
@@ -35,47 +38,73 @@ it('Testing of invalid customer Login', function (done) {
     })
     .end(function (err, res) {
       expect(res).to.have.status(401);
-      expect(res.text).to.equal('Incorrect Password');
+      expect(res.text).to.equal('Invalid Credentials');
       done();
     });
 });
 
 // Valid login
 it('Testing of Valid customer Login', function (done) {
+  this.timeout(1000);
   chai
     .request(apiUrl)
     .post('/customer/login')
     .send({
-      Email: 'pranjay.sagar01@gmail.com',
+      Email: 'pranjay.sagar05@gmail.com',
       Password: 'pranjay01',
     })
     .end(function (err, res) {
-      // console.log(res);
-      // console.log('res.cookie', res.header['set-cookie'][0]);
-      const tokenPart = res.header['set-cookie'][0].split(';');
-      // console.log('Token', tokenPart[0].substring(7));
-      token = tokenPart[0].substring(7);
       expect(res).to.have.status(200);
-      expect(res.text).to.equal('Successful Login');
+      let Resulytoken = res.text;
+      Resulytoken = Resulytoken.split(' ');
+      expect(Resulytoken[0]).to.equal('JWT');
       done();
     });
 });
 
-it('Testing for Update contact information', function (done) {
+// Updating profile with correct authentication login
+it('Testing for Update contact information with correct authentication', function (done) {
+  this.timeout(1000);
   chai
     .request(apiUrl)
     .put('/customer/updateProfile')
+    .set({ Authorization: `JWT ${token}` })
     .send({
-      Email: 'pranjay.sagar01@gmail.com',
-      NewEmail: 'pranjay.sagar01@gmail.com',
-      ContactNo: 9829992248,
       Password: 'pranjay01',
-      CountryCode: 1,
-      token,
-      userrole: 'Customer',
+      customerInfo: {
+        CustomerID: '5f89fc50381db33df9885afc',
+        CountryCode: 1,
+        Email: 'pranjay.sagar01@gmail.com',
+        NewEmail: 'pranjay.sagar01@gmail.com',
+        PhoneNo: 9829992248,
+      },
     })
     .end(function (err, res) {
       expect(res).to.have.status(204);
+      done();
+    });
+});
+
+// Updating profile with correct wrong authentication login
+it('Testing for Update contact information with invalid authentication', function (done) {
+  this.timeout(1000);
+  chai
+    .request(apiUrl)
+    .put('/customer/updateProfile')
+    .set({ Authorization: `JWT ` })
+    .send({
+      Password: 'pranjay01',
+      customerInfo: {
+        CustomerID: '5f89fc50381db33df9885afc',
+        CountryCode: 1,
+        Email: 'pranjay.sagar01@gmail.com',
+        NewEmail: 'pranjay.sagar01@gmail.com',
+        PhoneNo: 9829992248,
+      },
+    })
+    .end(function (err, res) {
+      expect(res).to.have.status(401);
+      expect(res.text).to.equal('Unauthorized');
       done();
     });
 });
@@ -85,10 +114,7 @@ it('Test for Restaurant search results', function (done) {
   chai
     .request(apiUrl)
     .get('/static/fetchRestaurantResults')
-    .send({
-      filter: 1,
-      searchString: 'mac',
-    })
+    .query({ filter: 1, searchString: 'mac', selectedPage: 0 })
     .end(function (err, res) {
       expect(res).to.have.status(200);
       done();
@@ -101,23 +127,18 @@ it('Testing of Restaurant Signup', function (done) {
     .request(apiUrl)
     .post('/biz/signup')
     .send({
-      Email: 'pranjay13@gmail.com',
+      Email: 'pranjay16@gmail.com',
       Password: 'pranjay01',
       Name: 'Joey Pizza',
-      Country_ID: 1,
-      State_ID: 5,
+      CountryName: 'U.S.A',
+      StateName: 'California',
       City: 'San Jose',
       Zip: '95134',
       Street: '330 Elan Village Lane',
-      Country_Code: 1,
-      Phone_no: 1234567890,
+      CountryCode: 1,
+      PhoneNo: 1234567890,
     })
     .end(function (err, res) {
-      // console.log(res);
-      // console.log('res.cookie', res.header['set-cookie'][0]);
-      const tokenPart = res.header['set-cookie'][0].split(';');
-      // console.log('Token', tokenPart[0].substring(7));
-      token = tokenPart[0].substring(7);
       expect(res).to.have.status(201);
       expect(res.text).to.equal('User Created');
       done();

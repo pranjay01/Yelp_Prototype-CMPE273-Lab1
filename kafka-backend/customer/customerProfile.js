@@ -70,7 +70,9 @@ async function handle_request(msg, callback) {
                 });
                 newCustomer.save((err1) => {
                   if (err1) {
-                    callback(err1, null);
+                    response.status = 422;
+                    response.data = 'Incorrect values';
+                    callback(response, null);
                   } else {
                     response.status = 201;
                     response.data = 'User Created';
