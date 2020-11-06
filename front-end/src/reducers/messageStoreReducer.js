@@ -1,4 +1,8 @@
-import { updateMessageStore, updateMessageList } from '../constants/action-types';
+import {
+  updateMessageStore,
+  updateMessageList,
+  updatemessageBoxStore,
+} from '../constants/action-types';
 
 const defaultState = {
   messageStore: {
@@ -23,6 +27,9 @@ const defaultState = {
     PageCount: 0,
     selectedPage: 0,
   },
+  messageBoxStore: {
+    message: '',
+  },
 };
 
 const messageStoreReducer = (state = defaultState, action) => {
@@ -38,6 +45,13 @@ const messageStoreReducer = (state = defaultState, action) => {
       return {
         ...state,
         messageListStore: { ...state.messageListStore, ...action.payload },
+        //   return Object.assign(state, action.payload);
+      };
+    }
+    case updatemessageBoxStore: {
+      return {
+        ...state,
+        messageBoxStore: { ...state.messageBoxStore, ...action.payload },
         //   return Object.assign(state, action.payload);
       };
     }

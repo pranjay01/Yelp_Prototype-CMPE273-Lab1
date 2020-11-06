@@ -24,6 +24,7 @@ export const updateCustomerForRestaurant = 'update-customer-for-restaurant';
 export const updateCustomerListStore = 'update-customer-list-store';
 export const updateMessageStore = 'update-message-store';
 export const updateMessageList = 'update-message-list';
+export const updatemessageBoxStore = 'update-message-box-store';
 export const SALADS = 'SALADS';
 export const APPETIZERS = 'APPETIZERS';
 export const MAIN_COURSE = 'MAIN_COURSE';

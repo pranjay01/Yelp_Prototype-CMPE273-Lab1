@@ -13,6 +13,7 @@ import {
   updateSnackbarData,
   updateCustomerForRestaurant,
   updateMessageStore,
+  updatemessageBoxStore,
 } from '../../../constants/action-types';
 import ReactPaginate from 'react-paginate';
 import MessageBodyModal from '../../CommonComponents/MessageBodyModal';
@@ -185,6 +186,10 @@ class ordersList extends Component {
 
   openMessageWindow = (event, customerID = null) => {
     event.preventDefault();
+    let msgpayload = {
+      message: '',
+    };
+    this.props.updatemessageBoxStore(msgpayload);
     if (this.props.messageStore.showMessageModal) {
       let payload = {
         Message: { MessageArray: [] },
@@ -265,6 +270,11 @@ class ordersList extends Component {
             Message: NewMessage,
           };
           this.props.updateMessageStore(payload);
+
+          let msgpayload = {
+            message: '',
+          };
+          this.props.updatemessageBoxStore(msgpayload);
         }
       },
       (error) => {
@@ -405,9 +415,14 @@ const mapDispatchToProps = (dispatch) => {
         payload,
       });
     },
+    updatemessageBoxStore: (payload) => {
+      dispatch({
+        type: updatemessageBoxStore,
+        payload,
+      });
+    },
   };
 };
-
 export default connect(mapStateToProps, mapDispatchToProps)(ordersList);
 
 // export default ordersList;

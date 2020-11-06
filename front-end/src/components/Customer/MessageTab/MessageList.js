@@ -2,8 +2,12 @@ import React, { Component } from 'react';
 import ReactPaginate from 'react-paginate';
 import axios from 'axios';
 import serverUrl from '../../../config';
-import { updateMessageList, updateMessageStore } from '../../../constants/action-types';
-import { updateOrderStore, updateLeftPannelHighlight } from '../../../constants/action-types';
+import {
+  updateMessageList,
+  updateMessageStore,
+  updateLeftPannelHighlight,
+  updatemessageBoxStore,
+} from '../../../constants/action-types';
 import { connect } from 'react-redux';
 import CustomerNavBar from '../CommonArea/CustomerNavBar';
 import GreyArea from '../CommonArea/GreyArea';
@@ -44,10 +48,10 @@ class MessageList extends Component {
   componentDidMount() {
     let payload = {
       profileIsActive: false,
-      eventsTabIsActive: true,
+      eventsTabIsActive: false,
       ordersTabIsActive: false,
       followingTabIsActive: false,
-      messageTabIsActive: false,
+      messageTabIsActive: true,
     };
     this.props.updateLeftPannelHighlight(payload);
     this.commonFetch();
@@ -59,6 +63,10 @@ class MessageList extends Component {
 
   openMessages = (event, CustomerId = null, RestaurantId = null) => {
     event.preventDefault();
+    let msgpayload = {
+      message: '',
+    };
+    this.props.updatemessageBoxStore(msgpayload);
     if (this.props.messageStore.showMessageModal) {
       let payload = {
         Message: { MessageArray: [] },
@@ -119,6 +127,10 @@ class MessageList extends Component {
             Message: NewMessage,
           };
           this.props.updateMessageStore(payload);
+          let msgpayload = {
+            message: '',
+          };
+          this.props.updatemessageBoxStore(msgpayload);
         }
       },
       (error) => {
@@ -235,6 +247,12 @@ const mapDispatchToProps = (dispatch) => {
     updateLeftPannelHighlight: (payload) => {
       dispatch({
         type: updateLeftPannelHighlight,
+        payload,
+      });
+    },
+    updatemessageBoxStore: (payload) => {
+      dispatch({
+        type: updatemessageBoxStore,
         payload,
       });
     },

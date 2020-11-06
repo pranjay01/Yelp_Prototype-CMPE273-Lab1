@@ -9,6 +9,7 @@ import {
   updateReviewList,
   updateCustomerForRestaurant,
   updateMessageStore,
+  updatemessageBoxStore,
 } from '../../../constants/action-types';
 import ReactPaginate from 'react-paginate';
 import MessageBodyModal from '../../CommonComponents/MessageBodyModal';
@@ -86,6 +87,10 @@ class ReviewList extends Component {
 
   openMessageWindow = (event, customerID = null) => {
     event.preventDefault();
+    let msgpayload = {
+      message: '',
+    };
+    this.props.updatemessageBoxStore(msgpayload);
     if (this.props.messageStore.showMessageModal) {
       let payload = {
         Message: { MessageArray: [] },
@@ -144,7 +149,7 @@ class ReviewList extends Component {
             SentFrom: this.props.restaurantHome.Name,
             SentTime: new Date(),
           };
-           let NewMessage = null;
+          let NewMessage = null;
           if (!this.props.messageStore.Message) {
             NewMessage = response.data;
           } else {
@@ -156,6 +161,10 @@ class ReviewList extends Component {
             Message: NewMessage,
           };
           this.props.updateMessageStore(payload);
+          let msgpayload = {
+            message: '',
+          };
+          this.props.updatemessageBoxStore(msgpayload);
         }
       },
       (error) => {
@@ -242,6 +251,12 @@ const mapDispatchToProps = (dispatch) => {
     updateMessageStore: (payload) => {
       dispatch({
         type: updateMessageStore,
+        payload,
+      });
+    },
+    updatemessageBoxStore: (payload) => {
+      dispatch({
+        type: updatemessageBoxStore,
         payload,
       });
     },

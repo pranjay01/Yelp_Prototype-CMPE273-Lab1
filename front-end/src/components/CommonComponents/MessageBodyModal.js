@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import MessageCard from './MessageCard';
+import { updatemessageBoxStore } from '../../../constants/action-types';
 
 class MessageBodyModal extends Component {
   constructor(props) {
@@ -8,9 +9,10 @@ class MessageBodyModal extends Component {
     this.state = { message: '' };
   }
   onChangeHandler = (event) => {
-    this.setState({
+    let payload = {
       message: event.target.value,
-    });
+    };
+    this.props.updatemessageBoxStore(payload);
   };
   render() {
     console.log('this.props.messageStore:', this.props.messageStore);
@@ -28,13 +30,15 @@ class MessageBodyModal extends Component {
           </span>
           <div>
             <textarea
-              value={this.state.message}
+              value={this.props.messageBoxStore.message}
               onChange={this.onChangeHandler}
               type="text"
             ></textarea>
           </div>
           <div>
-            <button onClick={(event) => this.props.sendMessage(event, this.state.message)}>
+            <button
+              onClick={(event) => this.props.sendMessage(event, this.props.messageBoxStore.message)}
+            >
               Send
             </button>
           </div>
@@ -58,10 +62,22 @@ class MessageBodyModal extends Component {
 
 // export default MessageBodyModal;
 const mapStateToProps = (state) => {
-  const { messageStore } = state.messageStoreReducer;
+  const { messageStore, messageBoxStore } = state.messageStoreReducer;
 
   return {
     messageStore,
+    messageBoxStore,
   };
 };
-export default connect(mapStateToProps, null)(MessageBodyModal);
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    updatemessageBoxStore: (payload) => {
+      dispatch({
+        type: updatemessageBoxStore,
+        payload,
+      });
+    },
+  };
+};
+export default connect(mapStateToProps, mapDispatchToProps)(MessageBodyModal);

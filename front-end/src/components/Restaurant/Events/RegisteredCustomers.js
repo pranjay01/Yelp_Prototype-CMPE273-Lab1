@@ -3,7 +3,11 @@ import axios from 'axios';
 import serverUrl from '../../../config';
 import CustomerStaticProfile from '../CommonComponent/CustomerStaticProfile';
 import { connect } from 'react-redux';
-import { updateCustomerForRestaurant, updateMessageStore } from '../../../constants/action-types';
+import {
+  updateCustomerForRestaurant,
+  updateMessageStore,
+  updatemessageBoxStore,
+} from '../../../constants/action-types';
 import ReactPaginate from 'react-paginate';
 
 import './RegisteredCustomers.css';
@@ -49,6 +53,10 @@ class RegisteredCustomers extends Component {
 
   openMessageWindow = (event, customerID = null) => {
     event.preventDefault();
+    let msgpayload = {
+      message: '',
+    };
+    this.props.updatemessageBoxStore(msgpayload);
     if (this.props.messageStore.showMessageModal) {
       let payload = {
         Message: { MessageArray: [] },
@@ -119,6 +127,10 @@ class RegisteredCustomers extends Component {
             Message: NewMessage,
           };
           this.props.updateMessageStore(payload);
+          let msgpayload = {
+            message: '',
+          };
+          this.props.updatemessageBoxStore(msgpayload);
         }
       },
       (error) => {
@@ -222,6 +234,12 @@ const mapDispatchToProps = (dispatch) => {
     updateMessageStore: (payload) => {
       dispatch({
         type: updateMessageStore,
+        payload,
+      });
+    },
+    updatemessageBoxStore: (payload) => {
+      dispatch({
+        type: updatemessageBoxStore,
         payload,
       });
     },
