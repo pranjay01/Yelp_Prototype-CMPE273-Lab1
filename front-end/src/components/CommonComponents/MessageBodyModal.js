@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import MessageCard from './MessageCard';
-import { updatemessageBoxStore } from '../../../constants/action-types';
+import { updatemessageBoxStore } from '../../constants/action-types';
 
 class MessageBodyModal extends Component {
   constructor(props) {
