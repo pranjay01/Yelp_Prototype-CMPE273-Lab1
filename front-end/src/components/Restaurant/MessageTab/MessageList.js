@@ -2,7 +2,11 @@ import React, { Component } from 'react';
 import ReactPaginate from 'react-paginate';
 import axios from 'axios';
 import serverUrl from '../../../config';
-import { updateMessageList, updateMessageStore } from '../../../constants/action-types';
+import {
+  updateMessageList,
+  updateMessageStore,
+  updatemessageBoxStore,
+} from '../../../constants/action-types';
 import { connect } from 'react-redux';
 import MessageCard from './MessageCard';
 import MessageBodyModal from '../../CommonComponents/MessageBodyModal';
@@ -48,6 +52,10 @@ class MessageList extends Component {
 
   openMessages = (event, CustomerId = null, RestaurantId = null) => {
     event.preventDefault();
+    let msgpayload = {
+      message: '',
+    };
+    this.props.updatemessageBoxStore(msgpayload);
     if (this.props.messageStore.showMessageModal) {
       let payload = {
         Message: { MessageArray: [] },
@@ -108,6 +116,10 @@ class MessageList extends Component {
             Message: NewMessage,
           };
           this.props.updateMessageStore(payload);
+          let msgpayload = {
+            message: '',
+          };
+          this.props.updatemessageBoxStore(msgpayload);
         }
       },
       (error) => {
@@ -187,6 +199,12 @@ const mapDispatchToProps = (dispatch) => {
     updateMessageStore: (payload) => {
       dispatch({
         type: updateMessageStore,
+        payload,
+      });
+    },
+    updatemessageBoxStore: (payload) => {
+      dispatch({
+        type: updatemessageBoxStore,
         payload,
       });
     },
