@@ -111,7 +111,7 @@ class MessageList extends Component {
             SentTime: new Date(),
           };
           const NewMessage = this.props.messageStore.Message;
-          NewMessage.MessageArray.push(msgInstance);
+          NewMessage.MessageArray.unshift(msgInstance);
           const payload = {
             Message: NewMessage,
           };
