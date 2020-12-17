@@ -13,7 +13,7 @@ const { getUserIdFromToken } = require('../common/loginLogout');
 const mysqlConnection = require('../mysqlConnection');
 
 const geo = geocoder({
-  key: 'AIzaSyBpI0r49yQH5FrrK6tsDHrbkYoBp8bWSXE',
+  key: '',
 });
 
 const { BUCKET_NAME } = process.env;
